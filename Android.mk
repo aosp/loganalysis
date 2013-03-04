@@ -23,7 +23,7 @@ LOCAL_JAVACFLAGS += -g -Xlint
 
 LOCAL_MODULE := loganalysis
 LOCAL_MODULE_TAGS := optional
-LOCAL_STATIC_JAVA_LIBRARIES := json-prebuilt junit
+LOCAL_STATIC_JAVA_LIBRARIES := guavalib json-prebuilt junit
 
 include $(BUILD_HOST_JAVA_LIBRARY)
 

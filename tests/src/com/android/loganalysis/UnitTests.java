@@ -51,6 +51,9 @@ import com.android.loganalysis.util.ArrayUtilTest;
 import com.android.loganalysis.util.LogPatternUtilTest;
 import com.android.loganalysis.util.LogTailUtilTest;
 import com.android.loganalysis.util.RegexTrieTest;
+import com.android.loganalysis.util.config.ArgsOptionParserTest;
+import com.android.loganalysis.util.config.OptionSetterTest;
+import com.android.loganalysis.util.config.OptionUpdateRuleTest;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -107,6 +110,11 @@ public class UnitTests extends TestSuite {
         addTestSuite(LogPatternUtilTest.class);
         addTestSuite(LogTailUtilTest.class);
         addTestSuite(RegexTrieTest.class);
+
+        // util.config
+        addTestSuite(ArgsOptionParserTest.class);
+        addTestSuite(OptionSetterTest.class);
+        addTestSuite(OptionUpdateRuleTest.class);
     }
 
     public static Test suite() {

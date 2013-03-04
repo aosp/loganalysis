@@ -2,8 +2,8 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/tradefederation"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/3"/>
+	<classpathentry exported="true" kind="var" path="TRADEFED_ROOT/out/host/common/obj/JAVA_LIBRARIES/guavalib_intermediates/javalib.jar" sourcepath="/TRADEFED_ROOT/external/guava/guava/src"/>
 	<classpathentry exported="true" kind="var" path="TRADEFED_ROOT/prebuilts/misc/common/json/json-prebuilt.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
