@@ -29,11 +29,13 @@ public class BugreportItem extends GenericItem {
     private static final String TIME = "TIME";
     private static final String MEM_INFO = "MEM_INFO";
     private static final String PROCRANK = "PROCRANK";
+    private static final String TOP = "TOP";
     private static final String SYSTEM_LOG = "SYSTEM_LOG";
     private static final String SYSTEM_PROPS = "SYSTEM_PROPS";
+    private static final String DUMPSYS = "DUMPSYS";
 
     private static final Set<String> ATTRIBUTES = new HashSet<String>(Arrays.asList(
-            TIME, MEM_INFO, PROCRANK, SYSTEM_LOG, SYSTEM_PROPS));
+            TIME, MEM_INFO, PROCRANK, TOP, SYSTEM_LOG, SYSTEM_PROPS, DUMPSYS));
 
     /**
      * The constructor for {@link BugreportItem}.
@@ -85,6 +87,20 @@ public class BugreportItem extends GenericItem {
     }
 
     /**
+     * Get the {@link TopItem} of the bugreport.
+     */
+    public TopItem getTop() {
+        return (TopItem) getAttribute(TOP);
+    }
+
+    /**
+     * Set the {@link TopItem} of the bugreport.
+     */
+    public void setTop(TopItem top) {
+        setAttribute(TOP, top);
+    }
+
+    /**
      * Get the {@link LogcatItem} of the bugreport.
      */
     public LogcatItem getSystemLog() {
@@ -110,5 +126,19 @@ public class BugreportItem extends GenericItem {
      */
     public void setSystemProps(SystemPropsItem systemProps) {
         setAttribute(SYSTEM_PROPS, systemProps);
+    }
+
+    /**
+     * Get the {@link DumpsysItem} of the bugreport.
+     */
+    public DumpsysItem getDumpsys() {
+        return (DumpsysItem) getAttribute(DUMPSYS);
+    }
+
+    /**
+     * Set the {@link DumpsysItem} of the bugreport.
+     */
+    public void setDumpsys(DumpsysItem dumpsys) {
+        setAttribute(DUMPSYS, dumpsys);
     }
 }

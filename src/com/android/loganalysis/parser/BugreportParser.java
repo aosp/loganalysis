@@ -17,12 +17,14 @@ package com.android.loganalysis.parser;
 
 import com.android.loganalysis.item.AnrItem;
 import com.android.loganalysis.item.BugreportItem;
+import com.android.loganalysis.item.DumpsysItem;
 import com.android.loganalysis.item.GenericLogcatItem;
 import com.android.loganalysis.item.IItem;
 import com.android.loganalysis.item.LogcatItem;
 import com.android.loganalysis.item.MemInfoItem;
 import com.android.loganalysis.item.ProcrankItem;
 import com.android.loganalysis.item.SystemPropsItem;
+import com.android.loganalysis.item.TopItem;
 import com.android.loganalysis.item.TracesItem;
 
 import java.io.BufferedReader;
@@ -42,10 +44,12 @@ import java.util.regex.Pattern;
 public class BugreportParser extends AbstractSectionParser {
     private static final String MEM_INFO_SECTION_REGEX = "------ MEMORY INFO .*";
     private static final String PROCRANK_SECTION_REGEX = "------ PROCRANK .*";
+    private static final String TOP_SECTION_REGEX = "------ CPU INFO .*";
     private static final String SYSTEM_PROP_SECTION_REGEX = "------ SYSTEM PROPERTIES .*";
     private static final String SYSTEM_LOG_SECTION_REGEX =
             "------ (SYSTEM|MAIN|MAIN AND SYSTEM) LOG .*";
     private static final String ANR_TRACES_SECTION_REGEX = "------ VM TRACES AT LAST ANR .*";
+    private static final String DUMPSYS_SECTION_REGEX = "------ DUMPSYS .*";
     private static final String NOOP_SECTION_REGEX = "------ .*";
 
     /**
@@ -113,9 +117,11 @@ public class BugreportParser extends AbstractSectionParser {
         });
         addSectionParser(new MemInfoParser(), MEM_INFO_SECTION_REGEX);
         addSectionParser(new ProcrankParser(), PROCRANK_SECTION_REGEX);
+        addSectionParser(new TopParser(), TOP_SECTION_REGEX);
         addSectionParser(new SystemPropsParser(), SYSTEM_PROP_SECTION_REGEX);
         addSectionParser(new TracesParser(), ANR_TRACES_SECTION_REGEX);
         addSectionParser(mLogcatParser, SYSTEM_LOG_SECTION_REGEX);
+        addSectionParser(new DumpsysParser(), DUMPSYS_SECTION_REGEX);
         addSectionParser(new NoopParser(), NOOP_SECTION_REGEX);
     }
 
@@ -130,8 +136,10 @@ public class BugreportParser extends AbstractSectionParser {
         if (mBugreport != null) {
             mBugreport.setMemInfo((MemInfoItem) getSection(MemInfoItem.TYPE));
             mBugreport.setProcrank((ProcrankItem) getSection(ProcrankItem.TYPE));
+            mBugreport.setTop((TopItem) getSection(TopItem.TYPE));
             mBugreport.setSystemLog((LogcatItem) getSection(LogcatItem.TYPE));
             mBugreport.setSystemProps((SystemPropsItem) getSection(SystemPropsItem.TYPE));
+            mBugreport.setDumpsys((DumpsysItem) getSection(DumpsysItem.TYPE));
 
             if (mBugreport.getSystemLog() != null && mBugreport.getProcrank() != null) {
                 for (IItem item : mBugreport.getSystemLog().getEvents()) {

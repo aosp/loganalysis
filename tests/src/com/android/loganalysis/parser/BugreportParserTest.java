@@ -101,6 +101,16 @@ public class BugreportParserTest extends TestCase {
                 "----- end 2887 -----",
                 "",
                 "------ SECTION ------",
+                "",
+                "------ DUMPSYS (dumpsys) ------",
+                "DUMP OF SERVICE batteryinfo:",
+                "Statistics since last unplugged:",
+                "  Kernel Wake lock \"PowerManagerService.WakeLocks\": 5m 10s 61ms (2 times) realtime",
+                "  Kernel Wake lock \"pm8921_eoc\": 9s 660ms (0 times) realtime",
+                "",
+                "  All partial wake locks:",
+                "  Wake lock #0 partialWakelock: 5m 9s 260ms (1 times) realtime",
+                "  Wake lock #1000 AlarmManager: 422ms (7 times) realtime",
                 "");
 
         BugreportItem bugreport = new BugreportParser().parse(lines);
@@ -122,6 +132,9 @@ public class BugreportParserTest extends TestCase {
 
         assertNotNull(bugreport.getSystemProps());
         assertEquals(4, bugreport.getSystemProps().size());
+
+        assertNotNull(bugreport.getDumpsys());
+        assertNotNull(bugreport.getDumpsys().getBatteryInfo());
     }
 
     /**
