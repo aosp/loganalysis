@@ -27,7 +27,7 @@ public class ProcrankItem implements IItem {
     public static final String TYPE = "PROCRANK";
 
     private class ProcrankValue {
-        public String mProcessName = null;
+        public String mProcessName;
         public int mVss;
         public int mRss;
         public int mPss;
