@@ -58,7 +58,26 @@ public class BugreportParser extends AbstractSectionParser {
     private static final Pattern DATE = Pattern.compile(
             "^== dumpstate: (\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2})$");
 
+    private IParser mBugreportParser = new IParser() {
+        @Override
+        public BugreportItem parse(List<String> lines) {
+            BugreportItem bugreport = new BugreportItem();
+            for (String line : lines) {
+                Matcher m = DATE.matcher(line);
+                if (m.matches()) {
+                    bugreport.setTime(parseTime(m.group(1)));
+                }
+            }
+            return bugreport;
+        }
+    };
+    private MemInfoParser mMemInfoParser = new MemInfoParser();
+    private ProcrankParser mProcrankParser = new ProcrankParser();
+    private TopParser mTopParser = new TopParser();
+    private SystemPropsParser mSystemPropsParser = new SystemPropsParser();
+    private TracesParser mTracesParser = new TracesParser();
     private LogcatParser mLogcatParser = new LogcatParser();
+    private DumpsysParser mDumpsysParser = new DumpsysParser();
     private BugreportItem mBugreport = null;
 
     /**
@@ -102,26 +121,14 @@ public class BugreportParser extends AbstractSectionParser {
      */
     protected void setup() {
         // Set the initial parser explicitly since the header isn't part of a section.
-        setParser(new IParser() {
-            @Override
-            public BugreportItem parse(List<String> lines) {
-                BugreportItem bugreport = new BugreportItem();
-                for (String line : lines) {
-                    Matcher m = DATE.matcher(line);
-                    if (m.matches()) {
-                        bugreport.setTime(parseTime(m.group(1)));
-                    }
-                }
-                return bugreport;
-            }
-        });
-        addSectionParser(new MemInfoParser(), MEM_INFO_SECTION_REGEX);
-        addSectionParser(new ProcrankParser(), PROCRANK_SECTION_REGEX);
-        addSectionParser(new TopParser(), TOP_SECTION_REGEX);
-        addSectionParser(new SystemPropsParser(), SYSTEM_PROP_SECTION_REGEX);
-        addSectionParser(new TracesParser(), ANR_TRACES_SECTION_REGEX);
+        setParser(mBugreportParser);
+        addSectionParser(mMemInfoParser, MEM_INFO_SECTION_REGEX);
+        addSectionParser(mProcrankParser, PROCRANK_SECTION_REGEX);
+        addSectionParser(mTopParser, TOP_SECTION_REGEX);
+        addSectionParser(mSystemPropsParser, SYSTEM_PROP_SECTION_REGEX);
+        addSectionParser(mTracesParser, ANR_TRACES_SECTION_REGEX);
         addSectionParser(mLogcatParser, SYSTEM_LOG_SECTION_REGEX);
-        addSectionParser(new DumpsysParser(), DUMPSYS_SECTION_REGEX);
+        addSectionParser(mDumpsysParser, DUMPSYS_SECTION_REGEX);
         addSectionParser(new NoopParser(), NOOP_SECTION_REGEX);
     }
 
@@ -134,12 +141,12 @@ public class BugreportParser extends AbstractSectionParser {
         super.commit();
 
         if (mBugreport != null) {
-            mBugreport.setMemInfo((MemInfoItem) getSection(MemInfoItem.TYPE));
-            mBugreport.setProcrank((ProcrankItem) getSection(ProcrankItem.TYPE));
-            mBugreport.setTop((TopItem) getSection(TopItem.TYPE));
-            mBugreport.setSystemLog((LogcatItem) getSection(LogcatItem.TYPE));
-            mBugreport.setSystemProps((SystemPropsItem) getSection(SystemPropsItem.TYPE));
-            mBugreport.setDumpsys((DumpsysItem) getSection(DumpsysItem.TYPE));
+            mBugreport.setMemInfo((MemInfoItem) getSection(mMemInfoParser));
+            mBugreport.setProcrank((ProcrankItem) getSection(mProcrankParser));
+            mBugreport.setTop((TopItem) getSection(mTopParser));
+            mBugreport.setSystemLog((LogcatItem) getSection(mLogcatParser));
+            mBugreport.setSystemProps((SystemPropsItem) getSection(mSystemPropsParser));
+            mBugreport.setDumpsys((DumpsysItem) getSection(mDumpsysParser));
 
             if (mBugreport.getSystemLog() != null && mBugreport.getProcrank() != null) {
                 for (IItem item : mBugreport.getSystemLog().getEvents()) {
@@ -152,7 +159,7 @@ public class BugreportParser extends AbstractSectionParser {
                 }
             }
 
-            TracesItem traces = (TracesItem) getSection(TracesItem.TYPE);
+            TracesItem traces = (TracesItem) getSection(mTracesParser);
             if (traces != null && traces.getApp() != null && traces.getStack() != null &&
                     mBugreport.getSystemLog() != null) {
                 addAnrTrace(mBugreport.getSystemLog().getAnrs(), traces.getApp(),
@@ -184,7 +191,7 @@ public class BugreportParser extends AbstractSectionParser {
     @Override
     protected void onSwitchParser() {
         if (mBugreport == null) {
-            mBugreport = (BugreportItem) getSection(BugreportItem.TYPE);
+            mBugreport = (BugreportItem) getSection(mBugreportParser);
             if (mBugreport.getTime() != null) {
                 mLogcatParser.setYear(new SimpleDateFormat("yyyy").format(mBugreport.getTime()));
             }

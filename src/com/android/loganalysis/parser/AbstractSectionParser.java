@@ -36,7 +36,7 @@ public abstract class AbstractSectionParser implements IParser {
     private RegexTrie<IParser> mSectionTrie = new RegexTrie<IParser>();
     private IParser mCurrentParser = new NoopParser();
     private List<String> mParseBlock = new LinkedList<String>();
-    private Map<String, IItem> mSections = new HashMap<String, IItem>();
+    private Map<IParser, IItem> mSections = new HashMap<IParser, IItem>();
 
     /**
      * A method to add a given section parser to the set of potential parsers to use.
@@ -89,11 +89,11 @@ public abstract class AbstractSectionParser implements IParser {
     /**
      * Gets the {@link IItem} for a given section.
      *
-     * @param section The {@link IItem} type for the section.
+     * @param parser The {@link IParser} type for the section.
      * @return The {@link IItem}.
      */
-    protected IItem getSection(String section) {
-        return mSections.get(section);
+    protected IItem getSection(IParser parser) {
+        return mSections.get(parser);
     }
 
     /**
@@ -115,7 +115,7 @@ public abstract class AbstractSectionParser implements IParser {
         if (mCurrentParser != null) {
             IItem item = mCurrentParser.parse(mParseBlock);
             if (item != null && !(mCurrentParser instanceof NoopParser)) {
-                mSections.put(item.getType(), item);
+                mSections.put(mCurrentParser, item);
                 // CLog.v("Just ran the %s parser", mCurrentParser.getClass().getSimpleName());
             }
         }

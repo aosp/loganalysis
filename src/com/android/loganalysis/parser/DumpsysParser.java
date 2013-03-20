@@ -27,6 +27,7 @@ public class DumpsysParser extends AbstractSectionParser {
     private static final String BATTERY_INFO_SECTION_REGEX = "DUMP OF SERVICE batteryinfo:";
     private static final String NOOP_SECTION_REGEX = "DUMP OF SERVICE .*";
 
+    private DumpsysBatteryInfoParser mBatteryInfoParser = new DumpsysBatteryInfoParser();
     private DumpsysItem mDumpsys = new DumpsysItem();
 
     /**
@@ -48,7 +49,7 @@ public class DumpsysParser extends AbstractSectionParser {
      * Sets up the parser by adding the section parsers.
      */
     protected void setup() {
-        addSectionParser(new DumpsysBatteryInfoParser(), BATTERY_INFO_SECTION_REGEX);
+        addSectionParser(mBatteryInfoParser, BATTERY_INFO_SECTION_REGEX);
         addSectionParser(new NoopParser(), NOOP_SECTION_REGEX);
     }
 
@@ -62,7 +63,7 @@ public class DumpsysParser extends AbstractSectionParser {
 
         if (mDumpsys != null) {
             mDumpsys.setBatteryInfo(
-                    (DumpsysBatteryInfoItem) getSection(DumpsysBatteryInfoItem.TYPE));
+                    (DumpsysBatteryInfoItem) getSection(mBatteryInfoParser));
         }
     }
 }
