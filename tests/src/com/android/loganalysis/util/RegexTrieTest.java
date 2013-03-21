@@ -38,10 +38,6 @@ public class RegexTrieTest extends TestCase {
         mTrie = new RegexTrie<Integer>();
     }
 
-    private void dumpTrie(RegexTrie trie) {
-        System.err.format("Trie is '%s'\n", trie.toString());
-    }
-
     public void testStringPattern() {
         mTrie.put(STORED_VAL, "[p]art1", "[p]art2", "[p]art3");
         Integer retrieved = mTrie.retrieve("part1", "part2", "part3");
@@ -212,7 +208,6 @@ public class RegexTrieTest extends TestCase {
     public void testMultiChild() {
         mTrie.put(STORED_VAL + 1, "a", "b");
         mTrie.put(STORED_VAL + 2, "a", "c");
-        dumpTrie(mTrie);
 
         Object retrieved;
         retrieved = mTrie.retrieve("a", "b");
