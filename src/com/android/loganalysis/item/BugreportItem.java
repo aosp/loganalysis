@@ -30,12 +30,15 @@ public class BugreportItem extends GenericItem {
     private static final String MEM_INFO = "MEM_INFO";
     private static final String PROCRANK = "PROCRANK";
     private static final String TOP = "TOP";
+    private static final String KERNEL_LOG = "KERNEL_LOG";
+    private static final String LAST_KMSG = "LAST_KMSG";
     private static final String SYSTEM_LOG = "SYSTEM_LOG";
     private static final String SYSTEM_PROPS = "SYSTEM_PROPS";
     private static final String DUMPSYS = "DUMPSYS";
 
     private static final Set<String> ATTRIBUTES = new HashSet<String>(Arrays.asList(
-            TIME, MEM_INFO, PROCRANK, TOP, SYSTEM_LOG, SYSTEM_PROPS, DUMPSYS));
+            TIME, MEM_INFO, PROCRANK, TOP, KERNEL_LOG, LAST_KMSG, SYSTEM_LOG, SYSTEM_PROPS,
+            DUMPSYS));
 
     /**
      * The constructor for {@link BugreportItem}.
@@ -98,6 +101,34 @@ public class BugreportItem extends GenericItem {
      */
     public void setTop(TopItem top) {
         setAttribute(TOP, top);
+    }
+
+    /**
+     * Get the kernel log {@link KernelLogItem} of the bugreport.
+     */
+    public KernelLogItem getKernelLog() {
+        return (KernelLogItem) getAttribute(KERNEL_LOG);
+    }
+
+    /**
+     * Set the kernel log {@link KernelLogItem} of the bugreport.
+     */
+    public void setKernelLog(KernelLogItem systemLog) {
+        setAttribute(KERNEL_LOG, systemLog);
+    }
+
+    /**
+     * Get the last kmsg {@link KernelLogItem} of the bugreport.
+     */
+    public KernelLogItem getLastKmsg() {
+        return (KernelLogItem) getAttribute(LAST_KMSG);
+    }
+
+    /**
+     * Set the last kmsg {@link KernelLogItem} of the bugreport.
+     */
+    public void setLastKmsg(KernelLogItem systemLog) {
+        setAttribute(LAST_KMSG, systemLog);
     }
 
     /**

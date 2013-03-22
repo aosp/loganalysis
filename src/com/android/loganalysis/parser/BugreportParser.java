@@ -20,6 +20,7 @@ import com.android.loganalysis.item.BugreportItem;
 import com.android.loganalysis.item.DumpsysItem;
 import com.android.loganalysis.item.GenericLogcatItem;
 import com.android.loganalysis.item.IItem;
+import com.android.loganalysis.item.KernelLogItem;
 import com.android.loganalysis.item.LogcatItem;
 import com.android.loganalysis.item.MemInfoItem;
 import com.android.loganalysis.item.ProcrankItem;
@@ -44,6 +45,8 @@ import java.util.regex.Pattern;
 public class BugreportParser extends AbstractSectionParser {
     private static final String MEM_INFO_SECTION_REGEX = "------ MEMORY INFO .*";
     private static final String PROCRANK_SECTION_REGEX = "------ PROCRANK .*";
+    private static final String KERNEL_LOG_SECTION_REGEX = "------ KERNEL LOG .*";
+    private static final String LAST_KMSG_SECTION_REGEX = "------ LAST KMSG .*";
     private static final String TOP_SECTION_REGEX = "------ CPU INFO .*";
     private static final String SYSTEM_PROP_SECTION_REGEX = "------ SYSTEM PROPERTIES .*";
     private static final String SYSTEM_LOG_SECTION_REGEX =
@@ -76,6 +79,8 @@ public class BugreportParser extends AbstractSectionParser {
     private TopParser mTopParser = new TopParser();
     private SystemPropsParser mSystemPropsParser = new SystemPropsParser();
     private TracesParser mTracesParser = new TracesParser();
+    private KernelLogParser mKernelLogParser = new KernelLogParser();
+    private KernelLogParser mLastKmsgParser = new KernelLogParser();
     private LogcatParser mLogcatParser = new LogcatParser();
     private DumpsysParser mDumpsysParser = new DumpsysParser();
     private BugreportItem mBugreport = null;
@@ -128,6 +133,8 @@ public class BugreportParser extends AbstractSectionParser {
         addSectionParser(mSystemPropsParser, SYSTEM_PROP_SECTION_REGEX);
         addSectionParser(mTracesParser, ANR_TRACES_SECTION_REGEX);
         addSectionParser(mLogcatParser, SYSTEM_LOG_SECTION_REGEX);
+        addSectionParser(mKernelLogParser, KERNEL_LOG_SECTION_REGEX);
+        addSectionParser(mLastKmsgParser, LAST_KMSG_SECTION_REGEX);
         addSectionParser(mDumpsysParser, DUMPSYS_SECTION_REGEX);
         addSectionParser(new NoopParser(), NOOP_SECTION_REGEX);
     }
@@ -145,6 +152,8 @@ public class BugreportParser extends AbstractSectionParser {
             mBugreport.setProcrank((ProcrankItem) getSection(mProcrankParser));
             mBugreport.setTop((TopItem) getSection(mTopParser));
             mBugreport.setSystemLog((LogcatItem) getSection(mLogcatParser));
+            mBugreport.setKernelLog((KernelLogItem) getSection(mKernelLogParser));
+            mBugreport.setLastKmsg((KernelLogItem) getSection(mLastKmsgParser));
             mBugreport.setSystemProps((SystemPropsItem) getSection(mSystemPropsParser));
             mBugreport.setDumpsys((DumpsysItem) getSection(mDumpsysParser));
 

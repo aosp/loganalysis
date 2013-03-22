@@ -49,6 +49,11 @@ public class BugreportParserTest extends TestCase {
                 "Cached:            86204 kB",
                 "SwapCached:            0 kB",
                 "",
+                "------ CPU INFO (top -n 1 -d 1 -m 30 -t) ------",
+                "",
+                "User 3%, System 3%, IOW 0%, IRQ 0%",
+                "User 33 + Nice 0 + Sys 32 + Idle 929 + IOW 0 + IRQ 0 + SIRQ 0 = 994",
+                "",
                 "------ PROCRANK (procrank) ------",
                 "  PID      Vss      Rss      Pss      Uss  cmdline",
                 "  178   87136K   81684K   52829K   50012K  system_server",
@@ -58,6 +63,11 @@ public class BugreportParserTest extends TestCase {
                 "                          203624K  163604K  TOTAL",
                 "RAM: 731448K total, 415804K free, 9016K buffers, 108548K cached",
                 "[procrank: 1.6s elapsed]",
+                "",
+                "------ KERNEL LOG (dmesg) ------",
+                "<6>[    0.000000] Initializing cgroup subsys cpu",
+                "<3>[    1.000000] benign message",
+                "",
                 "",
                 "------ SYSTEM LOG (logcat -v threadtime -d *:v) ------",
                 "04-25 09:55:47.799  3064  3082 E AndroidRuntime: java.lang.Exception",
@@ -78,6 +88,10 @@ public class BugreportParserTest extends TestCase {
                 "[dalvik.vm.heapgrowthlimit]: [48m]",
                 "[dalvik.vm.heapsize]: [256m]",
                 "[gsm.version.ril-impl]: [android moto-ril-multimode 1.0]",
+                "",
+                "------ LAST KMSG (/proc/last_kmsg) ------",
+                "[    0.000000] Initializing cgroup subsys cpu",
+                "[   16.203491] benight message",
                 "",
                 "------ SECTION ------",
                 "",
@@ -120,8 +134,14 @@ public class BugreportParserTest extends TestCase {
         assertNotNull(bugreport.getMemInfo());
         assertEquals(5, bugreport.getMemInfo().size());
 
+        assertNotNull(bugreport.getTop());
+        assertEquals(994, bugreport.getTop().getTotal());
+
         assertNotNull(bugreport.getProcrank());
         assertEquals(3, bugreport.getProcrank().getPids().size());
+
+        assertNotNull(bugreport.getKernelLog());
+        assertEquals(1.0, bugreport.getKernelLog().getStopTime(), 0.000005);
 
         assertNotNull(bugreport.getSystemLog());
         assertEquals(parseTime("2012-04-25 09:55:47.799"), bugreport.getSystemLog().getStartTime());
@@ -129,6 +149,9 @@ public class BugreportParserTest extends TestCase {
         assertEquals(3, bugreport.getSystemLog().getEvents().size());
         assertEquals(1, bugreport.getSystemLog().getAnrs().size());
         assertNotNull(bugreport.getSystemLog().getAnrs().get(0).getTrace());
+
+        assertNotNull(bugreport.getLastKmsg());
+        assertEquals(16.203491, bugreport.getLastKmsg().getStopTime(), 0.000005);
 
         assertNotNull(bugreport.getSystemProps());
         assertEquals(4, bugreport.getSystemProps().size());
