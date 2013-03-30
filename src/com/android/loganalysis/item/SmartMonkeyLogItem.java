@@ -53,11 +53,13 @@ public class SmartMonkeyLogItem extends GenericItem {
     private static final String FINAL_COUNT = "FINAL_COUNT";
     private static final String ANR_TIMES = "ANR_TIMES";
     private static final String CRASH_TIMES = "CRASH_TIMES";
+    private static final String INTERMEDIATE_TIME = "INTERMEDIATE_TIME";
 
     private static final Set<String> ATTRIBUTES = new HashSet<String>(Arrays.asList(
             START_TIME, STOP_TIME, PACKAGES, THROTTLE, TARGET_INVOCATIONS, ABORTED,
             TOTAL_DURATION, START_UPTIME_DURATION, STOP_UPTIME_DURATION, APPLICATIONS,
-            IS_FINISHED, INTERMEDIATE_COUNT, FINAL_COUNT, ANR_TIMES, CRASH_TIMES));
+            IS_FINISHED, INTERMEDIATE_COUNT, FINAL_COUNT, ANR_TIMES, CRASH_TIMES,
+            INTERMEDIATE_TIME));
 
     /**
      * The constructor for {@link MonkeyLogItem}.
@@ -90,6 +92,20 @@ public class SmartMonkeyLogItem extends GenericItem {
      */
     public void setStartTime(Date time) {
         setAttribute(START_TIME, time);
+    }
+
+    /**
+     * Set the last time reported for a monkey event
+     */
+    public void setIntermediateTime(Date time) {
+        setAttribute(INTERMEDIATE_TIME, time);
+    }
+
+    /**
+     * Get the last time reported for a monkey event
+     */
+    public Date getIntermediateTime() {
+        return (Date) getAttribute(INTERMEDIATE_TIME);
     }
 
     /**
@@ -170,7 +186,11 @@ public class SmartMonkeyLogItem extends GenericItem {
      * Get the total duration of the monkey run in milliseconds.
      */
     public long getTotalDuration() {
-        return (Long) getAttribute(TOTAL_DURATION);
+        if (getIsFinished())
+            return (Long) getAttribute(TOTAL_DURATION);
+        Date startTime = getStartTime();
+        Date endTime = getIntermediateTime();
+        return endTime.getTime() - startTime.getTime() / 1000;
     }
 
     /**
@@ -248,7 +268,9 @@ public class SmartMonkeyLogItem extends GenericItem {
      * Get the final count for the monkey run.
      */
     public int getFinalCount() {
-        return (Integer) getAttribute(FINAL_COUNT);
+        if (getIsFinished())
+            return (Integer) getAttribute(FINAL_COUNT);
+        return getIntermediateCount();
     }
 
     /**

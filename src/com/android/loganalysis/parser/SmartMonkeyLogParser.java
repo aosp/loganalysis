@@ -54,6 +54,8 @@ public class SmartMonkeyLogParser implements IParser {
     private static final Pattern INTERMEDIATE_COUNT = Pattern.compile(
             TIME_STAMP_GROUP + INVOKE_NUM_GROUP + SEQ_NUM_GROUP + ".*");
 
+    private static final Pattern INTERMEDIATE_TIME = Pattern.compile(TIME_STAMP_GROUP);
+
     private static final Pattern FINISHED = Pattern.compile(
             TIME_STAMP_GROUP + "Monkey finished");
 
@@ -100,6 +102,12 @@ public class SmartMonkeyLogParser implements IParser {
         for (String line : lines) {
             parseLine(line);
         }
+
+        if (mSmartMonkeyLog.getStopUptimeDuration() == 0)
+            mSmartMonkeyLog.setIsFinished(false);
+        else
+            mSmartMonkeyLog.setIsFinished(true);
+
         return mSmartMonkeyLog;
     }
 
@@ -147,6 +155,10 @@ public class SmartMonkeyLogParser implements IParser {
             mSmartMonkeyLog.setStopTime(parseTime(m.group(1)));
             mSmartMonkeyLog.setStopUptimeDuration(Long.parseLong(m.group(2)));
             mSmartMonkeyLog.setTotalDuration(Long.parseLong(m.group(3)));
+        }
+        m = INTERMEDIATE_TIME.matcher(line);
+        if (m.matches()) {
+            mSmartMonkeyLog.setIntermediateTime(parseTime(m.group(1)));
         }
         m = FINAL_COUNT.matcher(line);
         if (m.matches()) {
