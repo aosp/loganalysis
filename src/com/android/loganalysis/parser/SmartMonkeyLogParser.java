@@ -54,7 +54,7 @@ public class SmartMonkeyLogParser implements IParser {
     private static final Pattern INTERMEDIATE_COUNT = Pattern.compile(
             TIME_STAMP_GROUP + INVOKE_NUM_GROUP + SEQ_NUM_GROUP + ".*");
 
-    private static final Pattern INTERMEDIATE_TIME = Pattern.compile(TIME_STAMP_GROUP);
+    private static final Pattern INTERMEDIATE_TIME = Pattern.compile(TIME_STAMP_GROUP + ".*");
 
     private static final Pattern FINISHED = Pattern.compile(
             TIME_STAMP_GROUP + "Monkey finished");
