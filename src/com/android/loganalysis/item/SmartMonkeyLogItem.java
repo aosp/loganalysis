@@ -71,6 +71,7 @@ public class SmartMonkeyLogItem extends GenericItem {
         setAttribute(PACKAGES, new ArrayList<String>());
         setAttribute(CRASH_TIMES, new DateSet());
         setAttribute(ANR_TIMES, new DateSet());
+        setAttribute(INTERMEDIATE_TIME, new DateSet());
         setAttribute(THROTTLE, 0);
         setAttribute(FINAL_COUNT, 0);
         setAttribute(IS_FINISHED, false);
