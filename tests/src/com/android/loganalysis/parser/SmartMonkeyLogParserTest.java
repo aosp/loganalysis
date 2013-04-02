@@ -112,6 +112,8 @@ public class SmartMonkeyLogParserTest extends TestCase {
         SmartMonkeyLogItem monkeyLog = new SmartMonkeyLogParser().parse(lines);
         assertNotNull(monkeyLog);
         assertEquals(12, monkeyLog.getIntermediateCount());
+        assertEquals(SmartMonkeyLogParser.parseTime("2013-03-04 12:33:39.510"),
+                monkeyLog.getIntermediateTime());
     }
 
     /**
