@@ -69,14 +69,16 @@ public class MonkeyLogParser implements IParser {
 
     private static final Pattern ANR = Pattern.compile(
             "// NOT RESPONDING: (\\S+) \\(pid (\\d+)\\)");
-    private static final Pattern JAVA_CRASH = Pattern.compile(
+    private static final Pattern CRASH = Pattern.compile(
             "// CRASH: (\\S+) \\(pid (\\d+)\\)");
 
     private static final Pattern TRACES_START = Pattern.compile("anr traces:");
     private static final Pattern TRACES_STOP = Pattern.compile("// anr traces status was \\d+");
 
     private boolean mMatchingAnr = false;
+    private boolean mMatchingCrash = false;
     private boolean mMatchingJavaCrash = false;
+    private boolean mMatchingNativeCrash = false;
     private boolean mMatchingTraces = false;
     private List<String> mBlock = null;
     private String mApp = null;
@@ -120,32 +122,37 @@ public class MonkeyLogParser implements IParser {
     private void parseLine(String line) {
         Matcher m;
 
-        if (mMatchingAnr || mMatchingJavaCrash) {
-            if (mMatchingJavaCrash) {
-                line = line.replace("// ", "");
-            }
+        if (mMatchingAnr) {
             if ("".equals(line)) {
-                GenericLogcatItem crash;
-                if (mMatchingAnr) {
-                    crash = new AnrParser().parse(mBlock);
-                } else {
-                    crash = new JavaCrashParser().parse(mBlock);
-                }
-                if (crash != null) {
-                    crash.setPid(mPid);
-                    crash.setApp(mApp);
-                    mMonkeyLog.setCrash(crash);
-                }
-
-                mMatchingAnr = false;
-                mMatchingJavaCrash = false;
-                mBlock = null;
-                mApp = null;
-                mPid = 0;
+                AnrItem crash = new AnrParser().parse(mBlock);
+                addCrashAndReset(crash);
             } else {
                 mBlock.add(line);
+                return;
             }
-            return;
+        }
+
+        if (mMatchingCrash) {
+            if (!mMatchingJavaCrash && !mMatchingNativeCrash && line.startsWith("// Short Msg: ")) {
+                if (line.contains("Native crash")) {
+                    mMatchingNativeCrash = true;
+                } else {
+                    mMatchingJavaCrash = true;
+                }
+            }
+            if (line.startsWith("// ")) {
+                line = line.replace("// ", "");
+                mBlock.add(line);
+                return;
+            } else {
+                GenericLogcatItem crash = null;
+                if (mMatchingJavaCrash) {
+                    crash = new JavaCrashParser().parse(mBlock);
+                } else if (mMatchingNativeCrash) {
+                    crash = new NativeCrashParser().parse(mBlock);
+                }
+                addCrashAndReset(crash);
+            }
         }
 
         if (mMatchingTraces) {
@@ -243,18 +250,37 @@ public class MonkeyLogParser implements IParser {
             mBlock = new LinkedList<String>();
             mMatchingAnr = true;
         }
-        m = JAVA_CRASH.matcher(line);
+        m = CRASH.matcher(line);
         if (m.matches()) {
             mApp = m.group(1);
             mPid = Integer.parseInt(m.group(2));
             mBlock = new LinkedList<String>();
-            mMatchingJavaCrash = true;
+            mMatchingCrash = true;
         }
         m = TRACES_START.matcher(line);
         if (m.matches()) {
             mBlock = new LinkedList<String>();
             mMatchingTraces = true;
         }
+    }
+
+    /**
+     * Add a crash to the monkey log item and reset the parser state for crashes.
+     */
+    private void addCrashAndReset(GenericLogcatItem crash) {
+        if (crash != null) {
+            crash.setPid(mPid);
+            crash.setApp(mApp);
+            mMonkeyLog.setCrash(crash);
+        }
+
+        mMatchingAnr = false;
+        mMatchingCrash = false;
+        mMatchingJavaCrash = false;
+        mMatchingNativeCrash = false;
+        mBlock = null;
+        mApp = null;
+        mPid = 0;
     }
 
     /**
