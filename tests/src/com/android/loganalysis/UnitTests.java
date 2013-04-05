@@ -32,6 +32,7 @@ import com.android.loganalysis.parser.SystemPropsParserTest;
 import com.android.loganalysis.parser.TopParserTest;
 import com.android.loganalysis.parser.TracesParserTest;
 import com.android.loganalysis.util.ArrayUtilTest;
+import com.android.loganalysis.util.LogTailUtilTest;
 import com.android.loganalysis.util.RegexTrieTest;
 
 import junit.framework.Test;
@@ -68,6 +69,7 @@ public class UnitTests extends TestSuite {
 
         // util
         addTestSuite(ArrayUtilTest.class);
+        addTestSuite(LogTailUtilTest.class);
         addTestSuite(RegexTrieTest.class);
     }
 
