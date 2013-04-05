@@ -187,8 +187,9 @@ public class SmartMonkeyLogItem extends GenericItem {
      * Get the total duration of the monkey run in milliseconds.
      */
     public long getTotalDuration() {
-        if (getIsFinished())
+        if (getIsFinished() || getIsAborted())
             return (Long) getAttribute(TOTAL_DURATION);
+        // else it crashed
         Date startTime = getStartTime();
         Date endTime = getIntermediateTime();
         return endTime.getTime() - startTime.getTime() / 1000;
@@ -312,7 +313,7 @@ public class SmartMonkeyLogItem extends GenericItem {
     /**
      * Get the status of no sequences abort
      */
-    public boolean getAborted() {
+    public boolean getIsAborted() {
         return (Boolean) getAttribute(ABORTED);
     }
 
@@ -320,7 +321,7 @@ public class SmartMonkeyLogItem extends GenericItem {
      * Set the status of no sequences abort
      * @param noSeq
      */
-    public void setAborted(boolean noSeq) {
+    public void setIsAborted(boolean noSeq) {
         setAttribute(ABORTED, noSeq);
     }
 }

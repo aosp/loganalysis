@@ -37,7 +37,7 @@ public class SmartMonkeyLogParser implements IParser {
     private static final String SEQ_NUM_GROUP = "\\(Seq:.*?(\\d+)\\)";
 
     private static final Pattern START_TIME = Pattern.compile(
-            TIME_STAMP_GROUP + "Starting \\[.*\\]");
+            TIME_STAMP_GROUP + "Starting.*");
 
     private static final Pattern START_UPTIME = Pattern.compile(
             TIME_STAMP_GROUP + "Device uptime: (\\d+) sec$");
@@ -170,7 +170,7 @@ public class SmartMonkeyLogParser implements IParser {
         }
         m = ABORTED.matcher(line);
         if (m.matches()) {
-            mSmartMonkeyLog.setAborted(true);
+            mSmartMonkeyLog.setIsAborted(true);
         }
         m = UI_CRASH.matcher(line);
         if (m.matches()) {

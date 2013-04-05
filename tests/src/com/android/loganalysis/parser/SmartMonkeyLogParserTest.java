@@ -142,6 +142,6 @@ public class SmartMonkeyLogParserTest extends TestCase {
         assertEquals(999, monkeyLog.getFinalCount());
         assertEquals(20, monkeyLog.getTotalDuration());
         assertEquals(608193, monkeyLog.getStopUptimeDuration());
-        assertEquals(true, monkeyLog.getAborted());
+        assertEquals(true, monkeyLog.getIsAborted());
     }
 }
