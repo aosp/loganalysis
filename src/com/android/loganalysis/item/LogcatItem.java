@@ -128,4 +128,18 @@ public class LogcatItem extends GenericItem {
         }
         return ncs;
     }
+
+    /**
+     * Get the list of all {@link MiscLogcatItem} events for a cateogry.
+     */
+    public List<MiscLogcatItem> getMiscEvents(String category) {
+        List<MiscLogcatItem> items = new LinkedList<MiscLogcatItem>();
+        for (IItem item : getEvents()) {
+            if (item instanceof MiscLogcatItem &&
+                    ((MiscLogcatItem) item).getCategory().equals(category)) {
+                items.add((MiscLogcatItem) item);
+            }
+        }
+        return items;
+    }
 }

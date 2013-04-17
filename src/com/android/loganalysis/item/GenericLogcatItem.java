@@ -102,28 +102,28 @@ public abstract class GenericLogcatItem extends GenericItem {
     }
 
     /**
-     * Get the last preamble for of the event.
+     * Get the last preamble for the event.
      */
     public String getLastPreamble() {
         return (String) getAttribute(LAST_PREAMBLE);
     }
 
     /**
-     * Set the last preamble for of the event.
+     * Set the last preamble for the event.
      */
     public void setLastPreamble(String preamble) {
         setAttribute(LAST_PREAMBLE, preamble);
     }
 
     /**
-     * Get the process preamble for of the event.
+     * Get the process preamble for the event.
      */
     public String getProcessPreamble() {
         return (String) getAttribute(PROC_PREAMBLE);
     }
 
     /**
-     * Set the process preamble for of the event.
+     * Set the process preamble for the event.
      */
     public void setProcessPreamble(String preamble) {
         setAttribute(PROC_PREAMBLE, preamble);

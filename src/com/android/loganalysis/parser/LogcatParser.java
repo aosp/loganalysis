@@ -17,7 +17,10 @@ package com.android.loganalysis.parser;
 
 import com.android.loganalysis.item.GenericLogcatItem;
 import com.android.loganalysis.item.LogcatItem;
+import com.android.loganalysis.item.MiscLogcatItem;
 import com.android.loganalysis.util.ArrayUtil;
+import com.android.loganalysis.util.LogPatternUtil;
+import com.android.loganalysis.util.LogTailUtil;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -28,7 +31,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -43,6 +45,9 @@ import java.util.regex.Pattern;
  * </p>
  */
 public class LogcatParser implements IParser {
+    public static final String HIGH_CPU_USAGE = "HIGH_CPU_USAGE";
+    public static final String HIGH_MEMORY_USAGE = "HIGH_MEMORY_USAGE";
+    public static final String RUNTIME_RESTART = "RUNTIME_RESTART";
 
     /**
      * Match a single line of `logcat -v threadtime`, such as:
@@ -86,11 +91,9 @@ public class LogcatParser implements IParser {
         }
     }
 
-    private static final int MAX_BUFF_SIZE = 500;
-    private static final int MAX_LAST_PREAMBLE_SIZE = 15;
-    private static final int MAX_PROC_PREAMBLE_SIZE = 15;
+    private LogPatternUtil mPatternUtil = new LogPatternUtil();
+    private LogTailUtil mPreambleUtil = new LogTailUtil();
 
-    private LinkedList<String> mRingBuffer = new LinkedList<String>();
     private String mYear = null;
 
     LogcatItem mLogcat = new LogcatItem();
@@ -105,6 +108,7 @@ public class LogcatParser implements IParser {
      * Constructor for {@link LogcatParser}.
      */
     public LogcatParser() {
+        initPatterns();
     }
 
     /**
@@ -113,6 +117,7 @@ public class LogcatParser implements IParser {
      * @param year The year as a string.
      */
     public LogcatParser(String year) {
+        this();
         setYear(year);
     }
 
@@ -201,8 +206,8 @@ public class LogcatParser implements IParser {
             String key = encodeLine(pid, tid, level, tag);
             LogcatData data;
             if (!mDataMap.containsKey(key) || AnrParser.START.matcher(msg).matches()) {
-                data = new LogcatData(pid, tid, time, level, tag, getLastPreamble(),
-                        getProcPreamble(pid));
+                data = new LogcatData(pid, tid, time, level, tag, mPreambleUtil.getLastTail(),
+                        mPreambleUtil.getIdTail(pid));
                 mDataMap.put(key, data);
                 mDataList.add(data);
             } else {
@@ -217,8 +222,8 @@ public class LogcatParser implements IParser {
             String key = encodeLine(pid, tid, level, tag);
             LogcatData data;
             if (!mDataMap.containsKey(key)) {
-                data = new LogcatData(pid, tid, time, level, tag, getLastPreamble(),
-                        getProcPreamble(pid));
+                data = new LogcatData(pid, tid, time, level, tag, mPreambleUtil.getLastTail(),
+                        mPreambleUtil.getIdTail(pid));
                 mDataMap.put(key, data);
                 mDataList.add(data);
             } else {
@@ -227,11 +232,16 @@ public class LogcatParser implements IParser {
             data.mLines.add(msg);
         }
 
-        // After parsing the line, add it the the buffer for the preambles.
-        mRingBuffer.add(line);
-        if (mRingBuffer.size() > MAX_BUFF_SIZE) {
-            mRingBuffer.removeFirst();
+        // Check the message here but add it in commit()
+        if (mPatternUtil.checkMessage(msg) != null) {
+            LogcatData data = new LogcatData(pid, tid, time, level, tag,
+                    mPreambleUtil.getLastTail(), mPreambleUtil.getIdTail(pid));
+            data.mLines.add(msg);
+            mDataList.add(data);
         }
+
+        // After parsing the line, add it the the buffer for the preambles.
+        mPreambleUtil.addLine(pid, line);
     }
 
     /**
@@ -249,6 +259,15 @@ public class LogcatParser implements IParser {
             } else if ("I".equals(data.mLevel) && "DEBUG".equals(data.mTag)) {
                 // CLog.v("Parsing native crash: %s", data.mLines);
                 item = new NativeCrashParser().parse(data.mLines);
+            } else {
+                String msg = ArrayUtil.join("\n", data.mLines);
+                String category = mPatternUtil.checkMessage(msg);
+                if (category != null) {
+                    MiscLogcatItem logcatItem = new MiscLogcatItem();
+                    logcatItem.setCategory(category);
+                    logcatItem.setMessage(msg);
+                    item = logcatItem;
+                }
             }
             if (item != null) {
                 item.setEventTime(data.mTime);
@@ -298,55 +317,17 @@ public class LogcatParser implements IParser {
         }
     }
 
-    /**
-     * Get the last {@value #MAX_LAST_PREAMBLE_SIZE} lines of logcat.
-     */
-    private String getLastPreamble() {
-        final int size = mRingBuffer.size();
-        List<String> preamble;
-        if (size > getLastPreambleSize()) {
-            preamble = mRingBuffer.subList(size - getLastPreambleSize(), size);
-        } else {
-            preamble = mRingBuffer;
-        }
-        return ArrayUtil.join("\n", preamble).trim();
-    }
+    private void initPatterns() {
+        // High CPU usage
+        mPatternUtil.addPattern(Pattern.compile(".* timed out \\(is the CPU pegged\\?\\).*"),
+                HIGH_CPU_USAGE);
 
-    /**
-     * Get the last {@value #MAX_PROC_PREAMBLE_SIZE} lines of logcat which match the given pid.
-     */
-    private String getProcPreamble(int pid) {
-        LinkedList<String> preamble = new LinkedList<String>();
+        // High memory usage
+        mPatternUtil.addPattern(Pattern.compile(
+                "GetBufferLock timed out for thread \\d+ buffer .*"), HIGH_MEMORY_USAGE);
 
-        ListIterator<String> li = mRingBuffer.listIterator(mRingBuffer.size());
-        while (li.hasPrevious()) {
-            String line = li.previous();
-
-            Matcher m = THREADTIME_LINE.matcher(line);
-            Matcher tm = TIME_LINE.matcher(line);
-            if ((m.matches() && pid == Integer.parseInt(m.group(2))) ||
-                    (tm.matches() && pid == Integer.parseInt(tm.group(4)))) {
-                preamble.addFirst(line);
-            }
-
-            if (preamble.size() == getProcPreambleSize()) {
-                return ArrayUtil.join("\n", preamble).trim();
-            }
-        }
-        return ArrayUtil.join("\n", preamble).trim();
-    }
-
-    /**
-     * Get the number of lines in the last preamble. Exposed for unit testing.
-     */
-    int getLastPreambleSize() {
-        return MAX_LAST_PREAMBLE_SIZE;
-    }
-
-    /**
-     * Get the number of lines in the process preamble. Exposed for unit testing.
-     */
-    int getProcPreambleSize() {
-        return MAX_PROC_PREAMBLE_SIZE;
+        // Runtime restarts
+        mPatternUtil.addPattern(Pattern.compile("\\*\\*\\* WATCHDOG KILLING SYSTEM PROCESS.*"),
+                RUNTIME_RESTART);
     }
 }

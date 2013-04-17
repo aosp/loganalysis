@@ -16,6 +16,7 @@
 package com.android.loganalysis.parser;
 
 import com.android.loganalysis.item.LogcatItem;
+import com.android.loganalysis.item.MiscLogcatItem;
 import com.android.loganalysis.util.ArrayUtil;
 
 import junit.framework.TestCase;
@@ -101,6 +102,40 @@ public class LogcatParserTest extends TestCase {
         assertEquals("", logcat.getNativeCrashes().get(0).getProcessPreamble());
         assertEquals(parseTime("2012-04-25 18:33:27.273"),
                 logcat.getNativeCrashes().get(0).getEventTime());
+    }
+
+    public void testParse_misc_events() throws ParseException {
+        List<String> lines = Arrays.asList(
+                "04-25 18:33:27.273  1676  1821 W AudioTrack: obtainBuffer timed out (is the CPU pegged?) 0x361378 user=0000116a, server=00000000",
+                "04-25 18:33:28.273  7813  7813 E gralloc : GetBufferLock timed out for thread 7813 buffer 0x61 usage 0x200 LockState 1",
+                "04-25 18:33:29.273   395   637 W Watchdog: *** WATCHDOG KILLING SYSTEM PROCESS: null");
+
+        LogcatItem logcat = new LogcatParser("2012").parse(lines);
+        assertNotNull(logcat);
+        assertEquals(parseTime("2012-04-25 18:33:27.273"), logcat.getStartTime());
+        assertEquals(parseTime("2012-04-25 18:33:29.273"), logcat.getStopTime());
+        assertEquals(3, logcat.getEvents().size());
+        assertEquals(1, logcat.getMiscEvents(LogcatParser.HIGH_CPU_USAGE).size());
+        assertEquals(1, logcat.getMiscEvents(LogcatParser.HIGH_MEMORY_USAGE).size());
+        assertEquals(1, logcat.getMiscEvents(LogcatParser.RUNTIME_RESTART).size());
+
+        MiscLogcatItem item = logcat.getMiscEvents(LogcatParser.HIGH_CPU_USAGE).get(0);
+
+        assertEquals(1676, item.getPid().intValue());
+        assertEquals(1821, item.getTid().intValue());
+        assertEquals(parseTime("2012-04-25 18:33:27.273"), item.getEventTime());
+
+        item = logcat.getMiscEvents(LogcatParser.HIGH_MEMORY_USAGE).get(0);
+
+        assertEquals(7813, item.getPid().intValue());
+        assertEquals(7813, item.getTid().intValue());
+        assertEquals(parseTime("2012-04-25 18:33:28.273"), item.getEventTime());
+
+        item = logcat.getMiscEvents(LogcatParser.RUNTIME_RESTART).get(0);
+
+        assertEquals(395, item.getPid().intValue());
+        assertEquals(637, item.getTid().intValue());
+        assertEquals(parseTime("2012-04-25 18:33:29.273"), item.getEventTime());
     }
 
     /**
@@ -225,9 +260,9 @@ public class LogcatParserTest extends TestCase {
     }
 
     /**
-     * Test that the preambles are set correctly if there's only partial preambles.
+     * Test that the preambles are set correctly.
      */
-    public void testParse_partial_preambles() throws ParseException {
+    public void testParse_preambles() throws ParseException {
         List<String> lines = Arrays.asList(
                 "04-25 09:15:47.799   123  3082 I tag: message 1",
                 "04-25 09:20:47.799  3064  3082 I tag: message 2",
@@ -261,61 +296,6 @@ public class LogcatParserTest extends TestCase {
         LogcatItem logcat = new LogcatParser("2012").parse(lines);
         assertNotNull(logcat);
         assertEquals(parseTime("2012-04-25 09:15:47.799"), logcat.getStartTime());
-        assertEquals(parseTime("2012-04-25 09:55:47.799"), logcat.getStopTime());
-        assertEquals(1, logcat.getEvents().size());
-        assertEquals(1, logcat.getJavaCrashes().size());
-        assertEquals(3064, logcat.getJavaCrashes().get(0).getPid().intValue());
-        assertEquals(3082, logcat.getJavaCrashes().get(0).getTid().intValue());
-        assertEquals(ArrayUtil.join("\n", expectedLastPreamble),
-                logcat.getJavaCrashes().get(0).getLastPreamble());
-        assertEquals(ArrayUtil.join("\n", expectedProcPreamble),
-                logcat.getJavaCrashes().get(0).getProcessPreamble());
-        assertEquals(parseTime("2012-04-25 09:55:47.799"),
-                logcat.getJavaCrashes().get(0).getEventTime());
-    }
-
-    /**
-     * Test that the preambles are set correctly if there's only full preambles.
-     */
-    public void testParse_preambles() throws ParseException {
-        List<String> lines = Arrays.asList(
-                "04-25 09:43:47.799  3064  3082 I tag: message 1",
-                "04-25 09:44:47.799   123  3082 I tag: message 2",
-                "04-25 09:45:47.799  3064  3082 I tag: message 3",
-                "04-25 09:46:47.799   234  3082 I tag: message 4",
-                "04-25 09:47:47.799  3064  3082 I tag: message 5",
-                "04-25 09:48:47.799   345  3082 I tag: message 6",
-                "04-25 09:49:47.799  3064  3082 I tag: message 7",
-                "04-25 09:50:47.799   456  3082 I tag: message 8",
-                "04-25 09:55:47.799  3064  3082 E AndroidRuntime: java.lang.Exception",
-                "04-25 09:55:47.799  3064  3082 E AndroidRuntime: \tat class.method1(Class.java:1)",
-                "04-25 09:55:47.799  3064  3082 E AndroidRuntime: \tat class.method2(Class.java:2)",
-                "04-25 09:55:47.799  3064  3082 E AndroidRuntime: \tat class.method3(Class.java:3)");
-
-        List<String> expectedLastPreamble = Arrays.asList(
-                "04-25 09:48:47.799   345  3082 I tag: message 6",
-                "04-25 09:49:47.799  3064  3082 I tag: message 7",
-                "04-25 09:50:47.799   456  3082 I tag: message 8");
-
-        List<String> expectedProcPreamble = Arrays.asList(
-                "04-25 09:45:47.799  3064  3082 I tag: message 3",
-                "04-25 09:47:47.799  3064  3082 I tag: message 5",
-                "04-25 09:49:47.799  3064  3082 I tag: message 7");
-
-        LogcatItem logcat = new LogcatParser("2012") {
-            @Override
-            int getLastPreambleSize() {
-                return 3;
-            }
-
-            @Override
-            int getProcPreambleSize() {
-                return 3;
-            }
-        }.parse(lines);
-
-        assertNotNull(logcat);
-        assertEquals(parseTime("2012-04-25 09:43:47.799"), logcat.getStartTime());
         assertEquals(parseTime("2012-04-25 09:55:47.799"), logcat.getStopTime());
         assertEquals(1, logcat.getEvents().size());
         assertEquals(1, logcat.getJavaCrashes().size());
