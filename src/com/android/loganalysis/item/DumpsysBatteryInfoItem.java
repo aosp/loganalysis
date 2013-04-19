@@ -129,14 +129,14 @@ public class DumpsysBatteryInfoItem implements IItem {
     /**
      * Get the list of kernel wake locks from the last unplugged section of the battery info.
      */
-    public List<WakeLock> getLastUnpluggedKernelWakeLock() {
+    public List<WakeLock> getLastUnpluggedKernelWakeLocks() {
         return mLastUnpluggedKernelWakeLocks;
     }
 
     /**
      * Get the list of wake locks from the last unplugged section of the battery info.
      */
-    public List<WakeLock> getLastUnpluggedWakeLock() {
+    public List<WakeLock> getLastUnpluggedWakeLocks() {
         return mLastUnpluggedWakeLocks;
     }
 

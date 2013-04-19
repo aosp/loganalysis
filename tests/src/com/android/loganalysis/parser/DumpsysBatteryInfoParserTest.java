@@ -96,13 +96,13 @@ public class DumpsysBatteryInfoParserTest extends TestCase {
         DumpsysBatteryInfoParser parser = new DumpsysBatteryInfoParser();
         DumpsysBatteryInfoItem item = parser.parse(inputBlock);
 
-        assertEquals(5, item.getLastUnpluggedWakeLock().size());
-        assertEquals(3, item.getLastUnpluggedKernelWakeLock().size());
+        assertEquals(5, item.getLastUnpluggedWakeLocks().size());
+        assertEquals(3, item.getLastUnpluggedKernelWakeLocks().size());
 
         assertEquals("partialWakelock",
-                item.getLastUnpluggedWakeLock().get(0).getName());
+                item.getLastUnpluggedWakeLocks().get(0).getName());
         assertEquals("PowerManagerService.WakeLocks",
-                item.getLastUnpluggedKernelWakeLock().get(0).getName());
+                item.getLastUnpluggedKernelWakeLocks().get(0).getName());
     }
 
     /**
@@ -115,8 +115,8 @@ public class DumpsysBatteryInfoParserTest extends TestCase {
         parser.parseLastUnpluggedKernelWakeLock(inputLine);
         DumpsysBatteryInfoItem item = parser.getItem();
 
-        assertEquals(1, item.getLastUnpluggedKernelWakeLock().size());
-        WakeLock wakeLock = item.getLastUnpluggedKernelWakeLock().get(0);
+        assertEquals(1, item.getLastUnpluggedKernelWakeLocks().size());
+        WakeLock wakeLock = item.getLastUnpluggedKernelWakeLocks().get(0);
         assertEquals("Process", wakeLock.getName());
         assertNull(wakeLock.getNumber());
         assertEquals(DumpsysBatteryInfoParser.getMs(1, 2, 3, 4, 5), wakeLock.getHeldTime());
@@ -128,8 +128,8 @@ public class DumpsysBatteryInfoParserTest extends TestCase {
         parser.parseLastUnpluggedKernelWakeLock(inputLine);
         item = parser.getItem();
 
-        assertEquals(1, item.getLastUnpluggedKernelWakeLock().size());
-        wakeLock = item.getLastUnpluggedKernelWakeLock().get(0);
+        assertEquals(1, item.getLastUnpluggedKernelWakeLocks().size());
+        wakeLock = item.getLastUnpluggedKernelWakeLocks().get(0);
         assertEquals("Process", wakeLock.getName());
         assertNull(wakeLock.getNumber());
         assertEquals(5 * 60 * 1000 + 7, wakeLock.getHeldTime());
@@ -146,8 +146,8 @@ public class DumpsysBatteryInfoParserTest extends TestCase {
         parser.parseLastUnpluggedWakeLock(inputLine);
         DumpsysBatteryInfoItem item = parser.getItem();
 
-        assertEquals(1, item.getLastUnpluggedWakeLock().size());
-        WakeLock wakeLock = item.getLastUnpluggedWakeLock().get(0);
+        assertEquals(1, item.getLastUnpluggedWakeLocks().size());
+        WakeLock wakeLock = item.getLastUnpluggedWakeLocks().get(0);
         assertEquals("Process", wakeLock.getName());
         assertEquals((Integer) 1234, wakeLock.getNumber());
         assertEquals(DumpsysBatteryInfoParser.getMs(1, 2, 3, 4, 5), wakeLock.getHeldTime());
@@ -159,8 +159,8 @@ public class DumpsysBatteryInfoParserTest extends TestCase {
         parser.parseLastUnpluggedWakeLock(inputLine);
         item = parser.getItem();
 
-        assertEquals(1, item.getLastUnpluggedWakeLock().size());
-        wakeLock = item.getLastUnpluggedWakeLock().get(0);
+        assertEquals(1, item.getLastUnpluggedWakeLocks().size());
+        wakeLock = item.getLastUnpluggedWakeLocks().get(0);
         assertEquals("Process:with:colons", wakeLock.getName());
         assertEquals((Integer) 1234, wakeLock.getNumber());
         assertEquals(5 * 60 * 1000 + 7, wakeLock.getHeldTime());

@@ -165,8 +165,8 @@ public class DumpsysBatteryInfoParser implements IParser {
      * Parses a string into a long, or returns 0 if the string is null.
      *
      * @param s a {@link String} containing the long representation to be parsed
-     * @return the long represented by the argument in decimal, or 0 if the string is {@link null}.
-     * @throws NumberFormatException if the string is not {@link null} or does not contain a
+     * @return the long represented by the argument in decimal, or 0 if the string is {@code null}.
+     * @throws NumberFormatException if the string is not {@code null} or does not contain a
      * parsable long.
      */
     private long parseLongOrZero(String s) {

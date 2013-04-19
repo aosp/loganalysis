@@ -52,7 +52,7 @@ public class DumpsysParserTest extends TestCase {
         DumpsysItem item = parser.parse(inputBlock);
 
         assertNotNull(item.getBatteryInfo());
-        assertEquals(2, item.getBatteryInfo().getLastUnpluggedWakeLock().size());
-        assertEquals(2, item.getBatteryInfo().getLastUnpluggedKernelWakeLock().size());
+        assertEquals(2, item.getBatteryInfo().getLastUnpluggedWakeLocks().size());
+        assertEquals(2, item.getBatteryInfo().getLastUnpluggedKernelWakeLocks().size());
     }
 }
