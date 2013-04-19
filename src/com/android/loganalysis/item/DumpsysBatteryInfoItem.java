@@ -15,23 +15,42 @@
  */
 package com.android.loganalysis.item;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * An {@link IItem} used to store the battery info part of the dumpsys output.
  */
 public class DumpsysBatteryInfoItem implements IItem {
-    public static final String TYPE = "DUMPSYS_BATTERY_INFO";
+
+    /** Constant for JSON output */
+    public static final String WAKELOCKS = "WAKELOCKS";
+    /** Constant for JSON output */
+    public static final String KERNEL_WAKELOCKS = "KERNEL_WAKELOCKS";
 
     /**
      * A class designed to store information related to wake locks and kernel wake locks.
      */
-    public class WakeLock {
-        private String mName;
-        private Integer mNumber;
-        private long mHeldTime;
-        private int mLockedCount;
+    public static class WakeLock extends GenericItem {
+
+        /** Constant for JSON output */
+        public static final String NAME = "NAME";
+        /** Constant for JSON output */
+        public static final String NUMBER = "NUMBER";
+        /** Constant for JSON output */
+        public static final String HELD_TIME = "HELD_TIME";
+        /** Constant for JSON output */
+        public static final String LOCKED_COUNT = "LOCKED_COUNT";
+
+        private static final Set<String> ATTRIBUTES = new HashSet<String>(Arrays.asList(
+                NAME, NUMBER, HELD_TIME, LOCKED_COUNT));
 
         /**
          * The constructor for {@link WakeLock}
@@ -53,38 +72,40 @@ public class DumpsysBatteryInfoItem implements IItem {
          * @param lockedCount The number of times the wake lock was locked
          */
         public WakeLock(String name, Integer number, long heldTime, int lockedCount) {
-            mName = name;
-            mNumber = number;
-            mHeldTime = heldTime;
-            mLockedCount = lockedCount;
+            super(ATTRIBUTES);
+
+            setAttribute(NAME, name);
+            setAttribute(NUMBER, number);
+            setAttribute(HELD_TIME, heldTime);
+            setAttribute(LOCKED_COUNT, lockedCount);
         }
 
         /**
          * Get the name of the wake lock.
          */
         public String getName() {
-            return mName;
+            return (String) getAttribute(NAME);
         }
 
         /**
          * Get the number of the wake lock.
          */
         public Integer getNumber() {
-            return mNumber;
+            return (Integer) getAttribute(NUMBER);
         }
 
         /**
          * Get the time the wake lock was held in milliseconds.
          */
         public long getHeldTime() {
-            return mHeldTime;
+            return (Long) getAttribute(HELD_TIME);
         }
 
         /**
          * Get the number of times the wake lock was locked.
          */
         public int getLockedCount() {
-            return mLockedCount;
+            return (Integer) getAttribute(LOCKED_COUNT);
         }
     }
 
@@ -123,14 +144,6 @@ public class DumpsysBatteryInfoItem implements IItem {
      * {@inheritDoc}
      */
     @Override
-    public String getType() {
-        return TYPE;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public IItem merge(IItem other) throws ConflictingItemException {
         throw new ConflictingItemException("Dumpsys battery info items cannot be merged");
     }
@@ -143,4 +156,27 @@ public class DumpsysBatteryInfoItem implements IItem {
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public JSONObject toJson() {
+        JSONObject object = new JSONObject();
+        try {
+            JSONArray kernelWakeLocks = new JSONArray();
+            for (WakeLock wakeLock : mLastUnpluggedKernelWakeLocks) {
+                kernelWakeLocks.put(wakeLock.toJson());
+            }
+            object.put(KERNEL_WAKELOCKS, kernelWakeLocks);
+
+            JSONArray wakeLocks = new JSONArray();
+            for (WakeLock wakeLock : mLastUnpluggedWakeLocks) {
+                wakeLocks.put(wakeLock.toJson());
+            }
+            object.put(WAKELOCKS, wakeLocks);
+        } catch (JSONException e) {
+            // Ignore
+        }
+        return object;
+    }
 }

@@ -18,12 +18,5 @@ package com.android.loganalysis.item;
 /**
  * An {@link IItem} used to store the memory info output.
  */
-public class MemInfoItem extends GenericMapItem<String, Integer> {
-    private static final long serialVersionUID = 2648395553885243585L;
-
-    public static final String TYPE = "MEMORY INFO";
-
-    public MemInfoItem() {
-        super(TYPE);
-    }
-}
+@SuppressWarnings("serial")
+public class MemInfoItem extends GenericMapItem<Integer> {}

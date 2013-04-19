@@ -16,7 +16,11 @@
 
 package com.android.loganalysis;
 
+import com.android.loganalysis.item.DumpsysBatteryInfoItemTest;
 import com.android.loganalysis.item.GenericItemTest;
+import com.android.loganalysis.item.MonkeyLogItemTest;
+import com.android.loganalysis.item.ProcrankItemTest;
+import com.android.loganalysis.item.SmartMonkeyLogItemTest;
 import com.android.loganalysis.parser.AbstractSectionParserTest;
 import com.android.loganalysis.parser.AnrParserTest;
 import com.android.loganalysis.parser.BugreportParserTest;
@@ -51,7 +55,11 @@ public class UnitTests extends TestSuite {
         super();
 
         // item
+        addTestSuite(DumpsysBatteryInfoItemTest.class);
         addTestSuite(GenericItemTest.class);
+        addTestSuite(MonkeyLogItemTest.class);
+        addTestSuite(ProcrankItemTest.class);
+        addTestSuite(SmartMonkeyLogItemTest.class);
 
         // parser
         addTestSuite(AbstractSectionParserTest.class);

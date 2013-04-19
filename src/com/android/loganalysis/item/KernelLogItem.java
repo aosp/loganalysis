@@ -25,11 +25,13 @@ import java.util.Set;
  * A {@link IItem} used to store kernel log info.
  */
 public class KernelLogItem extends GenericItem {
-    private static final String TYPE = "KERNEL LOG";
 
-    private static final String START_TIME = "START_TIME";
-    private static final String STOP_TIME = "STOP_TIME";
-    private static final String EVENTS = "EVENTS";
+    /** Constant for JSON output */
+    public static final String START_TIME = "START_TIME";
+    /** Constant for JSON output */
+    public static final String STOP_TIME = "STOP_TIME";
+    /** Constant for JSON output */
+    public static final String EVENTS = "EVENTS";
 
     private static final Set<String> ATTRIBUTES = new HashSet<String>(Arrays.asList(
             START_TIME, STOP_TIME, EVENTS));
@@ -42,7 +44,7 @@ public class KernelLogItem extends GenericItem {
      * The constructor for {@link KernelLogItem}.
      */
     public KernelLogItem() {
-        super(TYPE, ATTRIBUTES);
+        super(ATTRIBUTES);
 
         setAttribute(EVENTS, new ItemList());
     }

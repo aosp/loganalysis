@@ -23,16 +23,23 @@ import java.util.Set;
  * An {@link IItem} used to store the output of the top command.
  */
 public class TopItem extends GenericItem {
-    public static final String TYPE = "TOP";
 
-    private static final String USER = "USER";
-    private static final String NICE = "NICE";
-    private static final String SYSTEM = "SYSTEM";
-    private static final String IDLE = "IDLE";
-    private static final String IOW = "IOW";
-    private static final String IRQ = "IRQ";
-    private static final String SIRQ = "SIRQ";
-    private static final String TOTAL = "TOTAL";
+    /** Constant for JSON output */
+    public static final String USER = "USER";
+    /** Constant for JSON output */
+    public static final String NICE = "NICE";
+    /** Constant for JSON output */
+    public static final String SYSTEM = "SYSTEM";
+    /** Constant for JSON output */
+    public static final String IDLE = "IDLE";
+    /** Constant for JSON output */
+    public static final String IOW = "IOW";
+    /** Constant for JSON output */
+    public static final String IRQ = "IRQ";
+    /** Constant for JSON output */
+    public static final String SIRQ = "SIRQ";
+    /** Constant for JSON output */
+    public static final String TOTAL = "TOTAL";
 
     private static final Set<String> ATTRIBUTES = new HashSet<String>(Arrays.asList(
             USER, NICE, SYSTEM, IDLE, IOW, IRQ, SIRQ, TOTAL));
@@ -41,7 +48,7 @@ public class TopItem extends GenericItem {
      * The constructor for {@link TopItem}.
      */
     public TopItem() {
-        super(TYPE, ATTRIBUTES);
+        super(ATTRIBUTES);
 
         for (String attribute : ATTRIBUTES) {
             setAttribute(attribute, 0);

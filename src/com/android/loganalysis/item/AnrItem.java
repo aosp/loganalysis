@@ -23,8 +23,6 @@ import java.util.Set;
  * An {@link IItem} used to store ANR info.
  */
 public class AnrItem extends GenericLogcatItem {
-    public static final String TYPE = "ANR";
-
     /**
      * An enum used to select the CPU usage category.
      */
@@ -44,10 +42,14 @@ public class AnrItem extends GenericLogcatItem {
         LOAD_15;
     }
 
-    private static final String ACTIVITY = "ACTIVITY";
-    private static final String REASON = "REASON";
-    private static final String STACK = "STACK";
-    private static final String TRACE = "TRACE";
+    /** Constant for JSON output */
+    public static final String ACTIVITY = "ACTIVITY";
+    /** Constant for JSON output */
+    public static final String REASON = "REASON";
+    /** Constant for JSON output */
+    public static final String STACK = "STACK";
+    /** Constant for JSON output */
+    public static final String TRACE = "TRACE";
 
     private static final Set<String> ATTRIBUTES = new HashSet<String>(Arrays.asList(
         CpuUsageCategory.TOTAL.toString(),
@@ -63,7 +65,7 @@ public class AnrItem extends GenericLogcatItem {
      * The constructor for {@link AnrItem}.
      */
     public AnrItem() {
-        super(TYPE, ATTRIBUTES);
+        super(ATTRIBUTES);
     }
 
     /**

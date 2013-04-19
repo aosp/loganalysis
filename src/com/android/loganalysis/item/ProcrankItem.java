@@ -15,8 +15,13 @@
  */
 package com.android.loganalysis.item;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 
@@ -25,6 +30,21 @@ import java.util.Set;
  */
 public class ProcrankItem implements IItem {
     public static final String TYPE = "PROCRANK";
+
+    /** Constant for JSON output */
+    public static final String LINES = "LINES";
+    /** Constant for JSON output */
+    public static final String PID = "PID";
+    /** Constant for JSON output */
+    public static final String PROCESS_NAME = "PROCESS_NAME";
+    /** Constant for JSON output */
+    public static final String VSS = "VSS";
+    /** Constant for JSON output */
+    public static final String RSS = "RSS";
+    /** Constant for JSON output */
+    public static final String PSS = "PSS";
+    /** Constant for JSON output */
+    public static final String USS = "USS";
 
     private class ProcrankValue {
         public String mProcessName;
@@ -124,14 +144,6 @@ public class ProcrankItem implements IItem {
      * {@inheritDoc}
      */
     @Override
-    public String getType() {
-        return TYPE;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public IItem merge(IItem other) throws ConflictingItemException {
         throw new ConflictingItemException("Procrank items cannot be merged");
     }
@@ -142,5 +154,31 @@ public class ProcrankItem implements IItem {
     @Override
     public boolean isConsistent(IItem other) {
         return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public JSONObject toJson() {
+        JSONObject object = new JSONObject();
+        JSONArray lines = new JSONArray();
+        try {
+            for (Entry<Integer, ProcrankValue> entry : mProcrankLines.entrySet()) {
+                final ProcrankValue procrankValue = entry.getValue();
+                JSONObject line = new JSONObject();
+                line.put(PID, entry.getKey());
+                line.put(PROCESS_NAME, procrankValue.mProcessName);
+                line.put(VSS, procrankValue.mVss);
+                line.put(RSS, procrankValue.mRss);
+                line.put(PSS, procrankValue.mPss);
+                line.put(USS, procrankValue.mUss);
+                lines.put(line);
+            }
+            object.put(LINES, lines);
+        } catch (JSONException e) {
+            // Ignore
+        }
+        return object;
     }
 }

@@ -23,8 +23,8 @@ import java.util.Set;
  * An {@link IItem} used to store the output of the dumpsys section of the bugreport.
  */
 public class DumpsysItem extends GenericItem {
-    public static final String TYPE = "DUMPSYS";
 
+    /** Constant for JSON output */
     private static final String BATTERY_INFO = "BATTERY_INFO";
 
     private static final Set<String> ATTRIBUTES = new HashSet<String>(Arrays.asList(BATTERY_INFO));
@@ -33,7 +33,7 @@ public class DumpsysItem extends GenericItem {
      * The constructor for {@link BugreportItem}.
      */
     public DumpsysItem() {
-        super(TYPE, ATTRIBUTES);
+        super(ATTRIBUTES);
     }
 
     /**

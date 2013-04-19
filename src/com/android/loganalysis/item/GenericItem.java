@@ -15,6 +15,9 @@
  */
 package com.android.loganalysis.item;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -26,29 +29,18 @@ import java.util.Set;
 public class GenericItem implements IItem {
     private Map<String, Object> mAttributes = new HashMap<String, Object>();
     private Set<String> mAllowedAttributes;
-    private String mType = null;
 
-    protected GenericItem(String type, Set<String> allowedAttributes) {
+    protected GenericItem(Set<String> allowedAttributes) {
         mAllowedAttributes = new HashSet<String>();
         mAllowedAttributes.addAll(allowedAttributes);
-        mType = type;
     }
 
-    protected GenericItem(String type, Set<String> allowedAttributes,
-            Map<String, Object> attributes) {
-        this(type, allowedAttributes);
+    protected GenericItem(Set<String> allowedAttributes, Map<String, Object> attributes) {
+        this(allowedAttributes);
 
         for (Map.Entry<String, Object> entry : attributes.entrySet()) {
             setAttribute(entry.getKey(), entry.getValue());
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getType() {
-        return mType;
     }
 
     /**
@@ -63,7 +55,7 @@ public class GenericItem implements IItem {
             throw new ConflictingItemException("Conflicting class types");
         }
 
-        return new GenericItem(getType(), mAllowedAttributes, mergeAttributes(other));
+        return new GenericItem(mAllowedAttributes, mergeAttributes(other));
     }
 
     /**
@@ -133,6 +125,34 @@ public class GenericItem implements IItem {
             }
         }
         return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * This method will only return a JSON object with attributes that the JSON library knows how to
+     * encode, along with attributes which implement the {@link IItem} interface.  If objects are
+     * stored in this class that fall outside this category, they must be encoded outside of this
+     * method.
+     * </p>
+     */
+    @Override
+    public JSONObject toJson() {
+        JSONObject object = new JSONObject();
+        for (Map.Entry<String, Object> entry : mAttributes.entrySet()) {
+            final String key = entry.getKey();
+            final Object attribute = entry.getValue();
+            try {
+                if (attribute != null && attribute instanceof IItem) {
+                    object.put(key, ((IItem) attribute).toJson());
+                } else {
+                    object.put(key, attribute);
+                }
+            } catch (JSONException e) {
+                // Ignore
+            }
+        }
+        return object;
     }
 
     /**

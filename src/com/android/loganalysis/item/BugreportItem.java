@@ -24,17 +24,25 @@ import java.util.Set;
  * An {@link IItem} used to store Bugreport info.
  */
 public class BugreportItem extends GenericItem {
-    public static final String TYPE = "BUGREPORT";
 
-    private static final String TIME = "TIME";
-    private static final String MEM_INFO = "MEM_INFO";
-    private static final String PROCRANK = "PROCRANK";
-    private static final String TOP = "TOP";
-    private static final String KERNEL_LOG = "KERNEL_LOG";
-    private static final String LAST_KMSG = "LAST_KMSG";
-    private static final String SYSTEM_LOG = "SYSTEM_LOG";
-    private static final String SYSTEM_PROPS = "SYSTEM_PROPS";
-    private static final String DUMPSYS = "DUMPSYS";
+    /** Constant for JSON output */
+    public static final String TIME = "TIME";
+    /** Constant for JSON output */
+    public static final String MEM_INFO = "MEM_INFO";
+    /** Constant for JSON output */
+    public static final String PROCRANK = "PROCRANK";
+    /** Constant for JSON output */
+    public static final String TOP = "TOP";
+    /** Constant for JSON output */
+    public static final String KERNEL_LOG = "KERNEL_LOG";
+    /** Constant for JSON output */
+    public static final String LAST_KMSG = "LAST_KMSG";
+    /** Constant for JSON output */
+    public static final String SYSTEM_LOG = "SYSTEM_LOG";
+    /** Constant for JSON output */
+    public static final String SYSTEM_PROPS = "SYSTEM_PROPS";
+    /** Constant for JSON output */
+    public static final String DUMPSYS = "DUMPSYS";
 
     private static final Set<String> ATTRIBUTES = new HashSet<String>(Arrays.asList(
             TIME, MEM_INFO, PROCRANK, TOP, KERNEL_LOG, LAST_KMSG, SYSTEM_LOG, SYSTEM_PROPS,
@@ -44,7 +52,7 @@ public class BugreportItem extends GenericItem {
      * The constructor for {@link BugreportItem}.
      */
     public BugreportItem() {
-        super(TYPE, ATTRIBUTES);
+        super(ATTRIBUTES);
     }
 
     /**

@@ -25,24 +25,30 @@ import java.util.Set;
  * items such as {@link AnrItem} and {@link JavaCrashItem}.
  */
 public abstract class GenericLogcatItem extends GenericItem {
-    private static final String EVENT_TIME = "EVENT_TIME";
-    private static final String PID = "PID";
-    private static final String TID = "TID";
-    private static final String APP = "APP";
-    private static final String LAST_PREAMBLE = "LAST_PREAMBLE";
-    private static final String PROC_PREAMBLE = "PROC_PREAMBLE";
+
+    /** Constant for JSON output */
+    public static final String EVENT_TIME = "EVENT_TIME";
+    /** Constant for JSON output */
+    public static final String PID = "PID";
+    /** Constant for JSON output */
+    public static final String TID = "TID";
+    /** Constant for JSON output */
+    public static final String APP = "APP";
+    /** Constant for JSON output */
+    public static final String LAST_PREAMBLE = "LAST_PREAMBLE";
+    /** Constant for JSON output */
+    public static final String PROCESS_PREAMBLE = "PROCESS_PREAMBLE";
 
     private static final Set<String> ATTRIBUTES = new HashSet<String>(Arrays.asList(
-            EVENT_TIME, PID, TID, APP, LAST_PREAMBLE, PROC_PREAMBLE));
+            EVENT_TIME, PID, TID, APP, LAST_PREAMBLE, PROCESS_PREAMBLE));
 
     /**
      * Constructor for {@link GenericLogcatItem}.
      *
-     * @param type The type of the item.
      * @param attributes A list of allowed attributes.
      */
-    protected GenericLogcatItem(String type, Set<String> attributes) {
-        super(type, getAllAttributes(attributes));
+    protected GenericLogcatItem(Set<String> attributes) {
+        super(getAllAttributes(attributes));
     }
 
     /**
@@ -119,14 +125,14 @@ public abstract class GenericLogcatItem extends GenericItem {
      * Get the process preamble for the event.
      */
     public String getProcessPreamble() {
-        return (String) getAttribute(PROC_PREAMBLE);
+        return (String) getAttribute(PROCESS_PREAMBLE);
     }
 
     /**
      * Set the process preamble for the event.
      */
     public void setProcessPreamble(String preamble) {
-        setAttribute(PROC_PREAMBLE, preamble);
+        setAttribute(PROCESS_PREAMBLE, preamble);
     }
 
     /**

@@ -30,11 +30,13 @@ import java.util.Set;
  * </p>
  */
 public class TracesItem extends GenericItem {
-    public static final String TYPE = "TRACES_ITEM";
 
-    private static final String PID = "PID";
-    private static final String APP = "APP";
-    private static final String STACK = "STACK";
+    /** Constant for JSON output */
+    public static final String PID = "PID";
+    /** Constant for JSON output */
+    public static final String APP = "APP";
+    /** Constant for JSON output */
+    public static final String STACK = "STACK";
 
     private static final Set<String> ATTRIBUTES = new HashSet<String>(Arrays.asList(
             PID, APP, STACK));
@@ -43,7 +45,7 @@ public class TracesItem extends GenericItem {
      * The constructor for {@link TracesItem}.
      */
     public TracesItem() {
-        super(TYPE, ATTRIBUTES);
+        super(ATTRIBUTES);
     }
 
     /**

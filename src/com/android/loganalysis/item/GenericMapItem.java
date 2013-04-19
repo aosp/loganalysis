@@ -15,41 +15,15 @@
  */
 package com.android.loganalysis.item;
 
+import org.json.JSONObject;
+
 import java.util.HashMap;
 
 /**
  * An IItem that just represents a simple key/value map
  */
 @SuppressWarnings("serial")
-public class GenericMapItem<K, V> extends HashMap<K,V> implements IItem {
-    private String mType = null;
-
-    /**
-     * No-op zero-arg constructor
-     */
-    public GenericMapItem() {}
-
-    /**
-     * Convenience constructor that sets the type
-     */
-    public GenericMapItem(String type) {
-        setType(type);
-    }
-
-    /**
-     * Set the self-reported type that this {@link GenericMapItem} represents.
-     */
-    public void setType(String type) {
-        mType = type;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getType() {
-        return mType;
-    }
+public class GenericMapItem<V> extends HashMap<String, V> implements IItem {
 
     /**
      * {@inheritDoc}
@@ -67,5 +41,13 @@ public class GenericMapItem<K, V> extends HashMap<K,V> implements IItem {
     public boolean isConsistent(IItem other) {
         // FIXME
         return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public JSONObject toJson() {
+        return new JSONObject(this);
     }
 }

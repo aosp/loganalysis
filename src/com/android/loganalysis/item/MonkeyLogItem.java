@@ -15,6 +15,10 @@
  */
 package com.android.loganalysis.item;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
@@ -24,10 +28,8 @@ import java.util.Set;
  * An {@link IItem} used to store monkey log info.
  */
 public class MonkeyLogItem extends GenericItem {
-
-    private class StringSet extends HashSet<String> {
-        private static final long serialVersionUID = -2206822563602989856L;
-    }
+    @SuppressWarnings("serial")
+    private class StringSet extends HashSet<String> {}
 
     public enum DroppedCategory {
         KEYS,
@@ -37,24 +39,38 @@ public class MonkeyLogItem extends GenericItem {
         ROTATIONS
     }
 
-    private static final String TYPE = "MONKEY_LOG";
-
-    private static final String START_TIME = "START_TIME";
-    private static final String STOP_TIME = "STOP_TIME";
-    private static final String PACKAGES = "PACKAGES";
-    private static final String CATEGORIES = "CATEGORIES";
-    private static final String THROTTLE = "THROTTLE";
-    private static final String SEED = "SEED";
-    private static final String TARGET_COUNT = "TARGET_COUNT";
-    private static final String IGNORE_SECURITY_EXCEPTIONS = "IGNORE_SECURITY_EXCEPTIONS";
-    private static final String TOTAL_DURATION = "TOTAL_TIME";
-    private static final String START_UPTIME_DURATION = "START_UPTIME";
-    private static final String STOP_UPTIME_DURATION = "STOP_UPTIME";
-    private static final String IS_FINISHED = "IS_FINISHED";
-    private static final String NO_ACTIVITIES = "NO_ACTIVITIES";
-    private static final String INTERMEDIATE_COUNT = "INTERMEDIATE_COUNT";
-    private static final String FINAL_COUNT = "FINAL_COUNT";
-    private static final String CRASH = "CRASH";
+    /** Constant for JSON output */
+    public static final String START_TIME = "START_TIME";
+    /** Constant for JSON output */
+    public static final String STOP_TIME = "STOP_TIME";
+    /** Constant for JSON output */
+    public static final String PACKAGES = "PACKAGES";
+    /** Constant for JSON output */
+    public static final String CATEGORIES = "CATEGORIES";
+    /** Constant for JSON output */
+    public static final String THROTTLE = "THROTTLE";
+    /** Constant for JSON output */
+    public static final String SEED = "SEED";
+    /** Constant for JSON output */
+    public static final String TARGET_COUNT = "TARGET_COUNT";
+    /** Constant for JSON output */
+    public static final String IGNORE_SECURITY_EXCEPTIONS = "IGNORE_SECURITY_EXCEPTIONS";
+    /** Constant for JSON output */
+    public static final String TOTAL_DURATION = "TOTAL_TIME";
+    /** Constant for JSON output */
+    public static final String START_UPTIME_DURATION = "START_UPTIME";
+    /** Constant for JSON output */
+    public static final String STOP_UPTIME_DURATION = "STOP_UPTIME";
+    /** Constant for JSON output */
+    public static final String IS_FINISHED = "IS_FINISHED";
+    /** Constant for JSON output */
+    public static final String NO_ACTIVITIES = "NO_ACTIVITIES";
+    /** Constant for JSON output */
+    public static final String INTERMEDIATE_COUNT = "INTERMEDIATE_COUNT";
+    /** Constant for JSON output */
+    public static final String FINAL_COUNT = "FINAL_COUNT";
+    /** Constant for JSON output */
+    public static final String CRASH = "CRASH";
 
     private static final Set<String> ATTRIBUTES = new HashSet<String>(Arrays.asList(
             START_TIME, STOP_TIME, PACKAGES, CATEGORIES, THROTTLE, SEED, TARGET_COUNT,
@@ -70,7 +86,7 @@ public class MonkeyLogItem extends GenericItem {
      * The constructor for {@link MonkeyLogItem}.
      */
     public MonkeyLogItem() {
-        super(TYPE, ATTRIBUTES);
+        super(ATTRIBUTES);
 
         setAttribute(PACKAGES, new StringSet());
         setAttribute(CATEGORIES, new StringSet());
@@ -328,5 +344,29 @@ public class MonkeyLogItem extends GenericItem {
      */
     public void setCrash(GenericLogcatItem crash) {
         setAttribute(CRASH, crash);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public JSONObject toJson() {
+        JSONObject object = super.toJson();
+
+        // Override packages and categories
+        put(object, PACKAGES, new JSONArray(getPackages()));
+        put(object, CATEGORIES, new JSONArray(getCategories()));
+
+        return object;
+    }
+
+    /**
+     * Try to put an {@link Object} in a {@link JSONObject} and remove the existing key if it fails.
+     */
+    private static void put(JSONObject object, String key, Object value) {
+        try {
+            object.put(key, value);
+        } catch (JSONException e) {
+            object.remove(key);
+        }
     }
 }

@@ -23,10 +23,11 @@ import java.util.Set;
  * An {@link IItem} used to store miscellaneous logcat info.
  */
 public class MiscLogcatItem extends GenericLogcatItem {
-    public static final String TYPE = "MISC LOGCAT";
 
-    private static final String CATEGORY = "CATEGORY";
-    private static final String MESSAGE = "MESSAGE";
+    /** Constant for JSON output */
+    public static final String CATEGORY = "CATEGORY";
+    /** Constant for JSON output */
+    public static final String MESSAGE = "MESSAGE";
 
     private static final Set<String> ATTRIBUTES = new HashSet<String>(Arrays.asList(
             CATEGORY, MESSAGE));
@@ -35,7 +36,7 @@ public class MiscLogcatItem extends GenericLogcatItem {
      * The constructor for {@link MiscLogcatItem}.
      */
     public MiscLogcatItem() {
-        super(TYPE, ATTRIBUTES);
+        super(ATTRIBUTES);
     }
 
     /**

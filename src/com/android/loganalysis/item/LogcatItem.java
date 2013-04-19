@@ -26,11 +26,13 @@ import java.util.Set;
  * An {@link IItem} used to store logcat info.
  */
 public class LogcatItem extends GenericItem {
-    public static final String TYPE = "LOGCAT";
 
-    private static final String START_TIME = "START_TIME";
-    private static final String STOP_TIME = "STOP_TIME";
-    private static final String EVENTS = "EVENTS";
+    /** Constant for JSON output */
+    public static final String START_TIME = "START_TIME";
+    /** Constant for JSON output */
+    public static final String STOP_TIME = "STOP_TIME";
+    /** Constant for JSON output */
+    public static final String EVENTS = "EVENTS";
 
     private static final Set<String> ATTRIBUTES = new HashSet<String>(Arrays.asList(
             START_TIME, STOP_TIME, EVENTS));
@@ -43,7 +45,7 @@ public class LogcatItem extends GenericItem {
      * The constructor for {@link LogcatItem}.
      */
     public LogcatItem() {
-        super(TYPE, ATTRIBUTES);
+        super(ATTRIBUTES);
 
         setAttribute(EVENTS, new ItemList());
     }

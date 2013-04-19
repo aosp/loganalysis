@@ -18,13 +18,5 @@ package com.android.loganalysis.item;
 /**
  * An {@link IItem} used to store the system props info.
  */
-public class SystemPropsItem extends GenericMapItem<String, String> {
-
-    private static final long serialVersionUID = 7280770512647682477L;
-
-    public static final String TYPE = "SYSTEM PROPERTIES";
-
-    public SystemPropsItem() {
-        super(TYPE);
-    }
-}
+@SuppressWarnings("serial")
+public class SystemPropsItem extends GenericMapItem<String> {}

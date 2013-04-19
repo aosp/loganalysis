@@ -81,7 +81,7 @@ public class SmartMonkeyLogParser implements IParser {
      * object.
      *
      * @param input a {@link BufferedReader}.
-     * @return The {@link MonkeyLogItem}.
+     * @return The {@link SmartMonkeyLogItem}.
      * @see #parse(List)
      */
     public SmartMonkeyLogItem parse(BufferedReader input) throws IOException {
@@ -174,11 +174,11 @@ public class SmartMonkeyLogParser implements IParser {
         }
         m = UI_CRASH.matcher(line);
         if (m.matches()) {
-            mSmartMonkeyLog.addCrashTime(m.group(1));
+            mSmartMonkeyLog.addCrashTime(parseTime(m.group(1)));
         }
         m = UI_ANR.matcher(line);
         if (m.matches()) {
-            mSmartMonkeyLog.addAnrTime(m.group(1));
+            mSmartMonkeyLog.addAnrTime(parseTime(m.group(1)));
         }
     }
 

@@ -23,10 +23,11 @@ import java.util.Set;
  * An {@link IItem} used to store native crash info.
  */
 public class NativeCrashItem extends GenericLogcatItem {
-    public static final String TYPE = "NATIVE CRASH";
 
-    private static final String FINGERPRINT = "FINGERPRINT";
-    private static final String STACK = "STACK";
+    /** Constant for JSON output */
+    public static final String FINGERPRINT = "FINGERPRINT";
+    /** Constant for JSON output */
+    public static final String STACK = "STACK";
 
     private static final Set<String> ATTRIBUTES = new HashSet<String>(Arrays.asList(
             FINGERPRINT, STACK));
@@ -35,7 +36,7 @@ public class NativeCrashItem extends GenericLogcatItem {
      * The constructor for {@link NativeCrashItem}.
      */
     public NativeCrashItem() {
-        super(TYPE, ATTRIBUTES);
+        super(ATTRIBUTES);
     }
 
     /**

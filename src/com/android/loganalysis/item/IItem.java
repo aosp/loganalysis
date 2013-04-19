@@ -15,15 +15,12 @@
  */
 package com.android.loganalysis.item;
 
+import org.json.JSONObject;
+
 /**
  * Interface for all items that are created by any parser.
  */
 public interface IItem {
-
-    /**
-     * Determine what type this IItem represents.  May return {@code null}
-     */
-    public String getType();
 
     /**
      * Merges the item and another into an item with the most complete information.
@@ -52,4 +49,11 @@ public interface IItem {
      * the fields is null.
      */
     public boolean isConsistent(IItem other);
+
+    /**
+     * Get a JSON representation of the item.
+     *
+     * @return The representation of the item as a {@link JSONObject}.
+     */
+    public JSONObject toJson();
 }

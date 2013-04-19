@@ -23,11 +23,13 @@ import java.util.Set;
  * An {@link IItem} used to store Java crash info.
  */
 public class JavaCrashItem extends GenericLogcatItem {
-    public static final String TYPE = "JAVA CRASH";
 
-    private static final String EXCEPTION = "EXCEPTION";
-    private static final String MESSAGE = "MESSAGE";
-    private static final String STACK = "STACK";
+    /** Constant for JSON output */
+    public static final String EXCEPTION = "EXCEPTION";
+    /** Constant for JSON output */
+    public static final String MESSAGE = "MESSAGE";
+    /** Constant for JSON output */
+    public static final String STACK = "STACK";
 
     private static final Set<String> ATTRIBUTES = new HashSet<String>(Arrays.asList(
             EXCEPTION, MESSAGE, STACK));
@@ -36,7 +38,7 @@ public class JavaCrashItem extends GenericLogcatItem {
      * The constructor for {@link JavaCrashItem}.
      */
     public JavaCrashItem() {
-        super(TYPE, ATTRIBUTES);
+        super(ATTRIBUTES);
     }
 
     /**

@@ -24,12 +24,15 @@ import java.util.Set;
  * items such as {@link AnrItem} and {@link JavaCrashItem}.
  */
 public class MiscKernelLogItem extends GenericItem {
-    public static final String TYPE = "MISC KERNEL LOG";
 
-    private static final String EVENT_TIME = "EVENT_TIME";
-    private static final String PREAMBLE = "LAST_PREAMBLE";
-    private static final String CATEGORY = "CATEGORY";
-    private static final String MESSAGE = "MESSAGE";
+    /** Constant for JSON output */
+    public static final String EVENT_TIME = "EVENT_TIME";
+    /** Constant for JSON output */
+    public static final String PREAMBLE = "LAST_PREAMBLE";
+    /** Constant for JSON output */
+    public static final String CATEGORY = "CATEGORY";
+    /** Constant for JSON output */
+    public static final String MESSAGE = "MESSAGE";
 
     private static final Set<String> ATTRIBUTES = new HashSet<String>(Arrays.asList(
             EVENT_TIME, PREAMBLE, CATEGORY, MESSAGE));
@@ -38,7 +41,7 @@ public class MiscKernelLogItem extends GenericItem {
      * Constructor for {@link MiscKernelLogItem}.
      */
     public MiscKernelLogItem() {
-        super(TYPE, ATTRIBUTES);
+        super(ATTRIBUTES);
     }
 
     /**

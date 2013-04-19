@@ -17,7 +17,11 @@ package com.android.loganalysis.item;
 
 import junit.framework.TestCase;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -49,19 +53,19 @@ public class GenericItemTest extends TestCase {
 
     @Override
     public void setUp() {
-        mEmptyItem1 = new GenericItem(null, ATTRIBUTES);
-        mEmptyItem2 = new GenericItem(null, ATTRIBUTES);
-        mStringItem = new GenericItem(null, ATTRIBUTES);
+        mEmptyItem1 = new GenericItem(ATTRIBUTES);
+        mEmptyItem2 = new GenericItem(ATTRIBUTES);
+        mStringItem = new GenericItem(ATTRIBUTES);
         mStringItem.setAttribute("string", mStringAttribute);
-        mIntegerItem = new GenericItem(null, ATTRIBUTES);
+        mIntegerItem = new GenericItem(ATTRIBUTES);
         mIntegerItem.setAttribute("integer", mIntegerAttribute);
-        mFullItem1 = new GenericItem(null, ATTRIBUTES);
+        mFullItem1 = new GenericItem(ATTRIBUTES);
         mFullItem1.setAttribute("string", mStringAttribute);
         mFullItem1.setAttribute("integer", mIntegerAttribute);
-        mFullItem2 = new GenericItem(null, ATTRIBUTES);
+        mFullItem2 = new GenericItem(ATTRIBUTES);
         mFullItem2.setAttribute("string", mStringAttribute);
         mFullItem2.setAttribute("integer", mIntegerAttribute);
-        mInconsistentItem = new GenericItem(null, ATTRIBUTES);
+        mInconsistentItem = new GenericItem(ATTRIBUTES);
         mInconsistentItem.setAttribute("string", "gnirts");
         mInconsistentItem.setAttribute("integer", 2);
     }
@@ -155,7 +159,7 @@ public class GenericItemTest extends TestCase {
      * {@link GenericItem#getAttribute(String)}.
      */
     public void testAttributes() {
-        GenericItem item = new GenericItem(null, ATTRIBUTES);
+        GenericItem item = new GenericItem(ATTRIBUTES);
 
         assertNull(item.getAttribute("string"));
         assertNull(item.getAttribute("integer"));
@@ -217,5 +221,44 @@ public class GenericItemTest extends TestCase {
         } catch (ConflictingItemException e) {
             // Expected because "test" conflicts with "".
         }
+    }
+
+    /**
+     * Test that {@link GenericItem#toJson()} returns correctly.
+     */
+    public void testToJson() throws JSONException {
+        GenericItem item = new GenericItem(new HashSet<String>(Arrays.asList(
+                "string", "date", "object", "integer", "long", "float", "double", "null")));
+        Date date = new Date();
+        Object object = new Object();
+        item.setAttribute("string", "foo");
+        item.setAttribute("date", date);
+        item.setAttribute("object", object);
+        item.setAttribute("integer", 0);
+        item.setAttribute("long", 1L);
+        item.setAttribute("float", 2.5f);
+        item.setAttribute("double", 3.5);
+        item.setAttribute("null", null);
+
+        // Convert to JSON string and back again
+        JSONObject output = new JSONObject(item.toJson().toString());
+
+        System.out.println(item.toJson());
+
+        assertTrue(output.has("string"));
+        assertEquals("foo", output.get("string"));
+        assertTrue(output.has("date"));
+        assertEquals(date.toString(), output.get("date"));
+        assertTrue(output.has("object"));
+        assertEquals(object.toString(), output.get("object"));
+        assertTrue(output.has("integer"));
+        assertEquals(0, output.get("integer"));
+        assertTrue(output.has("long"));
+        assertEquals(1, output.get("long"));
+        assertTrue(output.has("float"));
+        assertEquals(2.5, output.get("float"));
+        assertTrue(output.has("double"));
+        assertEquals(3.5, output.get("double"));
+        assertFalse(output.has("null"));
     }
 }

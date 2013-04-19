@@ -18,9 +18,8 @@ package com.android.loganalysis.item;
 /**
  * Thrown if there is conflicting information when trying to combine two items.
  */
+@SuppressWarnings("serial")
 public class ConflictingItemException extends Exception {
-
-    private static final long serialVersionUID = 3303627598068792143L;
 
     /**
      * Creates a {@link ConflictingItemException}.

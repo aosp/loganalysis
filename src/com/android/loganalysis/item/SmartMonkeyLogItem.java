@@ -15,45 +15,57 @@
  */
 package com.android.loganalysis.item;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Set;
-
-import com.android.loganalysis.parser.SmartMonkeyLogParser;
 
 /**
  * An {@link IItem} used to store monkey log info.
  */
 public class SmartMonkeyLogItem extends GenericItem {
 
-    private class DateSet extends HashSet<Date> {
-        private static final long serialVersionUID = -22L;
-    }
+    @SuppressWarnings("serial")
+    private class DateSet extends HashSet<Date> {}
 
-    private static final String TYPE = "SMART_MONKEY_LOG";
-
-    private static final String START_TIME = "START_TIME";
-    private static final String STOP_TIME = "STOP_TIME";
-    private static final String APPLICATIONS = "APPS";
-    private static final String PACKAGES = "PACKAGES";
-    private static final String THROTTLE = "THROTTLE";
-    private static final String TARGET_INVOCATIONS = "TARGET_INVOCATIONS";
-    private static final String TOTAL_DURATION = "TOTAL_TIME";
-    private static final String START_UPTIME_DURATION = "START_UPTIME";
-    private static final String STOP_UPTIME_DURATION = "STOP_UPTIME";
-    private static final String IS_FINISHED = "IS_FINISHED";
-    private static final String ABORTED = "ABORTED";
-    private static final String INTERMEDIATE_COUNT = "INTERMEDIATE_COUNT";
-    private static final String FINAL_COUNT = "FINAL_COUNT";
-    private static final String ANR_TIMES = "ANR_TIMES";
-    private static final String CRASH_TIMES = "CRASH_TIMES";
-    private static final String INTERMEDIATE_TIME = "INTERMEDIATE_TIME";
+    /** Constant for JSON output */
+    public static final String START_TIME = "START_TIME";
+    /** Constant for JSON output */
+    public static final String STOP_TIME = "STOP_TIME";
+    /** Constant for JSON output */
+    public static final String APPLICATIONS = "APPS";
+    /** Constant for JSON output */
+    public static final String PACKAGES = "PACKAGES";
+    /** Constant for JSON output */
+    public static final String THROTTLE = "THROTTLE";
+    /** Constant for JSON output */
+    public static final String TARGET_INVOCATIONS = "TARGET_INVOCATIONS";
+    /** Constant for JSON output */
+    public static final String TOTAL_DURATION = "TOTAL_TIME";
+    /** Constant for JSON output */
+    public static final String START_UPTIME_DURATION = "START_UPTIME";
+    /** Constant for JSON output */
+    public static final String STOP_UPTIME_DURATION = "STOP_UPTIME";
+    /** Constant for JSON output */
+    public static final String IS_FINISHED = "IS_FINISHED";
+    /** Constant for JSON output */
+    public static final String ABORTED = "ABORTED";
+    /** Constant for JSON output */
+    public static final String INTERMEDIATE_COUNT = "INTERMEDIATE_COUNT";
+    /** Constant for JSON output */
+    public static final String FINAL_COUNT = "FINAL_COUNT";
+    /** Constant for JSON output */
+    public static final String ANR_TIMES = "ANR_TIMES";
+    /** Constant for JSON output */
+    public static final String CRASH_TIMES = "CRASH_TIMES";
+    /** Constant for JSON output */
+    public static final String INTERMEDIATE_TIME = "INTERMEDIATE_TIME";
 
     private static final Set<String> ATTRIBUTES = new HashSet<String>(Arrays.asList(
             START_TIME, STOP_TIME, PACKAGES, THROTTLE, TARGET_INVOCATIONS, ABORTED,
@@ -65,7 +77,7 @@ public class SmartMonkeyLogItem extends GenericItem {
      * The constructor for {@link MonkeyLogItem}.
      */
     public SmartMonkeyLogItem() {
-        super(TYPE, ATTRIBUTES);
+        super(ATTRIBUTES);
 
         setAttribute(APPLICATIONS, new ArrayList<String>());
         setAttribute(PACKAGES, new ArrayList<String>());
@@ -292,8 +304,8 @@ public class SmartMonkeyLogItem extends GenericItem {
     /**
      * Add ANR time
      */
-    public void addAnrTime(String time) {
-        ((DateSet) getAttribute(ANR_TIMES)).add(SmartMonkeyLogParser.parseTime(time));
+    public void addAnrTime(Date time) {
+        ((DateSet) getAttribute(ANR_TIMES)).add(time);
     }
 
     /**
@@ -306,8 +318,8 @@ public class SmartMonkeyLogItem extends GenericItem {
     /**
      * Add Crash time
      */
-    public void addCrashTime(String time) {
-        ((DateSet) getAttribute(CRASH_TIMES)).add(SmartMonkeyLogParser.parseTime(time));
+    public void addCrashTime(Date time) {
+        ((DateSet) getAttribute(CRASH_TIMES)).add(time);
     }
 
     /**
@@ -323,5 +335,32 @@ public class SmartMonkeyLogItem extends GenericItem {
      */
     public void setIsAborted(boolean noSeq) {
         setAttribute(ABORTED, noSeq);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public JSONObject toJson() {
+        JSONObject object = super.toJson();
+
+        // Override application, packages, and ANR and crash times.
+        put(object, APPLICATIONS, new JSONArray(getApplications()));
+        put(object, PACKAGES, new JSONArray(getPackages()));
+        put(object, ANR_TIMES, new JSONArray(getAnrTimes()));
+        put(object, CRASH_TIMES, new JSONArray(getCrashTimes()));
+
+        return object;
+    }
+
+    /**
+     * Try to put an {@link Object} in a {@link JSONObject} and remove the existing key if it fails.
+     */
+    private static void put(JSONObject object, String key, Object value) {
+        try {
+            object.put(key, value);
+        } catch (JSONException e) {
+            object.remove(key);
+        }
     }
 }
