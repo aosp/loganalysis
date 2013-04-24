@@ -16,6 +16,7 @@
 package com.android.loganalysis.parser;
 
 import com.android.loganalysis.item.TopItem;
+import com.android.loganalysis.util.ArrayUtil;
 
 import java.util.List;
 import java.util.regex.Matcher;
@@ -44,6 +45,7 @@ public class TopParser implements IParser {
     @Override
     public TopItem parse(List<String> lines) {
         TopItem item = new TopItem();
+        item.setText(ArrayUtil.join("\n", lines).trim());
 
         for (String line : lines) {
             Matcher m = TICKS_PAT.matcher(line);

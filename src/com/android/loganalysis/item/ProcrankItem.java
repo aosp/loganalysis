@@ -45,6 +45,8 @@ public class ProcrankItem implements IItem {
     public static final String PSS = "PSS";
     /** Constant for JSON output */
     public static final String USS = "USS";
+    /** Constant for JSON output */
+    public static final String TEXT = "TEXT";
 
     private class ProcrankValue {
         public String mProcessName;
@@ -62,6 +64,7 @@ public class ProcrankItem implements IItem {
         }
     }
 
+    private String mText = null;
     private Map<Integer, ProcrankValue> mProcrankLines = new HashMap<Integer, ProcrankValue>();
 
     /**
@@ -141,6 +144,20 @@ public class ProcrankItem implements IItem {
     }
 
     /**
+     * Get the raw text of the procrank command.
+     */
+    public String getText() {
+        return mText;
+    }
+
+    /**
+     * Set the raw text of the procrank command.
+     */
+    public void setText(String text) {
+        mText = text;
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -176,6 +193,7 @@ public class ProcrankItem implements IItem {
                 lines.put(line);
             }
             object.put(LINES, lines);
+            object.put(TEXT, getText());
         } catch (JSONException e) {
             // Ignore
         }

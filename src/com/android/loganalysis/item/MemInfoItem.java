@@ -15,8 +15,48 @@
  */
 package com.android.loganalysis.item;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 /**
  * An {@link IItem} used to store the memory info output.
  */
 @SuppressWarnings("serial")
-public class MemInfoItem extends GenericMapItem<Integer> {}
+public class MemInfoItem extends GenericMapItem<Integer> {
+
+    /** Constant for JSON output */
+    public static final String LINES = "LINES";
+    /** Constant for JSON output */
+    public static final String TEXT = "TEXT";
+
+    private String mText = null;
+
+    /**
+     * Get the raw text of the mem info command.
+     */
+    public String getText() {
+        return mText;
+    }
+
+    /**
+     * Set the raw text of the mem info command.
+     */
+    public void setText(String text) {
+        mText = text;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public JSONObject toJson() {
+        JSONObject object = new JSONObject();
+        try {
+            object.put(LINES, super.toJson());
+            object.put(TEXT, getText());
+        } catch (JSONException e) {
+            // Ignore
+        }
+        return object;
+    }
+}

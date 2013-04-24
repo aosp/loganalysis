@@ -243,8 +243,6 @@ public class GenericItemTest extends TestCase {
         // Convert to JSON string and back again
         JSONObject output = new JSONObject(item.toJson().toString());
 
-        System.out.println(item.toJson());
-
         assertTrue(output.has("string"));
         assertEquals("foo", output.get("string"));
         assertTrue(output.has("date"));

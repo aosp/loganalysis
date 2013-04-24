@@ -40,9 +40,11 @@ public class TopItem extends GenericItem {
     public static final String SIRQ = "SIRQ";
     /** Constant for JSON output */
     public static final String TOTAL = "TOTAL";
+    /** Constant for JSON output */
+    public static final String TEXT = "TEXT";
 
     private static final Set<String> ATTRIBUTES = new HashSet<String>(Arrays.asList(
-            USER, NICE, SYSTEM, IDLE, IOW, IRQ, SIRQ, TOTAL));
+            USER, NICE, SYSTEM, IDLE, IOW, IRQ, SIRQ, TOTAL, TEXT));
 
     /**
      * The constructor for {@link TopItem}.
@@ -165,5 +167,19 @@ public class TopItem extends GenericItem {
      */
     public void setTotal(int total) {
         setAttribute(TOTAL, total);
+    }
+
+    /**
+     * Get the raw text of the top command.
+     */
+    public String getText() {
+        return (String) getAttribute(TEXT);
+    }
+
+    /**
+     * Set the raw text of the top command.
+     */
+    public void setText(String text) {
+        setAttribute(TEXT, text);
     }
 }

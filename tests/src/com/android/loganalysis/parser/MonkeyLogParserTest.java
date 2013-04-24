@@ -39,7 +39,7 @@ public class MonkeyLogParserTest extends TestCase {
     /**
      * Test that a monkey can be parsed if there are no crashes.
      */
-    public void testParse_success() throws ParseException {
+    public void testParse_success() {
         List<String> lines = Arrays.asList(
                 "# Wednesday, 04/25/2012 01:37:12 AM - device uptime = 242.13: Monkey command used for this test:",
                 "adb shell monkey -p com.google.android.browser  -c android.intent.category.SAMPLE_CODE -c android.intent.category.CAR_DOCK -c android.intent.category.LAUNCHER -c android.intent.category.MONKEY -c android.intent.category.INFO  --ignore-security-exceptions --throttle 100  -s 528 -v -v -v 10000 ",
@@ -104,7 +104,7 @@ public class MonkeyLogParserTest extends TestCase {
     /**
      * Test that a monkey can be parsed if there is an ANR.
      */
-    public void testParse_anr() throws ParseException {
+    public void testParse_anr() {
         List<String> lines = Arrays.asList(
                 "# Tuesday, 04/24/2012 05:23:30 PM - device uptime = 216.48: Monkey command used for this test:",
                 "adb shell monkey -p com.google.android.youtube  -c android.intent.category.SAMPLE_CODE -c android.intent.category.CAR_DOCK -c android.intent.category.LAUNCHER -c android.intent.category.MONKEY -c android.intent.category.INFO  --ignore-security-exceptions --throttle 100  -s 993 -v -v -v 10000 ",
@@ -211,7 +211,7 @@ public class MonkeyLogParserTest extends TestCase {
     /**
      * Test that a monkey can be parsed if there is a Java crash.
      */
-    public void testParse_java_crash() throws ParseException {
+    public void testParse_java_crash() {
         List<String> lines = Arrays.asList(
                 "# Tuesday, 04/24/2012 05:05:50 PM - device uptime = 232.65: Monkey command used for this test:",
                 "adb shell monkey -p com.google.android.apps.maps  -c android.intent.category.SAMPLE_CODE -c android.intent.category.CAR_DOCK -c android.intent.category.LAUNCHER -c android.intent.category.MONKEY -c android.intent.category.INFO  --ignore-security-exceptions --throttle 100  -s 501 -v -v -v 10000 ",
@@ -282,7 +282,7 @@ public class MonkeyLogParserTest extends TestCase {
     /**
      * Test that a monkey can be parsed if there is a native crash.
      */
-    public void testParse_native_crash() throws ParseException {
+    public void testParse_native_crash() {
         List<String> lines = Arrays.asList(
                 "# Tuesday, 04/24/2012 05:05:50 PM - device uptime = 232.65: Monkey command used for this test:",
                 "adb shell monkey -p com.google.android.apps.maps  -c android.intent.category.SAMPLE_CODE -c android.intent.category.CAR_DOCK -c android.intent.category.LAUNCHER -c android.intent.category.MONKEY -c android.intent.category.INFO  --ignore-security-exceptions --throttle 100  -s 501 -v -v -v 10000 ",
@@ -375,7 +375,7 @@ public class MonkeyLogParserTest extends TestCase {
     /**
      * Test that a monkey can be parsed if there are no activities to run.
      */
-    public void testParse_no_activities() throws ParseException {
+    public void testParse_no_activities() {
         List<String> lines = Arrays.asList(
                 "# Wednesday, 04/25/2012 01:37:12 AM - device uptime = 242.13: Monkey command used for this test:",
                 "adb shell monkey -p com.google.android.browser  -c android.intent.category.SAMPLE_CODE -c android.intent.category.CAR_DOCK -c android.intent.category.LAUNCHER -c android.intent.category.MONKEY -c android.intent.category.INFO  --ignore-security-exceptions --throttle 100  -s 528 -v -v -v 10000 ",
@@ -420,7 +420,7 @@ public class MonkeyLogParserTest extends TestCase {
     /**
      * Test that the other date format can be parsed.
      */
-    public void testAlternateDateFormat() throws ParseException {
+    public void testAlternateDateFormat() {
         List<String> lines = Arrays.asList(
                 "# Tue Apr 24 17:05:50 PST 2012 - device uptime = 232.65: Monkey command used for this test:",
                 "adb shell monkey -p com.google.android.apps.maps  -c android.intent.category.SAMPLE_CODE -c android.intent.category.CAR_DOCK -c android.intent.category.LAUNCHER -c android.intent.category.MONKEY -c android.intent.category.INFO  --ignore-security-exceptions --throttle 100  -s 501 -v -v -v 10000 ",

@@ -16,6 +16,7 @@
 package com.android.loganalysis.parser;
 
 import com.android.loganalysis.item.ProcrankItem;
+import com.android.loganalysis.util.ArrayUtil;
 
 import java.util.List;
 import java.util.regex.Matcher;
@@ -43,6 +44,7 @@ public class ProcrankParser implements IParser {
     @Override
     public ProcrankItem parse(List<String> lines) {
         ProcrankItem item = new ProcrankItem();
+        item.setText(ArrayUtil.join("\n", lines).replaceAll("\\s+$", ""));
 
         for (String line : lines) {
             // If we have reached the end.

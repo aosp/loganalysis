@@ -16,6 +16,7 @@
 package com.android.loganalysis.parser;
 
 import com.android.loganalysis.item.MemInfoItem;
+import com.android.loganalysis.util.ArrayUtil;
 
 import java.util.List;
 import java.util.regex.Matcher;
@@ -35,10 +36,11 @@ public class MemInfoParser implements IParser {
      * @return The {@link MemInfoItem}.
      */
     @Override
-    public MemInfoItem parse(List<String> block) {
+    public MemInfoItem parse(List<String> lines) {
         MemInfoItem item = new MemInfoItem();
+        item.setText(ArrayUtil.join("\n", lines).trim());
 
-        for (String line : block) {
+        for (String line : lines) {
             Matcher m = INFO_LINE.matcher(line);
             if (m.matches()) {
                 String key = m.group(1);

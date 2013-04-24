@@ -16,6 +16,7 @@
 package com.android.loganalysis.parser;
 
 import com.android.loganalysis.item.ProcrankItem;
+import com.android.loganalysis.util.ArrayUtil;
 
 import junit.framework.TestCase;
 
@@ -53,6 +54,7 @@ public class ProcrankParserTest extends TestCase {
         assertEquals((Integer) 33122, procrank.getPss(3247));
         assertEquals((Integer) 28360, procrank.getUss(334));
         assertEquals("android.process.acore", procrank.getProcessName(2072));
+        assertEquals(ArrayUtil.join("\n", inputBlock), procrank.getText());
     }
 }
 

@@ -16,6 +16,7 @@
 package com.android.loganalysis.parser;
 
 import com.android.loganalysis.item.MemInfoItem;
+import com.android.loganalysis.util.ArrayUtil;
 
 import junit.framework.TestCase;
 
@@ -34,13 +35,14 @@ public class MemInfoParserTest extends TestCase {
                 "Cached:            86204 kB",
                 "SwapCached:            0 kB");
         MemInfoParser parser = new MemInfoParser();
-        MemInfoItem output = parser.parse(inputBlock);
+        MemInfoItem item = parser.parse(inputBlock);
 
-        assertEquals(5, output.size());
-        assertEquals((Integer)353332, output.get("MemTotal"));
-        assertEquals((Integer)65420, output.get("MemFree"));
-        assertEquals((Integer)20800, output.get("Buffers"));
-        assertEquals((Integer)86204, output.get("Cached"));
-        assertEquals((Integer)0, output.get("SwapCached"));
+        assertEquals(5, item.size());
+        assertEquals((Integer)353332, item.get("MemTotal"));
+        assertEquals((Integer)65420, item.get("MemFree"));
+        assertEquals((Integer)20800, item.get("Buffers"));
+        assertEquals((Integer)86204, item.get("Cached"));
+        assertEquals((Integer)0, item.get("SwapCached"));
+        assertEquals(ArrayUtil.join("\n", inputBlock), item.getText());
     }
 }

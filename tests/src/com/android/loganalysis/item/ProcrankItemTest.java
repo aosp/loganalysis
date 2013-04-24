@@ -25,6 +25,7 @@ import org.json.JSONObject;
  * Unit test for {@link ProcrankItem}.
  */
 public class ProcrankItemTest extends TestCase {
+
     /**
      * Test that {@link ProcrankItem#toJson()} returns correctly.
      */
@@ -32,12 +33,15 @@ public class ProcrankItemTest extends TestCase {
         ProcrankItem item = new ProcrankItem();
         item.addProcrankLine(0, "process0", 1, 2, 3, 4);
         item.addProcrankLine(5, "process1", 6, 7, 8, 9);
+        item.setText("foo\nbar");
 
         // Convert to JSON string and back again
         JSONObject output = new JSONObject(item.toJson().toString());
 
         assertTrue(output.has(ProcrankItem.LINES));
         assertTrue(output.get(ProcrankItem.LINES) instanceof JSONArray);
+        assertTrue(output.has(ProcrankItem.TEXT));
+        assertEquals("foo\nbar", output.get(ProcrankItem.TEXT));
 
         JSONArray lines = output.getJSONArray(ProcrankItem.LINES);
 

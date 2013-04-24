@@ -16,6 +16,7 @@
 package com.android.loganalysis.parser;
 
 import com.android.loganalysis.item.TopItem;
+import com.android.loganalysis.util.ArrayUtil;
 
 import junit.framework.TestCase;
 
@@ -48,6 +49,7 @@ public class TopParserTest extends TestCase {
         assertEquals(5, item.getIrq());
         assertEquals(25, item.getSirq());
         assertEquals(1000, item.getTotal());
+        assertEquals(ArrayUtil.join("\n", inputBlock), item.getText());
     }
 
     /**

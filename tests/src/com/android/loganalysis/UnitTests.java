@@ -26,9 +26,12 @@ import com.android.loganalysis.heuristic.PowerUsageHeuristicTest;
 import com.android.loganalysis.heuristic.RuntimeRestartHeuristicTest;
 import com.android.loganalysis.item.DumpsysBatteryInfoItemTest;
 import com.android.loganalysis.item.GenericItemTest;
+import com.android.loganalysis.item.MemInfoItemTest;
 import com.android.loganalysis.item.MonkeyLogItemTest;
 import com.android.loganalysis.item.ProcrankItemTest;
 import com.android.loganalysis.item.SmartMonkeyLogItemTest;
+import com.android.loganalysis.item.SystemPropsItemTest;
+import com.android.loganalysis.item.TopItemTest;
 import com.android.loganalysis.parser.AbstractSectionParserTest;
 import com.android.loganalysis.parser.AnrParserTest;
 import com.android.loganalysis.parser.BugreportParserTest;
@@ -75,9 +78,12 @@ public class UnitTests extends TestSuite {
         // item
         addTestSuite(DumpsysBatteryInfoItemTest.class);
         addTestSuite(GenericItemTest.class);
+        addTestSuite(MemInfoItemTest.class);
         addTestSuite(MonkeyLogItemTest.class);
         addTestSuite(ProcrankItemTest.class);
         addTestSuite(SmartMonkeyLogItemTest.class);
+        addTestSuite(SystemPropsItemTest.class);
+        addTestSuite(TopItemTest.class);
 
         // parser
         addTestSuite(AbstractSectionParserTest.class);
