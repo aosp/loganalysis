@@ -16,6 +16,7 @@
 package com.android.loganalysis.heuristic;
 
 import com.android.loganalysis.item.BugreportItem;
+import com.android.loganalysis.item.ConflictingItemException;
 import com.android.loganalysis.item.DumpsysItem;
 import com.android.loganalysis.item.KernelLogItem;
 import com.android.loganalysis.item.LogcatItem;
@@ -37,7 +38,8 @@ public abstract class AbstractHeuristic implements IHeuristic {
      * {@inheritDoc}
      */
     @Override
-    public void addBugreport(Date timestamp, BugreportItem bugreport) {
+    public void addBugreport(BugreportItem bugreport, Date timestamp, String uri)
+            throws ConflictingItemException {
         // Ignore
     }
 
@@ -45,7 +47,8 @@ public abstract class AbstractHeuristic implements IHeuristic {
      * {@inheritDoc}
      */
     @Override
-    public void addLogcat(Date timestamp, LogcatItem logcat) {
+    public void addLogcat(LogcatItem logcat, Date timestamp, String uri)
+            throws ConflictingItemException {
         // Ignore
     }
 
@@ -53,7 +56,8 @@ public abstract class AbstractHeuristic implements IHeuristic {
      * {@inheritDoc}
      */
     @Override
-    public void addKernelLog(Date timestamp, KernelLogItem kernelLog) {
+    public void addKernelLog(KernelLogItem kernelLog, Date timestamp, String uri)
+            throws ConflictingItemException {
         // Ignore
     }
 
@@ -61,7 +65,18 @@ public abstract class AbstractHeuristic implements IHeuristic {
      * {@inheritDoc}
      */
     @Override
-    public void addMemInfo(Date timestamp, MemInfoItem meminfo) {
+    public void addMemInfo(MemInfoItem meminfo, Date timestamp, String uri)
+            throws ConflictingItemException {
+        // Ignore
+    }
+
+    /**
+     * {@inheritDoc}
+     * @throws ConflictingItemException
+     */
+    @Override
+    public void addProcrank(ProcrankItem procrank, Date timestamp, String uri)
+            throws ConflictingItemException {
         // Ignore
     }
 
@@ -69,7 +84,8 @@ public abstract class AbstractHeuristic implements IHeuristic {
      * {@inheritDoc}
      */
     @Override
-    public void addProcrank(Date timestamp, ProcrankItem procrank) {
+    public void addTop(TopItem top, Date timestamp, String uri)
+            throws ConflictingItemException {
         // Ignore
     }
 
@@ -77,15 +93,8 @@ public abstract class AbstractHeuristic implements IHeuristic {
      * {@inheritDoc}
      */
     @Override
-    public void addTop(Date timestamp, TopItem top) {
-        // Ignore
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void addDumpsys(Date timestamp, DumpsysItem dumpsys) {
+    public void addDumpsys(DumpsysItem dumpsys, Date timestamp, String uri)
+            throws ConflictingItemException {
         // Ignore
     }
 

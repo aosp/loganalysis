@@ -36,7 +36,7 @@ public class PowerUsageHeuristicTest extends TestCase {
         batteryInfo.addLastUnpluggedWakeLock("wakelock", 0, heuristic.getCutoff() + 1, 0);
         batteryInfo.addLastUnpluggedKernelWakeLock("kernelwakelock", heuristic.getCutoff() - 1, 0);
         dumpsys.setBatteryInfo(batteryInfo);
-        heuristic.addDumpsys(null, dumpsys);
+        heuristic.addDumpsys(dumpsys, null, null);
 
         assertTrue(heuristic.failed());
     }
@@ -52,7 +52,7 @@ public class PowerUsageHeuristicTest extends TestCase {
         batteryInfo.addLastUnpluggedWakeLock("wakelock", 0, heuristic.getCutoff() - 1, 0);
         batteryInfo.addLastUnpluggedKernelWakeLock("kernelwakelock", heuristic.getCutoff() + 1, 0);
         dumpsys.setBatteryInfo(batteryInfo);
-        heuristic.addDumpsys(null, dumpsys);
+        heuristic.addDumpsys(dumpsys, null, null);
 
         assertTrue(heuristic.failed());
     }
@@ -68,7 +68,7 @@ public class PowerUsageHeuristicTest extends TestCase {
         batteryInfo.addLastUnpluggedWakeLock("wakelock", 0, heuristic.getCutoff() - 1, 0);
         batteryInfo.addLastUnpluggedKernelWakeLock("kernelwakelock", heuristic.getCutoff() - 1, 0);
         dumpsys.setBatteryInfo(batteryInfo);
-        heuristic.addDumpsys(null, dumpsys);
+        heuristic.addDumpsys(dumpsys, null, null);
 
         assertFalse(heuristic.failed());
     }

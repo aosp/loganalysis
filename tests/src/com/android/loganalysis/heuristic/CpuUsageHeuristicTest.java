@@ -36,7 +36,7 @@ public class CpuUsageHeuristicTest extends TestCase {
         top.setTotal(1000);
         top.setUser((int) (heuristic.getCutoff() * top.getTotal()) + 1);
         top.setIdle(top.getTotal() - top.getUser());
-        heuristic.addTop(null, top);
+        heuristic.addTop(top, null, null);
 
         assertTrue(heuristic.failed());
     }
@@ -50,7 +50,7 @@ public class CpuUsageHeuristicTest extends TestCase {
         top.setTotal(1000);
         top.setUser((int) (heuristic.getCutoff() * top.getTotal()) - 1);
         top.setIdle(top.getTotal() - top.getUser());
-        heuristic.addTop(null, top);
+        heuristic.addTop(top, null, null);
 
         assertFalse(heuristic.failed());
     }
@@ -65,7 +65,7 @@ public class CpuUsageHeuristicTest extends TestCase {
         MiscLogcatItem item = new MiscLogcatItem();
         item.setCategory(LogcatParser.HIGH_CPU_USAGE);
         logcat.addEvent(item);
-        heuristic.addLogcat(null, logcat);
+        heuristic.addLogcat(logcat, null, null);
 
         assertTrue(heuristic.failed());
     }

@@ -35,7 +35,7 @@ public class MemoryUsageHeuristicTest extends TestCase {
         MemInfoItem memInfo = new MemInfoItem();
         memInfo.put("MemTotal", 1000000);
         memInfo.put("MemFree", (int) ((1.0 - heuristic.getCutoff()) * memInfo.get("MemTotal")) - 1);
-        heuristic.addMemInfo(null, memInfo);
+        heuristic.addMemInfo(memInfo, null, null);
 
         assertTrue(heuristic.failed());
     }
@@ -48,7 +48,7 @@ public class MemoryUsageHeuristicTest extends TestCase {
         MemInfoItem memInfo = new MemInfoItem();
         memInfo.put("MemTotal", 1000000);
         memInfo.put("MemFree", (int) ((1.0 - heuristic.getCutoff()) * memInfo.get("MemTotal")) + 1);
-        heuristic.addMemInfo(null, memInfo);
+        heuristic.addMemInfo(memInfo, null, null);
 
         assertFalse(heuristic.failed());
     }
@@ -63,7 +63,7 @@ public class MemoryUsageHeuristicTest extends TestCase {
         MiscLogcatItem item = new MiscLogcatItem();
         item.setCategory(LogcatParser.HIGH_MEMORY_USAGE);
         logcat.addEvent(item);
-        heuristic.addLogcat(null, logcat);
+        heuristic.addLogcat(logcat, null, null);
 
         assertTrue(heuristic.failed());
     }

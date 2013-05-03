@@ -33,7 +33,7 @@ public class NativeCrashHeuristicTest extends TestCase {
         NativeCrashHeuristic heuristic = new NativeCrashHeuristic();
         LogcatItem logcat = new LogcatItem();
         logcat.addEvent(new NativeCrashItem());
-        heuristic.addLogcat(null, logcat);
+        heuristic.addLogcat(logcat, null, null);
 
         assertTrue(heuristic.failed());
     }
@@ -45,7 +45,7 @@ public class NativeCrashHeuristicTest extends TestCase {
     public void testCheckHeuristic_no_java_crash() {
         NativeCrashHeuristic heuristic = new NativeCrashHeuristic();
         LogcatItem logcat = new LogcatItem();
-        heuristic.addLogcat(null, logcat);
+        heuristic.addLogcat(logcat, null, null);
 
         assertFalse(heuristic.failed());
     }

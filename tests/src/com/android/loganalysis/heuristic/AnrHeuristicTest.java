@@ -32,7 +32,7 @@ public class AnrHeuristicTest extends TestCase {
         AnrHeuristic heuristic = new AnrHeuristic();
         LogcatItem logcat = new LogcatItem();
         logcat.addEvent(new AnrItem());
-        heuristic.addLogcat(null, logcat);
+        heuristic.addLogcat(logcat, null, null);
 
         assertTrue(heuristic.failed());
     }
@@ -43,7 +43,7 @@ public class AnrHeuristicTest extends TestCase {
     public void testCheckHeuristic_no_anr() {
         AnrHeuristic heuristic = new AnrHeuristic();
         LogcatItem logcat = new LogcatItem();
-        heuristic.addLogcat(null, logcat);
+        heuristic.addLogcat(logcat, null, null);
 
         assertFalse(heuristic.failed());
     }

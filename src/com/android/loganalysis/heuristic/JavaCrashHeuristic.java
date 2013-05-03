@@ -41,7 +41,7 @@ public class JavaCrashHeuristic extends AbstractHeuristic {
      * {@inheritDoc}
      */
     @Override
-    public void addLogcat(Date timestamp, LogcatItem logcat) {
+    public void addLogcat(LogcatItem logcat, Date timestamp, String uri) {
         mLogcat = logcat;
     }
 

@@ -48,7 +48,8 @@ public class PowerUsageHeuristic extends AbstractHeuristic {
     /**
      * {@inheritDoc}
      */
-    public void addDumpsys(Date timestamp, DumpsysItem dumpsys) {
+    @Override
+    public void addDumpsys(DumpsysItem dumpsys, Date timestamp, String uri) {
         mBatteryInfo = dumpsys.getBatteryInfo();
     }
 

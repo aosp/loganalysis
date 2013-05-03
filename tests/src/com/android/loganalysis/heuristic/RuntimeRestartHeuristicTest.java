@@ -33,7 +33,7 @@ public class RuntimeRestartHeuristicTest extends TestCase {
     public void testCheckHeuristic_empty_procrank() {
         RuntimeRestartHeuristic heuristic = new RuntimeRestartHeuristic();
         ProcrankItem procrank = new ProcrankItem();
-        heuristic.addProcrank(null, procrank);
+        heuristic.addProcrank(procrank, null, null);
 
         assertFalse(heuristic.failed());
     }
@@ -46,7 +46,7 @@ public class RuntimeRestartHeuristicTest extends TestCase {
         RuntimeRestartHeuristic heuristic = new RuntimeRestartHeuristic();
         ProcrankItem procrank = new ProcrankItem();
         procrank.addProcrankLine(0, "foo", 0, 0, 0, 0);
-        heuristic.addProcrank(null, procrank);
+        heuristic.addProcrank(procrank, null, null);
 
         assertTrue(heuristic.failed());
     }
@@ -60,7 +60,7 @@ public class RuntimeRestartHeuristicTest extends TestCase {
         ProcrankItem procrank = new ProcrankItem();
         procrank.addProcrankLine(heuristic.getCutoff() + 1, heuristic.getSystemServerName(), 0, 0,
                 0, 0);
-        heuristic.addProcrank(null, procrank);
+        heuristic.addProcrank(procrank, null, null);
 
         assertTrue(heuristic.failed());
     }
@@ -76,7 +76,7 @@ public class RuntimeRestartHeuristicTest extends TestCase {
                 0, 0);
         procrank.addProcrankLine(heuristic.getCutoff() + 1, heuristic.getBootAnimationName(), 0, 0,
                 0, 0);
-        heuristic.addProcrank(null, procrank);
+        heuristic.addProcrank(procrank, null, null);
 
         assertTrue(heuristic.failed());
     }
@@ -90,7 +90,7 @@ public class RuntimeRestartHeuristicTest extends TestCase {
         ProcrankItem procrank = new ProcrankItem();
         procrank.addProcrankLine(heuristic.getCutoff() - 1, heuristic.getSystemServerName(), 0, 0,
                 0, 0);
-        heuristic.addProcrank(null, procrank);
+        heuristic.addProcrank(procrank, null, null);
 
         assertFalse(heuristic.failed());
     }
@@ -106,7 +106,7 @@ public class RuntimeRestartHeuristicTest extends TestCase {
                 0, 0);
         procrank.addProcrankLine(heuristic.getCutoff() - 2, heuristic.getBootAnimationName(), 0, 0,
                 0, 0);
-        heuristic.addProcrank(null, procrank);
+        heuristic.addProcrank(procrank, null, null);
 
         assertFalse(heuristic.failed());
     }
@@ -121,7 +121,7 @@ public class RuntimeRestartHeuristicTest extends TestCase {
         MiscLogcatItem item = new MiscLogcatItem();
         item.setCategory(LogcatParser.RUNTIME_RESTART);
         logcat.addEvent(item);
-        heuristic.addLogcat(null, logcat);
+        heuristic.addLogcat(logcat, null, null);
 
         assertTrue(heuristic.failed());
     }

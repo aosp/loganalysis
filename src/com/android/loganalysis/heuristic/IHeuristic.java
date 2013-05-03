@@ -16,6 +16,7 @@
 package com.android.loganalysis.heuristic;
 
 import com.android.loganalysis.item.BugreportItem;
+import com.android.loganalysis.item.ConflictingItemException;
 import com.android.loganalysis.item.DumpsysItem;
 import com.android.loganalysis.item.IItem;
 import com.android.loganalysis.item.KernelLogItem;
@@ -55,39 +56,102 @@ public interface IHeuristic {
     public static final String FAILED = "FAILED";
 
     /**
-     * Add a bugreport item to be checked.
+     * Add a {@link BugreportItem} to be checked.
+     *
+     * @param bugreport The {@link BugreportItem}.
+     * @param timestamp The {@link Date} of the bugreport, may be {@code null}.
+     * @param uri The URI of the bugreport, may be {@code null}.
+     * @throws ConflictingItemException If the {@link BugreportItem} contains information which does
+     * not match previously added {@link BugreportItem}s. This should only occur if the bugreports
+     * did not come from the same run. For example, if there was a device restart or if the
+     * bugreports are from multiple devices.
      */
-    public void addBugreport(Date timestamp, BugreportItem bugreport);
+    public void addBugreport(BugreportItem bugreport, Date timestamp, String uri)
+            throws ConflictingItemException;
 
     /**
-     * Add a logcat item to be checked.
+     * Add a {@link LogcatItem} to be checked.
+     *
+     * @param logcat The {@link LogcatItem}.
+     * @param timestamp The {@link Date} of the logcat, may be {@code null}.
+     * @param uri The URI of the logcat, may be {@code null}.
+     * @throws ConflictingItemException If the {@link LogcatItem} contains information which does
+     * not match previously added {@link LogcatItem}s. This should only occur if the logcats did not
+     * come from the same run. For example, if there was a device restart or if logcats are from
+     * multiple devices.
      */
-    public void addLogcat(Date timestamp, LogcatItem logcat);
+    public void addLogcat(LogcatItem logcat, Date timestamp, String uri)
+            throws ConflictingItemException;
 
     /**
-     * Add a kernel log item to be checked.
+     * Add a {@link KernelLogItem} to be checked.
+     *
+     * @param kernelLog The {@link KernelLogItem}.
+     * @param timestamp The {@link Date} of the kernel log, may be {@code null}.
+     * @param uri The URI of the kernel log, may be {@code null}.
+     * @throws ConflictingItemException If the {@link KernelLogItem} contains information which does
+     * not match previously added {@link KernelLogItem}s. This should only occur if the kernel logs
+     * did not come from the same run. For example, if there was a device restart or if kernel logs
+     * come from multiple devices.
      */
-    public void addKernelLog(Date timestamp, KernelLogItem kernelLog);
+    public void addKernelLog(KernelLogItem kernelLog, Date timestamp, String uri)
+            throws ConflictingItemException;
 
     /**
-     * Add a memory info item to be checked.
+     * Add a {@link MemInfoItem} to be checked.
+     *
+     * @param meminfo The {@link MemInfoItem}.
+     * @param timestamp The {@link Date} of the kernel log, may be {@code null}.
+     * @param uri The URI of the kernel log, may be {@code null}.
+     * @throws ConflictingItemException If the {@link MemInfoItem} contains information which does
+     * not match previously added {@link MemInfoItem}s. This should only occur if the mem info did
+     * not come from the same run. For example, if there was a device restart or if mem info came
+     * from multiple devices.
      */
-    public void addMemInfo(Date timestamp, MemInfoItem meminfo);
+    public void addMemInfo(MemInfoItem meminfo, Date timestamp, String uri)
+            throws ConflictingItemException;
 
     /**
-     * Add a procrank item to be checked.
+     * Add a {@link ProcrankItem} to be checked.
+     *
+     * @param procrank The {@link ProcrankItem}.
+     * @param timestamp The {@link Date} of the procrank output, may be {@code null}.
+     * @param uri The URI of the procrank output, may be {@code null}.
+     * @throws ConflictingItemException If the {@link ProcrankItem} contains information which does
+     * not match previously added {@link ProcrankItem}s. This should only occur if the procranks
+     * did not come from the same run. For example, if there was a device restart or if procranks
+     * come from multiple devices.
      */
-    public void addProcrank(Date timestamp, ProcrankItem procrank);
+    public void addProcrank(ProcrankItem procrank, Date timestamp, String uri)
+            throws ConflictingItemException;
 
     /**
-     * Add a top item to be checked.
+     * Add a {@link TopItem} to be checked.
+     *
+     * @param top The {@link TopItem}.
+     * @param timestamp The {@link Date} of the top output, may be {@code null}.
+     * @param uri The URI of the top output, may be {@code null}.
+     * @throws ConflictingItemException If the {@link TopItem} contains information which does not
+     * match previously added {@link TopItem}s. This should only occur if the top info did not come
+     * from the same run. For example, if there was a device restart or if top info came from
+     * multiple devices.
      */
-    public void addTop(Date timestamp, TopItem top);
+    public void addTop(TopItem top, Date timestamp, String uri)
+            throws ConflictingItemException;
 
     /**
-     * Add a dumpsys item to be checked.
+     * Add a {@link DumpsysItem} to be checked.
+     *
+     * @param dumpsys The {@link DumpsysItem}.
+     * @param timestamp The {@link Date} of the dumpsys, may be {@code null}.
+     * @param uri The URI of the dumpsys, may be {@code null}.
+     * @throws ConflictingItemException If the {@link DumpsysItem} contains information which does
+     * not match previously added {@link DumpsysItem}s. This should only occur if the dumpsys did
+     * not come from the same run.  For example, if there was a device restart or if dumpsys came
+     * from multiple devices.
      */
-    public void addDumpsys(Date timestamp, DumpsysItem dumpsys);
+    public void addDumpsys(DumpsysItem dumpsys, Date timestamp, String uri)
+            throws ConflictingItemException;
 
     /**
      * Checks to see if there are any problems.

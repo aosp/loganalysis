@@ -42,7 +42,7 @@ public class KernelResetHeuristic extends AbstractHeuristic {
      * {@inheritDoc}
      */
     @Override
-    public void addKernelLog(Date timestamp, KernelLogItem kernelLog) {
+    public void addKernelLog(KernelLogItem kernelLog, Date timestamp, String uri) {
         mKernelLog = kernelLog;
     }
 

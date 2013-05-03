@@ -36,7 +36,7 @@ public class KernelResetHeuristicTest extends TestCase {
         MiscKernelLogItem item = new MiscKernelLogItem();
         item.setCategory(KernelLogParser.KERNEL_RESET);
         kernelLog.addEvent(item);
-        heuristic.addKernelLog(null, kernelLog);
+        heuristic.addKernelLog(kernelLog, null, null);
 
         assertTrue(heuristic.failed());
     }
@@ -48,7 +48,7 @@ public class KernelResetHeuristicTest extends TestCase {
     public void testCheckHeuristic_no_reset() {
         KernelResetHeuristic heuristic = new KernelResetHeuristic();
         KernelLogItem kernelLog = new KernelLogItem();
-        heuristic.addKernelLog(null, kernelLog);
+        heuristic.addKernelLog(kernelLog, null, null);
 
         assertFalse(heuristic.failed());
     }

@@ -26,7 +26,7 @@ public class ConflictingItemException extends Exception {
      *
      * @param message The reason for the conflict.
      */
-    ConflictingItemException(String message) {
+    public ConflictingItemException(String message) {
         super(message);
     }
 }

@@ -49,14 +49,15 @@ public class CpuUsageHeuristic extends AbstractHeuristic {
      * {@inheritDoc}
      */
     @Override
-    public void addLogcat(Date timestamp, LogcatItem logcat) {
+    public void addLogcat(LogcatItem logcat, Date timestamp, String uri) {
         mLogcat = logcat;
     }
 
     /**
      * {@inheritDoc}
      */
-    public void addTop(Date timestamp, TopItem top) {
+    @Override
+    public void addTop(TopItem top, Date timestamp, String uri) {
         mTop = top;
     }
 

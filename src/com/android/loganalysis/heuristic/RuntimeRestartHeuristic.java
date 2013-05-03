@@ -52,7 +52,7 @@ public class RuntimeRestartHeuristic extends AbstractHeuristic {
      * {@inheritDoc}
      */
     @Override
-    public void addLogcat(Date timestamp, LogcatItem logcat) {
+    public void addLogcat(LogcatItem logcat, Date timestamp, String uri) {
         mLogcat = logcat;
     }
 
@@ -60,7 +60,7 @@ public class RuntimeRestartHeuristic extends AbstractHeuristic {
      * {@inheritDoc}
      */
     @Override
-    public void addProcrank(Date timestamp, ProcrankItem procrank) {
+    public void addProcrank(ProcrankItem procrank, Date timestamp, String uri) {
         mProcrank = procrank;
     }
 
