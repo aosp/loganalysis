@@ -131,7 +131,7 @@ public class RuntimeRestartHeuristic extends AbstractHeuristic {
         if (mLogcat != null) {
             for (MiscLogcatItem item : mLogcat.getMiscEvents(LogcatParser.RUNTIME_RESTART)) {
                 sb.append(String.format("Message: %s, Time: %s\n\nLast lines of logcat:\n%s\n\n" +
-                        "Process lines for pid %d:\n%s\n\n", item.getMessage(), item.getEventTime(),
+                        "Process lines for pid %d:\n%s\n\n", item.getStack(), item.getEventTime(),
                         item.getLastPreamble(), item.getPid(), item.getProcessPreamble()));
             }
         }

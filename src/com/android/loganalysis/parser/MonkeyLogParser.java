@@ -16,7 +16,7 @@
 package com.android.loganalysis.parser;
 
 import com.android.loganalysis.item.AnrItem;
-import com.android.loganalysis.item.GenericLogcatItem;
+import com.android.loganalysis.item.MiscLogcatItem;
 import com.android.loganalysis.item.MonkeyLogItem;
 import com.android.loganalysis.item.MonkeyLogItem.DroppedCategory;
 import com.android.loganalysis.item.TracesItem;
@@ -145,7 +145,7 @@ public class MonkeyLogParser implements IParser {
                 mBlock.add(line);
                 return;
             } else {
-                GenericLogcatItem crash = null;
+                MiscLogcatItem crash = null;
                 if (mMatchingJavaCrash) {
                     crash = new JavaCrashParser().parse(mBlock);
                 } else if (mMatchingNativeCrash) {
@@ -267,7 +267,7 @@ public class MonkeyLogParser implements IParser {
     /**
      * Add a crash to the monkey log item and reset the parser state for crashes.
      */
-    private void addCrashAndReset(GenericLogcatItem crash) {
+    private void addCrashAndReset(MiscLogcatItem crash) {
         if (crash != null) {
             crash.setPid(mPid);
             crash.setApp(mApp);

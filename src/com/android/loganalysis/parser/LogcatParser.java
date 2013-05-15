@@ -15,7 +15,6 @@
  */
 package com.android.loganalysis.parser;
 
-import com.android.loganalysis.item.GenericLogcatItem;
 import com.android.loganalysis.item.LogcatItem;
 import com.android.loganalysis.item.MiscLogcatItem;
 import com.android.loganalysis.util.ArrayUtil;
@@ -45,6 +44,9 @@ import java.util.regex.Pattern;
  * </p>
  */
 public class LogcatParser implements IParser {
+    public static final String ANR = "ANR";
+    public static final String JAVA_CRASH = "JAVA_CRASH";
+    public static final String NATIVE_CRASH = "NATIVE_CRASH";
     public static final String HIGH_CPU_USAGE = "HIGH_CPU_USAGE";
     public static final String HIGH_MEMORY_USAGE = "HIGH_MEMORY_USAGE";
     public static final String RUNTIME_RESTART = "RUNTIME_RESTART";
@@ -249,7 +251,7 @@ public class LogcatParser implements IParser {
      */
     private void commit() {
         for (LogcatData data : mDataList) {
-            GenericLogcatItem item = null;
+            MiscLogcatItem item = null;
             if ("E".equals(data.mLevel) && "ActivityManager".equals(data.mTag)) {
                 // CLog.v("Parsing ANR: %s", data.mLines);
                 item = new AnrParser().parse(data.mLines);
@@ -265,7 +267,7 @@ public class LogcatParser implements IParser {
                 if (category != null) {
                     MiscLogcatItem logcatItem = new MiscLogcatItem();
                     logcatItem.setCategory(category);
-                    logcatItem.setMessage(msg);
+                    logcatItem.setStack(msg);
                     item = logcatItem;
                 }
             }

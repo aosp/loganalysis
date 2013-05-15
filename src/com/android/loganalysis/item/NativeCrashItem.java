@@ -15,6 +15,8 @@
  */
 package com.android.loganalysis.item;
 
+import com.android.loganalysis.parser.LogcatParser;
+
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -22,21 +24,20 @@ import java.util.Set;
 /**
  * An {@link IItem} used to store native crash info.
  */
-public class NativeCrashItem extends GenericLogcatItem {
+public class NativeCrashItem extends MiscLogcatItem {
 
     /** Constant for JSON output */
     public static final String FINGERPRINT = "FINGERPRINT";
-    /** Constant for JSON output */
-    public static final String STACK = "STACK";
 
     private static final Set<String> ATTRIBUTES = new HashSet<String>(Arrays.asList(
-            FINGERPRINT, STACK));
+            FINGERPRINT));
 
     /**
      * The constructor for {@link NativeCrashItem}.
      */
     public NativeCrashItem() {
         super(ATTRIBUTES);
+        setCategory(LogcatParser.NATIVE_CRASH);
     }
 
     /**
@@ -51,19 +52,5 @@ public class NativeCrashItem extends GenericLogcatItem {
      */
     public void setFingerprint(String fingerprint) {
         setAttribute(FINGERPRINT, fingerprint);
-    }
-
-    /**
-     * Get the stack for the crash.
-     */
-    public String getStack() {
-        return (String) getAttribute(STACK);
-    }
-
-    /**
-     * Set the stack for the crash.
-     */
-    public void setStack(String stack) {
-        setAttribute(STACK, stack);
     }
 }

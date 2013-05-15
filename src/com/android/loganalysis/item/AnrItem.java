@@ -15,6 +15,8 @@
  */
 package com.android.loganalysis.item;
 
+import com.android.loganalysis.parser.LogcatParser;
+
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -22,7 +24,7 @@ import java.util.Set;
 /**
  * An {@link IItem} used to store ANR info.
  */
-public class AnrItem extends GenericLogcatItem {
+public class AnrItem extends MiscLogcatItem {
     /**
      * An enum used to select the CPU usage category.
      */
@@ -47,8 +49,6 @@ public class AnrItem extends GenericLogcatItem {
     /** Constant for JSON output */
     public static final String REASON = "REASON";
     /** Constant for JSON output */
-    public static final String STACK = "STACK";
-    /** Constant for JSON output */
     public static final String TRACE = "TRACE";
 
     private static final Set<String> ATTRIBUTES = new HashSet<String>(Arrays.asList(
@@ -59,13 +59,14 @@ public class AnrItem extends GenericLogcatItem {
         LoadCategory.LOAD_1.toString(),
         LoadCategory.LOAD_5.toString(),
         LoadCategory.LOAD_15.toString(),
-        ACTIVITY, REASON, STACK, TRACE));
+        ACTIVITY, REASON, TRACE));
 
     /**
      * The constructor for {@link AnrItem}.
      */
     public AnrItem() {
         super(ATTRIBUTES);
+        setCategory(LogcatParser.ANR);
     }
 
     /**
@@ -122,20 +123,6 @@ public class AnrItem extends GenericLogcatItem {
      */
     public void setReason(String reason) {
         setAttribute(REASON, reason);
-    }
-
-    /**
-     * Get the stack for the ANR.
-     */
-    public String getStack() {
-        return (String) getAttribute(STACK);
-    }
-
-    /**
-     * Set the stack for the ANR.
-     */
-    public void setStack(String stack) {
-        setAttribute(STACK, stack);
     }
 
     /**

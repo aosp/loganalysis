@@ -114,7 +114,7 @@ public class KernelLogParser implements IParser {
             MiscKernelLogItem kernelLogItem = new MiscKernelLogItem();
             kernelLogItem.setEventTime(mStopTime);
             kernelLogItem.setPreamble(mPreambleUtil.getLastTail());
-            kernelLogItem.setMessage(message);
+            kernelLogItem.setStack(message);
             kernelLogItem.setCategory(category);
             mKernelLog.addEvent(kernelLogItem);
         }

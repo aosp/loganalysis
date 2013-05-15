@@ -15,6 +15,10 @@
  */
 package com.android.loganalysis.item;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
@@ -37,9 +41,8 @@ public class LogcatItem extends GenericItem {
     private static final Set<String> ATTRIBUTES = new HashSet<String>(Arrays.asList(
             START_TIME, STOP_TIME, EVENTS));
 
-    private class ItemList extends LinkedList<IItem> {
-        private static final long serialVersionUID = 1088529764741812025L;
-    }
+    @SuppressWarnings("serial")
+    private class ItemList extends LinkedList<MiscLogcatItem> {}
 
     /**
      * The constructor for {@link LogcatItem}.
@@ -79,16 +82,16 @@ public class LogcatItem extends GenericItem {
     }
 
     /**
-     * Get the list of all {@link IItem} events.
+     * Get the list of all {@link MiscLogcatItem} events.
      */
-    public List<IItem> getEvents() {
+    public List<MiscLogcatItem> getEvents() {
         return (ItemList) getAttribute(EVENTS);
     }
 
     /**
-     * Add an {@link IItem} event to the end of the list of events.
+     * Add an {@link MiscLogcatItem} event to the end of the list of events.
      */
-    public void addEvent(IItem event) {
+    public void addEvent(MiscLogcatItem event) {
         ((ItemList) getAttribute(EVENTS)).add(event);
     }
 
@@ -143,5 +146,78 @@ public class LogcatItem extends GenericItem {
             }
         }
         return items;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public LogcatItem merge(IItem other) throws ConflictingItemException {
+        if (this == other) {
+            return this;
+        }
+        if (other == null || !(other instanceof LogcatItem)) {
+            throw new ConflictingItemException("Conflicting class types");
+        }
+
+        LogcatItem logcat = (LogcatItem) other;
+
+        Date start = logcat.getStartTime().before(getStartTime()) ?
+                logcat.getStartTime() : getStartTime();
+        Date stop = logcat.getStopTime().after(getStopTime()) ?
+                logcat.getStopTime() : getStopTime();
+        Date overlapStart = logcat.getStartTime().after(getStartTime()) ?
+                logcat.getStartTime() : getStartTime();
+        Date overlapStop = logcat.getStopTime().before(getStopTime()) ?
+                logcat.getStopTime() : getStopTime();
+
+        // Make sure that all events in the overlapping span are
+        ItemList mergedEvents = new ItemList();
+        for (MiscLogcatItem event : getEvents()) {
+            final Date eventTime = event.getEventTime();
+            if (eventTime.after(overlapStart) && eventTime.before(overlapStop) &&
+                    !logcat.getEvents().contains(event)) {
+                throw new ConflictingItemException("Event in first logcat not contained in " +
+                        "overlapping portion of other logcat.");
+            }
+            mergedEvents.add(event);
+        }
+
+        for (MiscLogcatItem event : logcat.getEvents()) {
+            final Date eventTime = event.getEventTime();
+            if (eventTime.after(overlapStart) && eventTime.before(overlapStop)) {
+                if (!getEvents().contains(event)) {
+                    throw new ConflictingItemException("Event in first logcat not contained in " +
+                            "overlapping portion of other logcat.");
+                }
+            } else {
+                mergedEvents.add(event);
+            }
+        }
+
+        LogcatItem mergedLogcat = new LogcatItem();
+        mergedLogcat.setStartTime(start);
+        mergedLogcat.setStopTime(stop);
+        mergedLogcat.setAttribute(EVENTS, mergedEvents);
+        return mergedLogcat;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public JSONObject toJson() {
+        JSONObject output = super.toJson();
+        JSONArray events = new JSONArray();
+        for (MiscLogcatItem event : getEvents()) {
+            events.put(event.toJson());
+        }
+
+        try {
+            output.put(EVENTS, events);
+        } catch (JSONException e) {
+            // Ignore
+        }
+        return output;
     }
 }

@@ -55,7 +55,7 @@ public class GenericItem implements IItem {
             throw new ConflictingItemException("Conflicting class types");
         }
 
-        return new GenericItem(mAllowedAttributes, mergeAttributes(other));
+        return new GenericItem(mAllowedAttributes, mergeAttributes(other, mAllowedAttributes));
     }
 
     /**
@@ -68,7 +68,8 @@ public class GenericItem implements IItem {
      * @return A Map from Strings to Objects containing merged attributes.
      * @throws ConflictingItemException If the two items are not consistent.
      */
-    protected Map<String, Object> mergeAttributes(IItem other) throws ConflictingItemException {
+    protected Map<String, Object> mergeAttributes(IItem other, Set<String> attributes)
+            throws ConflictingItemException {
         if (this == other) {
             return mAttributes;
         }
@@ -78,7 +79,7 @@ public class GenericItem implements IItem {
 
         GenericItem item = (GenericItem) other;
         Map<String, Object> mergedAttributes = new HashMap<String, Object>();
-        for (String attribute : mAllowedAttributes) {
+        for (String attribute : attributes) {
             mergedAttributes.put(attribute,
                     mergeObjects(getAttribute(attribute), item.getAttribute(attribute)));
         }

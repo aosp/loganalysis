@@ -32,10 +32,10 @@ public class MiscKernelLogItem extends GenericItem {
     /** Constant for JSON output */
     public static final String CATEGORY = "CATEGORY";
     /** Constant for JSON output */
-    public static final String MESSAGE = "MESSAGE";
+    public static final String STACK = "STACK";
 
     private static final Set<String> ATTRIBUTES = new HashSet<String>(Arrays.asList(
-            EVENT_TIME, PREAMBLE, CATEGORY, MESSAGE));
+            EVENT_TIME, PREAMBLE, CATEGORY, STACK));
 
     /**
      * Constructor for {@link MiscKernelLogItem}.
@@ -87,16 +87,16 @@ public class MiscKernelLogItem extends GenericItem {
     }
 
     /**
-     * Get the message for the event.
+     * Get the stack for the event.
      */
-    public String getMessage() {
-        return (String) getAttribute(MESSAGE);
+    public String getStack() {
+        return (String) getAttribute(STACK);
     }
 
     /**
-     * Set the message for the event.
+     * Set the stack for the event.
      */
-    public void setMessage(String message) {
-        setAttribute(MESSAGE, message);
+    public void setStack(String stack) {
+        setAttribute(STACK, stack);
     }
 }

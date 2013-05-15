@@ -18,11 +18,11 @@ package com.android.loganalysis.parser;
 import com.android.loganalysis.item.AnrItem;
 import com.android.loganalysis.item.BugreportItem;
 import com.android.loganalysis.item.DumpsysItem;
-import com.android.loganalysis.item.GenericLogcatItem;
 import com.android.loganalysis.item.IItem;
 import com.android.loganalysis.item.KernelLogItem;
 import com.android.loganalysis.item.LogcatItem;
 import com.android.loganalysis.item.MemInfoItem;
+import com.android.loganalysis.item.MiscLogcatItem;
 import com.android.loganalysis.item.ProcrankItem;
 import com.android.loganalysis.item.SystemPropsItem;
 import com.android.loganalysis.item.TopItem;
@@ -159,9 +159,9 @@ public class BugreportParser extends AbstractSectionParser {
 
             if (mBugreport.getSystemLog() != null && mBugreport.getProcrank() != null) {
                 for (IItem item : mBugreport.getSystemLog().getEvents()) {
-                    if (item instanceof GenericLogcatItem &&
-                            ((GenericLogcatItem) item).getApp() == null) {
-                        GenericLogcatItem logcatItem = (GenericLogcatItem) item;
+                    if (item instanceof MiscLogcatItem &&
+                            ((MiscLogcatItem) item).getApp() == null) {
+                        MiscLogcatItem logcatItem = (MiscLogcatItem) item;
                         logcatItem.setApp(mBugreport.getProcrank().getProcessName(
                                 logcatItem.getPid()));
                     }

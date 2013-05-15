@@ -334,15 +334,15 @@ public class MonkeyLogItem extends GenericItem {
      * Get the {@link AnrItem}, {@link JavaCrashItem}, or {@link NativeCrashItem} for the monkey run
      * or null if there was no crash.
      */
-    public GenericLogcatItem getCrash() {
-        return (GenericLogcatItem) getAttribute(CRASH);
+    public MiscLogcatItem getCrash() {
+        return (MiscLogcatItem) getAttribute(CRASH);
     }
 
     /**
      * Set the {@link AnrItem}, {@link JavaCrashItem}, or {@link NativeCrashItem} for the monkey
      * run.
      */
-    public void setCrash(GenericLogcatItem crash) {
+    public void setCrash(MiscLogcatItem crash) {
         setAttribute(CRASH, crash);
     }
 

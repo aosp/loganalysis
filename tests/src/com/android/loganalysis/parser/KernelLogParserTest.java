@@ -46,7 +46,7 @@ public class KernelLogParserTest extends TestCase {
         MiscKernelLogItem item = kernelLog.getMiscEvents(KernelLogParser.KERNEL_RESET).get(0);
         assertEquals(1.0, item.getEventTime(), 0.0000005);
         assertEquals("[    0.000000] Start", item.getPreamble());
-        assertEquals("Kernel panic", item.getMessage());
+        assertEquals("Kernel panic", item.getStack());
     }
 
     /**
@@ -68,7 +68,7 @@ public class KernelLogParserTest extends TestCase {
         MiscKernelLogItem item = kernelLog.getMiscEvents(KernelLogParser.KERNEL_RESET).get(0);
         assertEquals(1.0, item.getEventTime(), 0.0000005);
         assertEquals("<1>[    0.000000] Start", item.getPreamble());
-        assertEquals("Kernel panic", item.getMessage());
+        assertEquals("Kernel panic", item.getStack());
     }
 
     /**
@@ -90,7 +90,7 @@ public class KernelLogParserTest extends TestCase {
         MiscKernelLogItem item = kernelLog.getMiscEvents(KernelLogParser.KERNEL_RESET).get(0);
         assertEquals(2.0, item.getEventTime(), 0.0000005);
         assertEquals("[    0.000000] Start\n[    2.000000] End", item.getPreamble());
-        assertEquals("Last boot reason: hw_reset", item.getMessage());
+        assertEquals("Last boot reason: hw_reset", item.getStack());
     }
 
     /**
@@ -110,6 +110,6 @@ public class KernelLogParserTest extends TestCase {
         MiscKernelLogItem item = kernelLog.getMiscEvents(KernelLogParser.KERNEL_RESET).get(0);
         assertNull(item.getEventTime());
         assertEquals("", item.getPreamble());
-        assertEquals("Last boot reason: hw_reset", item.getMessage());
+        assertEquals("Last boot reason: hw_reset", item.getStack());
     }
 }

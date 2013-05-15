@@ -71,49 +71,49 @@ public class GenericItemTest extends TestCase {
     }
 
     /**
-     * Test for {@link GenericItem#mergeAttributes(IItem)}.
+     * Test for {@link GenericItem#mergeAttributes(IItem, Set)}.
      */
     public void testMergeAttributes() throws ConflictingItemException {
         Map<String, Object> attributes;
 
-        attributes = mEmptyItem1.mergeAttributes(mEmptyItem1);
+        attributes = mEmptyItem1.mergeAttributes(mEmptyItem1, ATTRIBUTES);
         assertNull(attributes.get("string"));
         assertNull(attributes.get("integer"));
 
-        attributes = mEmptyItem1.mergeAttributes(mEmptyItem2);
+        attributes = mEmptyItem1.mergeAttributes(mEmptyItem2, ATTRIBUTES);
         assertNull(attributes.get("string"));
         assertNull(attributes.get("integer"));
 
-        attributes = mEmptyItem2.mergeAttributes(mEmptyItem1);
+        attributes = mEmptyItem2.mergeAttributes(mEmptyItem1, ATTRIBUTES);
         assertNull(attributes.get("string"));
         assertNull(attributes.get("integer"));
 
-        attributes = mEmptyItem1.mergeAttributes(mStringItem);
+        attributes = mEmptyItem1.mergeAttributes(mStringItem, ATTRIBUTES);
         assertEquals(mStringAttribute, attributes.get("string"));
         assertNull(attributes.get("integer"));
 
-        attributes = mStringItem.mergeAttributes(mEmptyItem1);
+        attributes = mStringItem.mergeAttributes(mEmptyItem1, ATTRIBUTES);
         assertEquals(mStringAttribute, attributes.get("string"));
         assertNull(attributes.get("integer"));
 
-        attributes = mIntegerItem.mergeAttributes(mStringItem);
+        attributes = mIntegerItem.mergeAttributes(mStringItem, ATTRIBUTES);
         assertEquals(mStringAttribute, attributes.get("string"));
         assertEquals(mIntegerAttribute, attributes.get("integer"));
 
-        attributes = mEmptyItem1.mergeAttributes(mFullItem1);
+        attributes = mEmptyItem1.mergeAttributes(mFullItem1, ATTRIBUTES);
         assertEquals(mStringAttribute, attributes.get("string"));
         assertEquals(mIntegerAttribute, attributes.get("integer"));
 
-        attributes = mFullItem1.mergeAttributes(mEmptyItem1);
+        attributes = mFullItem1.mergeAttributes(mEmptyItem1, ATTRIBUTES);
         assertEquals(mStringAttribute, attributes.get("string"));
         assertEquals(mIntegerAttribute, attributes.get("integer"));
 
-        attributes = mFullItem1.mergeAttributes(mFullItem2);
+        attributes = mFullItem1.mergeAttributes(mFullItem2, ATTRIBUTES);
         assertEquals(mStringAttribute, attributes.get("string"));
         assertEquals(mIntegerAttribute, attributes.get("integer"));
 
         try {
-            mFullItem1.mergeAttributes(mInconsistentItem);
+            mFullItem1.mergeAttributes(mInconsistentItem, ATTRIBUTES);
             fail("Expecting a ConflictingItemException");
         } catch (ConflictingItemException e) {
             // Expected
@@ -228,9 +228,11 @@ public class GenericItemTest extends TestCase {
      */
     public void testToJson() throws JSONException {
         GenericItem item = new GenericItem(new HashSet<String>(Arrays.asList(
-                "string", "date", "object", "integer", "long", "float", "double", "null")));
+                "string", "date", "object", "integer", "long", "float", "double", "item", "null")));
         Date date = new Date();
         Object object = new Object();
+        NativeCrashItem subItem = new NativeCrashItem();
+
         item.setAttribute("string", "foo");
         item.setAttribute("date", date);
         item.setAttribute("object", object);
@@ -238,6 +240,7 @@ public class GenericItemTest extends TestCase {
         item.setAttribute("long", 1L);
         item.setAttribute("float", 2.5f);
         item.setAttribute("double", 3.5);
+        item.setAttribute("item", subItem);
         item.setAttribute("null", null);
 
         // Convert to JSON string and back again
@@ -257,6 +260,8 @@ public class GenericItemTest extends TestCase {
         assertEquals(2.5, output.get("float"));
         assertTrue(output.has("double"));
         assertEquals(3.5, output.get("double"));
+        assertTrue(output.has("item"));
+        assertTrue(output.get("item") instanceof JSONObject);
         assertFalse(output.has("null"));
     }
 }

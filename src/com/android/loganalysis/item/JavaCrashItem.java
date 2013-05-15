@@ -15,6 +15,8 @@
  */
 package com.android.loganalysis.item;
 
+import com.android.loganalysis.parser.LogcatParser;
+
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -22,23 +24,22 @@ import java.util.Set;
 /**
  * An {@link IItem} used to store Java crash info.
  */
-public class JavaCrashItem extends GenericLogcatItem {
+public class JavaCrashItem extends MiscLogcatItem {
 
     /** Constant for JSON output */
     public static final String EXCEPTION = "EXCEPTION";
     /** Constant for JSON output */
     public static final String MESSAGE = "MESSAGE";
-    /** Constant for JSON output */
-    public static final String STACK = "STACK";
 
     private static final Set<String> ATTRIBUTES = new HashSet<String>(Arrays.asList(
-            EXCEPTION, MESSAGE, STACK));
+            EXCEPTION, MESSAGE));
 
     /**
      * The constructor for {@link JavaCrashItem}.
      */
     public JavaCrashItem() {
         super(ATTRIBUTES);
+        setCategory(LogcatParser.JAVA_CRASH);
     }
 
     /**
@@ -67,19 +68,5 @@ public class JavaCrashItem extends GenericLogcatItem {
      */
     public void setMessage(String message) {
         setAttribute(MESSAGE, message);
-    }
-
-    /**
-     * Get the stack for the ANR.
-     */
-    public String getStack() {
-        return (String) getAttribute(STACK);
-    }
-
-    /**
-     * Set the stack for the ANR.
-     */
-    public void setStack(String stack) {
-        setAttribute(STACK, stack);
     }
 }
