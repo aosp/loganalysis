@@ -50,7 +50,9 @@ public class PowerUsageHeuristic extends AbstractHeuristic {
      */
     @Override
     public void addDumpsys(DumpsysItem dumpsys, Date timestamp, String uri) {
-        mBatteryInfo = dumpsys.getBatteryInfo();
+        if (dumpsys != null) {
+            mBatteryInfo = dumpsys.getBatteryInfo();
+        }
     }
 
     /**
@@ -101,6 +103,10 @@ public class PowerUsageHeuristic extends AbstractHeuristic {
             return null;
         }
 
+        if (mBatteryInfo == null) {
+            return null;
+        }
+
         int wakeLockCounter = 0;
         for (WakeLock wakeLock : mBatteryInfo.getLastUnpluggedWakeLocks()) {
             if (wakeLock.getHeldTime() > WAKE_LOCK_TIME_CUTOFF) {
@@ -140,6 +146,10 @@ public class PowerUsageHeuristic extends AbstractHeuristic {
             return null;
         }
 
+        if (mBatteryInfo == null) {
+            return null;
+        }
+
         StringBuilder sb = new StringBuilder();
         for (WakeLock wakeLock : mBatteryInfo.getLastUnpluggedWakeLocks()) {
             if (wakeLock.getHeldTime() > WAKE_LOCK_TIME_CUTOFF) {
@@ -165,22 +175,24 @@ public class PowerUsageHeuristic extends AbstractHeuristic {
     @Override
     public JSONObject toJson() {
         JSONObject output = super.toJson();
-        try {
-            output.put(CUTOFF, WAKE_LOCK_TIME_CUTOFF);
+        if (mBatteryInfo != null) {
+            try {
+                output.put(CUTOFF, WAKE_LOCK_TIME_CUTOFF);
 
-            JSONArray kernelWakeLocks = new JSONArray();
-            for (WakeLock wakeLock : mBatteryInfo.getLastUnpluggedKernelWakeLocks()) {
-                kernelWakeLocks.put(wakeLock.toJson());
-            }
-            output.put(KERNEL_WAKE_LOCKS, kernelWakeLocks);
+                JSONArray kernelWakeLocks = new JSONArray();
+                for (WakeLock wakeLock : mBatteryInfo.getLastUnpluggedKernelWakeLocks()) {
+                    kernelWakeLocks.put(wakeLock.toJson());
+                }
+                output.put(KERNEL_WAKE_LOCKS, kernelWakeLocks);
 
-            JSONArray wakeLocks = new JSONArray();
-            for (WakeLock wakeLock : mBatteryInfo.getLastUnpluggedWakeLocks()) {
-                wakeLocks.put(wakeLock.toJson());
+                JSONArray wakeLocks = new JSONArray();
+                for (WakeLock wakeLock : mBatteryInfo.getLastUnpluggedWakeLocks()) {
+                    wakeLocks.put(wakeLock.toJson());
+                }
+                output.put(WAKE_LOCKS, wakeLocks);
+            } catch (JSONException e) {
+                // Ignore
             }
-            output.put(WAKE_LOCKS, wakeLocks);
-        } catch (JSONException e) {
-            // Ignore
         }
         return output;
     }

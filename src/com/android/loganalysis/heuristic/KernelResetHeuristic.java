@@ -91,9 +91,11 @@ public class KernelResetHeuristic extends AbstractHeuristic {
         }
 
         StringBuilder sb = new StringBuilder();
-        for (MiscKernelLogItem item : mKernelLog.getMiscEvents(KernelLogParser.KERNEL_RESET)) {
-            sb.append(String.format("Reason: %s, Time: %.6f\nPreamble:\n%s\n\n", item.getMessage(),
-                    item.getEventTime(), item.getPreamble()));
+        if (mKernelLog != null) {
+            for (MiscKernelLogItem item : mKernelLog.getMiscEvents(KernelLogParser.KERNEL_RESET)) {
+                sb.append(String.format("Reason: %s, Time: %.6f\nPreamble:\n%s\n\n",
+                        item.getMessage(), item.getEventTime(), item.getPreamble()));
+            }
         }
         return sb.toString();
     }
@@ -106,8 +108,11 @@ public class KernelResetHeuristic extends AbstractHeuristic {
         JSONObject output = super.toJson();
         try {
             JSONArray kernelResets = new JSONArray();
-            for (MiscKernelLogItem item : mKernelLog.getMiscEvents(KernelLogParser.KERNEL_RESET)) {
-                kernelResets.put(item.toJson());
+            if (mKernelLog != null) {
+                for (MiscKernelLogItem item : mKernelLog.getMiscEvents(
+                        KernelLogParser.KERNEL_RESET)) {
+                    kernelResets.put(item.toJson());
+                }
             }
             output.put(KERNEL_RESETS, kernelResets);
         } catch (JSONException e) {

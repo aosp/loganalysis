@@ -251,8 +251,6 @@ public class ProcessLifecycleHeuristicTest extends TestCase {
         ProcessLifecycleHeuristic.mergeInterval(mergedIntervals, new Interval(
                 offsetDate(now, Calendar.MINUTE, 1), offsetDate(now, Calendar.MINUTE, 8)));
 
-        System.out.println(mergedIntervals);
-
         assertEquals(1, mergedIntervals.size());
         assertEquals(offsetDate(now, Calendar.MINUTE, -2), mergedIntervals.get(0).mStart);
         assertEquals(offsetDate(now, Calendar.MINUTE, 8), mergedIntervals.get(0).mStop);
