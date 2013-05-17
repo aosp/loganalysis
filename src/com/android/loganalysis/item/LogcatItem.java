@@ -139,10 +139,9 @@ public class LogcatItem extends GenericItem {
      */
     public List<MiscLogcatItem> getMiscEvents(String category) {
         List<MiscLogcatItem> items = new LinkedList<MiscLogcatItem>();
-        for (IItem item : getEvents()) {
-            if (item instanceof MiscLogcatItem &&
-                    ((MiscLogcatItem) item).getCategory().equals(category)) {
-                items.add((MiscLogcatItem) item);
+        for (MiscLogcatItem item : getEvents()) {
+            if (item.getCategory().equals(category)) {
+                items.add(item);
             }
         }
         return items;

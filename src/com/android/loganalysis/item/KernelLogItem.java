@@ -15,6 +15,10 @@
  */
 package com.android.loganalysis.item;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -36,9 +40,8 @@ public class KernelLogItem extends GenericItem {
     private static final Set<String> ATTRIBUTES = new HashSet<String>(Arrays.asList(
             START_TIME, STOP_TIME, EVENTS));
 
-    private class ItemList extends LinkedList<IItem> {
-        private static final long serialVersionUID = -441685822528904595L;
-    }
+    @SuppressWarnings("serial")
+    private class ItemList extends LinkedList<MiscKernelLogItem> {}
 
     /**
      * The constructor for {@link KernelLogItem}.
@@ -78,16 +81,16 @@ public class KernelLogItem extends GenericItem {
     }
 
     /**
-     * Get the list of all {@link IItem} events.
+     * Get the list of all {@link MiscKernelLogItem} events.
      */
-    public List<IItem> getEvents() {
+    public List<MiscKernelLogItem> getEvents() {
         return (ItemList) getAttribute(EVENTS);
     }
 
     /**
-     * Add an {@link IItem} event to the end of the list of events.
+     * Add an {@link MiscKernelLogItem} event to the end of the list of events.
      */
-    public void addEvent(IItem event) {
+    public void addEvent(MiscKernelLogItem event) {
         ((ItemList) getAttribute(EVENTS)).add(event);
     }
 
@@ -96,12 +99,30 @@ public class KernelLogItem extends GenericItem {
      */
     public List<MiscKernelLogItem> getMiscEvents(String category) {
         List<MiscKernelLogItem> items = new LinkedList<MiscKernelLogItem>();
-        for (IItem item : getEvents()) {
-            if (item instanceof MiscKernelLogItem &&
-                    ((MiscKernelLogItem) item).getCategory().equals(category)) {
-                items.add((MiscKernelLogItem) item);
+        for (MiscKernelLogItem item : getEvents()) {
+            if (item.getCategory().equals(category)) {
+                items.add(item);
             }
         }
         return items;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public JSONObject toJson() {
+        JSONObject output = super.toJson();
+        JSONArray events = new JSONArray();
+        for (MiscKernelLogItem event : getEvents()) {
+            events.put(event.toJson());
+        }
+
+        try {
+            output.put(EVENTS, events);
+        } catch (JSONException e) {
+            // Ignore
+        }
+        return output;
     }
 }
