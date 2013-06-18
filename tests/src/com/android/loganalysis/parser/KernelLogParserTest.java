@@ -17,6 +17,7 @@ package com.android.loganalysis.parser;
 
 import com.android.loganalysis.item.KernelLogItem;
 import com.android.loganalysis.item.MiscKernelLogItem;
+import com.android.loganalysis.util.LogPatternUtil;
 
 import junit.framework.TestCase;
 
@@ -111,5 +112,39 @@ public class KernelLogParserTest extends TestCase {
         assertNull(item.getEventTime());
         assertEquals("", item.getPreamble());
         assertEquals("Last boot reason: hw_reset", item.getStack());
+    }
+
+    /**
+     * Test that kernel patterns are matched.
+     */
+    public void testKernelResetPatterns() {
+        List<String> kernelResetPatterns = Arrays.asList(
+                "smem: DIAG",
+                "smsm: AMSS FATAL ERROR",
+                "kernel BUG at ",
+                "PC is at ",
+                "Internal error:",
+                "PVR_K:(Fatal): Debug assertion failed! []",
+                "Kernel panic",
+                "BP panicked",
+                "WROTE DSP RAMDUMP",
+                "tegra_wdt: last reset due to watchdog timeout",
+                "Last reset was MPU Watchdog Timer reset",
+                "[MODEM_IF] CRASH",
+                "Last boot reason: kernel_panic",
+                "Last boot reason: watchdog",
+                "Last boot reason: watchdogr",
+                "Last boot reason: hw_reset",
+                "Last boot reason: PowerKey",
+                "Last boot reason: Watchdog",
+                "Last boot reason: Panic",
+                "Last reset was system watchdog timer reset");
+
+        LogPatternUtil patternUtil = new KernelLogParser().getLogPatternUtil();
+
+        for (String pattern : kernelResetPatterns) {
+            assertEquals(String.format("Message \"%s\" was not matched.", pattern),
+                    KernelLogParser.KERNEL_RESET, patternUtil.checkMessage(pattern));
+        }
     }
 }

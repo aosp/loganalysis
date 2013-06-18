@@ -130,7 +130,7 @@ public class KernelLogParser implements IParser {
 
     private void initPatterns() {
         // Kernel resets
-        // TODO: Move nexus specific patterns into google repository
+        // TODO: Separate out device specific patterns
         mPatternUtil.addPattern(Pattern.compile("smem: DIAG.*"), KERNEL_RESET);
         mPatternUtil.addPattern(Pattern.compile("smsm: AMSS FATAL ERROR.*"), KERNEL_RESET);
         mPatternUtil.addPattern(Pattern.compile("kernel BUG at .*"), KERNEL_RESET);
@@ -147,8 +147,16 @@ public class KernelLogParser implements IParser {
                 KERNEL_RESET);
         mPatternUtil.addPattern(Pattern.compile("\\[MODEM_IF\\].*CRASH.*"), KERNEL_RESET);
         mPatternUtil.addPattern(Pattern.compile(
-                "Last boot reason: (kernel_panic|watchdogr?|hw_reset$)"), KERNEL_RESET);
+                "Last boot reason: (?:kernel_panic|watchdogr?|hw_reset(?:$|\n)|PowerKey|Watchdog" +
+                "|Panic)"), KERNEL_RESET);
         mPatternUtil.addPattern(Pattern.compile("Last reset was system watchdog timer reset"),
                 KERNEL_RESET);
+    }
+
+    /**
+     * Get the internal {@link LogPatternUtil}. Exposed for unit testing.
+     */
+    LogPatternUtil getLogPatternUtil() {
+        return mPatternUtil;
     }
 }
