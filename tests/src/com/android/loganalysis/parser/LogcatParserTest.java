@@ -331,6 +331,14 @@ public class LogcatParserTest extends TestCase {
                 logcat.getJavaCrashes().get(0).getEventTime());
     }
 
+    /**
+     * Test that an empty input returns {@code null}.
+     */
+    public void testEmptyInput() {
+        LogcatItem item = new LogcatParser().parse(Arrays.asList(""));
+        assertNull(item);
+    }
+
     private Date parseTime(String timeStr) throws ParseException {
         DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
         return formatter.parse(timeStr);

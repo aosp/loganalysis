@@ -115,6 +115,14 @@ public class KernelLogParserTest extends TestCase {
     }
 
     /**
+     * Test that an empty input returns {@code null}.
+     */
+    public void testEmptyInput() {
+        KernelLogItem item = new KernelLogParser().parse(Arrays.asList(""));
+        assertNull(item);
+    }
+
+    /**
      * Test that kernel patterns are matched.
      */
     public void testKernelResetPatterns() {

@@ -38,8 +38,8 @@ public class TopParserTest extends TestCase {
                 "",
                 "  PID   TID PR CPU% S     VSS     RSS PCY UID      Thread          Proc",
                 " 4474  4474  0   2% R   1420K    768K     shell    top             top");
-        TopParser parser = new TopParser();
-        TopItem item = parser.parse(inputBlock);
+
+        TopItem item = new TopParser().parse(inputBlock);
 
         assertEquals(150, item.getUser());
         assertEquals(50, item.getNice());
@@ -61,8 +61,7 @@ public class TopParserTest extends TestCase {
                 "User 0 + Nice 0 + Sys 0 + Idle 1000 + IOW 0 + IRQ 0 + SIRQ 0 = 1000",
                 "User 150 + Nice 50 + Sys 200 + Idle 510 + IOW 60 + IRQ 5 + SIRQ 25 = 1000");
 
-        TopParser parser = new TopParser();
-        TopItem item = parser.parse(inputBlock);
+        TopItem item = new TopParser().parse(inputBlock);
 
         assertEquals(150, item.getUser());
         assertEquals(50, item.getNice());
@@ -72,5 +71,13 @@ public class TopParserTest extends TestCase {
         assertEquals(5, item.getIrq());
         assertEquals(25, item.getSirq());
         assertEquals(1000, item.getTotal());
+    }
+
+    /**
+     * Test that an empty input returns {@code null}.
+     */
+    public void testEmptyInput() {
+        TopItem item = new TopParser().parse(Arrays.asList(""));
+        assertNull(item);
     }
 }

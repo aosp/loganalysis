@@ -44,8 +44,13 @@ public class TopParser implements IParser {
      */
     @Override
     public TopItem parse(List<String> lines) {
+        final String text = ArrayUtil.join("\n", lines).trim();
+        if ("".equals(text)) {
+            return null;
+        }
+
         TopItem item = new TopItem();
-        item.setText(ArrayUtil.join("\n", lines).trim());
+        item.setText(text);
 
         for (String line : lines) {
             Matcher m = TICKS_PAT.matcher(line);

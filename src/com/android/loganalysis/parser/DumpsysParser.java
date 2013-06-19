@@ -28,7 +28,7 @@ public class DumpsysParser extends AbstractSectionParser {
     private static final String NOOP_SECTION_REGEX = "DUMP OF SERVICE .*";
 
     private DumpsysBatteryInfoParser mBatteryInfoParser = new DumpsysBatteryInfoParser();
-    private DumpsysItem mDumpsys = new DumpsysItem();
+    private DumpsysItem mDumpsys = null;
 
     /**
      * {@inheritDoc}
@@ -38,6 +38,9 @@ public class DumpsysParser extends AbstractSectionParser {
     public DumpsysItem parse(List<String> lines) {
         setup();
         for (String line : lines) {
+            if (mDumpsys == null && !"".equals(line.trim())) {
+                mDumpsys = new DumpsysItem();
+            }
             parseLine(line);
         }
         commit();

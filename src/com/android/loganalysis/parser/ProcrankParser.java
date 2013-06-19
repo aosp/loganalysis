@@ -43,8 +43,13 @@ public class ProcrankParser implements IParser {
      */
     @Override
     public ProcrankItem parse(List<String> lines) {
+        final String text = ArrayUtil.join("\n", lines).replaceAll("\\s+$", "");
+        if ("".equals(text.trim())) {
+            return null;
+        }
+
         ProcrankItem item = new ProcrankItem();
-        item.setText(ArrayUtil.join("\n", lines).replaceAll("\\s+$", ""));
+        item.setText(text);
 
         for (String line : lines) {
             // If we have reached the end.

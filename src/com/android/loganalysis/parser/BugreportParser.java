@@ -64,8 +64,11 @@ public class BugreportParser extends AbstractSectionParser {
     private IParser mBugreportParser = new IParser() {
         @Override
         public BugreportItem parse(List<String> lines) {
-            BugreportItem bugreport = new BugreportItem();
+            BugreportItem bugreport = null;
             for (String line : lines) {
+                if (bugreport == null && !"".equals(line.trim())) {
+                    bugreport = new BugreportItem();
+                }
                 Matcher m = DATE.matcher(line);
                 if (m.matches()) {
                     bugreport.setTime(parseTime(m.group(1)));
@@ -83,7 +86,10 @@ public class BugreportParser extends AbstractSectionParser {
     private KernelLogParser mLastKmsgParser = new KernelLogParser();
     private LogcatParser mLogcatParser = new LogcatParser();
     private DumpsysParser mDumpsysParser = new DumpsysParser();
+
     private BugreportItem mBugreport = null;
+
+    private boolean mParsedInput = false;
 
     /**
      * Parse a bugreport from a {@link BufferedReader} into an {@link BugreportItem} object.
@@ -97,6 +103,9 @@ public class BugreportParser extends AbstractSectionParser {
 
         setup();
         while ((line = input.readLine()) != null) {
+            if (!mParsedInput && !"".equals(line.trim())) {
+                mParsedInput = true;
+            }
             parseLine(line);
         }
         commit();
@@ -113,6 +122,9 @@ public class BugreportParser extends AbstractSectionParser {
     public BugreportItem parse(List<String> lines) {
         setup();
         for (String line : lines) {
+            if (!mParsedInput && !"".equals(line.trim())) {
+                mParsedInput = true;
+            }
             parseLine(line);
         }
         commit();
@@ -146,6 +158,10 @@ public class BugreportParser extends AbstractSectionParser {
     protected void commit() {
         // signal EOF
         super.commit();
+
+        if (mParsedInput && mBugreport == null) {
+            mBugreport = new BugreportItem();
+        }
 
         if (mBugreport != null) {
             mBugreport.setMemInfo((MemInfoItem) getSection(mMemInfoParser));
@@ -201,7 +217,7 @@ public class BugreportParser extends AbstractSectionParser {
     protected void onSwitchParser() {
         if (mBugreport == null) {
             mBugreport = (BugreportItem) getSection(mBugreportParser);
-            if (mBugreport.getTime() != null) {
+            if (mBugreport != null && mBugreport.getTime() != null) {
                 mLogcatParser.setYear(new SimpleDateFormat("yyyy").format(mBugreport.getTime()));
             }
         }

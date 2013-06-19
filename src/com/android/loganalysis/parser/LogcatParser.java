@@ -98,7 +98,7 @@ public class LogcatParser implements IParser {
 
     private String mYear = null;
 
-    LogcatItem mLogcat = new LogcatItem();
+    LogcatItem mLogcat = null;
 
     Map<String, LogcatData> mDataMap = new HashMap<String, LogcatData>();
     List<LogcatData> mDataList = new LinkedList<LogcatData>();
@@ -170,6 +170,12 @@ public class LogcatParser implements IParser {
      * @param line The line to parse
      */
     private void parseLine(String line) {
+        if ("".equals(line.trim())) {
+            return;
+        }
+        if (mLogcat == null) {
+            mLogcat = new LogcatItem();
+        }
         Integer pid = null;
         Integer tid = null;
         Date time = null;
@@ -250,6 +256,9 @@ public class LogcatParser implements IParser {
      * Signal that the input has finished.
      */
     private void commit() {
+        if (mLogcat == null) {
+            return;
+        }
         for (LogcatData data : mDataList) {
             MiscLogcatItem item = null;
             if ("E".equals(data.mLevel) && "ActivityManager".equals(data.mTag)) {

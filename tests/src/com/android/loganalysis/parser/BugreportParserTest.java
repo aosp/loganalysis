@@ -16,6 +16,7 @@
 package com.android.loganalysis.parser;
 
 import com.android.loganalysis.item.BugreportItem;
+import com.android.loganalysis.item.IItem;
 import com.android.loganalysis.util.ArrayUtil;
 
 import junit.framework.TestCase;
@@ -313,6 +314,68 @@ public class BugreportParserTest extends TestCase {
         assertNotNull(bugreport.getSystemLog());
         assertEquals(1, bugreport.getSystemLog().getAnrs().size());
         assertNull(bugreport.getSystemLog().getAnrs().get(0).getTrace());
+    }
+
+    /**
+     * Test that missing sections in bugreport are set to {@code null}, not empty {@link IItem}s.
+     */
+    public void testNoSections() {
+        List<String> lines = Arrays.asList(
+                "========================================================",
+                "== dumpstate: 2012-04-25 20:45:10",
+                "========================================================");
+
+        BugreportItem bugreport = new BugreportParser().parse(lines);
+        assertNotNull(bugreport);
+        assertNull(bugreport.getDumpsys());
+        assertNull(bugreport.getKernelLog());
+        assertNull(bugreport.getLastKmsg());
+        assertNull(bugreport.getMemInfo());
+        assertNull(bugreport.getProcrank());
+        assertNull(bugreport.getSystemLog());
+        assertNull(bugreport.getSystemProps());
+        assertNull(bugreport.getTop());
+
+        lines = Arrays.asList(
+                "========================================================",
+                "== dumpstate: 2012-04-25 20:45:10",
+                "========================================================",
+                "",
+                "------ DUMPSYS (dumpsys) ------",
+                "",
+                "------ KERNEL LOG (dmesg) ------",
+                "",
+                "------ LAST KMSG (/proc/last_kmsg) ------",
+                "",
+                "------ MEMORY INFO (/proc/meminfo) ------",
+                "",
+                "------ PROCRANK (procrank) ------",
+                "",
+                "------ SYSTEM LOG (logcat -v threadtime -d *:v) ------",
+                "",
+                "------ SYSTEM PROPERTIES ------",
+                "",
+                "------ CPU INFO (top -n 1 -d 1 -m 30 -t) ------",
+                "");
+
+        bugreport = new BugreportParser().parse(lines);
+        assertNotNull(bugreport);
+        assertNull(bugreport.getDumpsys());
+        assertNull(bugreport.getKernelLog());
+        assertNull(bugreport.getLastKmsg());
+        assertNull(bugreport.getMemInfo());
+        assertNull(bugreport.getProcrank());
+        assertNull(bugreport.getSystemLog());
+        assertNull(bugreport.getSystemProps());
+        assertNull(bugreport.getTop());
+    }
+
+    /**
+     * Test that an empty input returns {@code null}.
+     */
+    public void testEmptyInput() {
+        BugreportItem item = new BugreportParser().parse(Arrays.asList(""));
+        assertNull(item);
     }
 
     /**

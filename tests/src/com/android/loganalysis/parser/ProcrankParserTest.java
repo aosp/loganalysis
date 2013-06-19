@@ -27,6 +27,10 @@ import java.util.List;
  * Unit tests for {@link ProcrankParser}
  */
 public class ProcrankParserTest extends TestCase {
+
+    /**
+     * Test that normal input is parsed.
+     */
     public void testProcRankParser() {
         List<String> inputBlock = Arrays.asList(
                 "  PID      Vss      Rss      Pss      Uss  cmdline",
@@ -41,8 +45,8 @@ public class ProcrankParserTest extends TestCase {
                 "                          203624K  163604K  TOTAL",
                 "RAM: 731448K total, 415804K free, 9016K buffers, 108548K cached",
                 "[procrank: 1.6s elapsed]");
-        ProcrankParser parser = new ProcrankParser();
-        ProcrankItem procrank = parser.parse(inputBlock);
+
+        ProcrankItem procrank = new ProcrankParser().parse(inputBlock);
 
         // Ensures that only valid lines are parsed. Only 6 of the 11 lines under the header are
         // valid.
@@ -55,6 +59,14 @@ public class ProcrankParserTest extends TestCase {
         assertEquals((Integer) 28360, procrank.getUss(334));
         assertEquals("android.process.acore", procrank.getProcessName(2072));
         assertEquals(ArrayUtil.join("\n", inputBlock), procrank.getText());
+    }
+
+    /**
+     * Test that an empty input returns {@code null}.
+     */
+    public void testEmptyInput() {
+        ProcrankItem item = new ProcrankParser().parse(Arrays.asList(""));
+        assertNull(item);
     }
 }
 

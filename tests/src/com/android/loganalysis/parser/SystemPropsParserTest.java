@@ -26,14 +26,18 @@ import java.util.List;
  * Unit tests for {@link SystemPropsParser}
  */
 public class SystemPropsParserTest extends TestCase {
+
+    /**
+     * Test that normal input is parsed.
+     */
     public void testSimpleParse() {
         List<String> inputBlock = Arrays.asList(
                 "[dalvik.vm.dexopt-flags]: [m=y]",
                 "[dalvik.vm.heapgrowthlimit]: [48m]",
                 "[dalvik.vm.heapsize]: [256m]",
                 "[gsm.version.ril-impl]: [android moto-ril-multimode 1.0]");
-        SystemPropsParser parser = new SystemPropsParser();
-        SystemPropsItem map = parser.parse(inputBlock);
+
+        SystemPropsItem map = new SystemPropsParser().parse(inputBlock);
 
         assertEquals(4, map.size());
         assertEquals("m=y", map.get("dalvik.vm.dexopt-flags"));
@@ -52,12 +56,20 @@ public class SystemPropsParserTest extends TestCase {
                 "[ends with newline]: [yup",
                 "]",
                 "[dalvik.vm.heapsize]: [256m]");
-        SystemPropsParser parser = new SystemPropsParser();
-        SystemPropsItem map = parser.parse(inputBlock);
+
+        SystemPropsItem map = new SystemPropsParser().parse(inputBlock);
 
         assertEquals(2, map.size());
         assertEquals("m=y", map.get("dalvik.vm.dexopt-flags"));
         assertEquals("256m", map.get("dalvik.vm.heapsize"));
+    }
+
+    /**
+     * Test that an empty input returns {@code null}.
+     */
+    public void testEmptyInput() {
+        SystemPropsItem item = new SystemPropsParser().parse(Arrays.asList(""));
+        assertNull(item);
     }
 }
 

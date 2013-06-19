@@ -72,10 +72,7 @@ public abstract class AbstractSectionParser implements IParser {
             }
         } else {
             runCurrentParser();
-            mParseBlock.clear();
             mCurrentParser = nextParser;
-
-            onSwitchParser();
         }
     }
 
@@ -105,6 +102,9 @@ public abstract class AbstractSectionParser implements IParser {
         mCurrentParser = parser;
     }
 
+    /**
+     * Callback for when parsers are switched.
+     */
     protected void onSwitchParser() {
     }
 
@@ -119,6 +119,9 @@ public abstract class AbstractSectionParser implements IParser {
                 // CLog.v("Just ran the %s parser", mCurrentParser.getClass().getSimpleName());
             }
         }
+
+        mParseBlock.clear();
+        onSwitchParser();
     }
 }
 

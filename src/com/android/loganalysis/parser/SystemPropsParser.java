@@ -36,15 +36,18 @@ public class SystemPropsParser implements IParser {
      */
     @Override
     public SystemPropsItem parse(List<String> lines) {
+        final String text = ArrayUtil.join("\n", lines).trim();
+        if ("".equals(text)) {
+            return null;
+        }
+
         SystemPropsItem item = new SystemPropsItem();
-        item.setText(ArrayUtil.join("\n", lines).trim());
+        item.setText(text);
 
         for (String line : lines) {
             Matcher m = PROP_LINE.matcher(line);
             if (m.matches()) {
                 item.put(m.group(1), m.group(2));
-            } else {
-                // CLog.w("Failed to parse line '%s'", line);
             }
         }
         return item;

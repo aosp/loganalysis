@@ -39,7 +39,7 @@ public class KernelLogParser implements IParser {
     private static final Pattern LOG_LINE = Pattern.compile(
             "^(<\\d+>)?\\[\\s*(\\d+.\\d{6})\\] (.*)$");
 
-    private KernelLogItem mKernelLog = new KernelLogItem();
+    private KernelLogItem mKernelLog = null;
     private Double mStartTime = null;
     private Double mStopTime = null;
 
@@ -87,6 +87,12 @@ public class KernelLogParser implements IParser {
      * @param line The line to parse
      */
     private void parseLine(String line) {
+        if ("".equals(line.trim())) {
+            return;
+        }
+        if (mKernelLog == null) {
+            mKernelLog = new KernelLogItem();
+        }
         Matcher m = LOG_LINE.matcher(line);
         if (m.matches()) {
             Double time = Double.parseDouble(m.group(2));
@@ -124,6 +130,9 @@ public class KernelLogParser implements IParser {
      * Signal that the input has finished.
      */
     private void commit() {
+        if (mKernelLog == null) {
+            return;
+        }
         mKernelLog.setStartTime(mStartTime);
         mKernelLog.setStopTime(mStopTime);
     }

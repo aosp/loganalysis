@@ -48,11 +48,18 @@ public class DumpsysParserTest extends TestCase {
                 "DUMP OF SERVICE process2:",
                 "-------------------------------------------------------------------------------");
 
-        DumpsysParser parser = new DumpsysParser();
-        DumpsysItem item = parser.parse(inputBlock);
+        DumpsysItem item = new DumpsysParser().parse(inputBlock);
 
         assertNotNull(item.getBatteryInfo());
         assertEquals(2, item.getBatteryInfo().getLastUnpluggedWakeLocks().size());
         assertEquals(2, item.getBatteryInfo().getLastUnpluggedKernelWakeLocks().size());
+    }
+
+    /**
+     * Test that an empty input returns {@code null}.
+     */
+    public void testEmptyInput() {
+        DumpsysItem item = new DumpsysParser().parse(Arrays.asList(""));
+        assertNull(item);
     }
 }

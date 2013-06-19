@@ -27,6 +27,10 @@ import java.util.List;
  * Unit tests for {@link MemInfoParser}
  */
 public class MemInfoParserTest extends TestCase {
+
+    /**
+     * Test that normal input is parsed.
+     */
     public void testMemInfoParser() {
         List<String> inputBlock = Arrays.asList(
                 "MemTotal:         353332 kB",
@@ -34,8 +38,8 @@ public class MemInfoParserTest extends TestCase {
                 "Buffers:           20800 kB",
                 "Cached:            86204 kB",
                 "SwapCached:            0 kB");
-        MemInfoParser parser = new MemInfoParser();
-        MemInfoItem item = parser.parse(inputBlock);
+
+        MemInfoItem item = new MemInfoParser().parse(inputBlock);
 
         assertEquals(5, item.size());
         assertEquals((Integer)353332, item.get("MemTotal"));
@@ -44,5 +48,13 @@ public class MemInfoParserTest extends TestCase {
         assertEquals((Integer)86204, item.get("Cached"));
         assertEquals((Integer)0, item.get("SwapCached"));
         assertEquals(ArrayUtil.join("\n", inputBlock), item.getText());
+    }
+
+    /**
+     * Test that an empty input returns {@code null}.
+     */
+    public void testEmptyInput() {
+        MemInfoItem item = new MemInfoParser().parse(Arrays.asList(""));
+        assertNull(item);
     }
 }

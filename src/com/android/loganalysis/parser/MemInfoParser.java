@@ -37,8 +37,13 @@ public class MemInfoParser implements IParser {
      */
     @Override
     public MemInfoItem parse(List<String> lines) {
+        final String text = ArrayUtil.join("\n", lines).trim();
+        if ("".equals(text)) {
+            return null;
+        }
+
         MemInfoItem item = new MemInfoItem();
-        item.setText(ArrayUtil.join("\n", lines).trim());
+        item.setText(text);
 
         for (String line : lines) {
             Matcher m = INFO_LINE.matcher(line);
@@ -46,8 +51,6 @@ public class MemInfoParser implements IParser {
                 String key = m.group(1);
                 Integer value = Integer.parseInt(m.group(2));
                 item.put(key, value);
-            } else {
-                // CLog.w("Failed to parse line '%s'", line);
             }
         }
 
