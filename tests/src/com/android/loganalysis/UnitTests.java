@@ -16,15 +16,6 @@
 
 package com.android.loganalysis;
 
-import com.android.loganalysis.heuristic.AnrHeuristicTest;
-import com.android.loganalysis.heuristic.CpuUsageHeuristicTest;
-import com.android.loganalysis.heuristic.JavaCrashHeuristicTest;
-import com.android.loganalysis.heuristic.KernelResetHeuristicTest;
-import com.android.loganalysis.heuristic.MemoryUsageHeuristicTest;
-import com.android.loganalysis.heuristic.NativeCrashHeuristicTest;
-import com.android.loganalysis.heuristic.PowerUsageHeuristicTest;
-import com.android.loganalysis.heuristic.ProcessLifecycleHeuristicTest;
-import com.android.loganalysis.heuristic.RuntimeRestartHeuristicTest;
 import com.android.loganalysis.item.DumpsysBatteryInfoItemTest;
 import com.android.loganalysis.item.GenericItemTest;
 import com.android.loganalysis.item.MemInfoItemTest;
@@ -68,17 +59,6 @@ public class UnitTests extends TestSuite {
 
     public UnitTests() {
         super();
-
-        // heuristic
-        addTestSuite(AnrHeuristicTest.class);
-        addTestSuite(CpuUsageHeuristicTest.class);
-        addTestSuite(JavaCrashHeuristicTest.class);
-        addTestSuite(KernelResetHeuristicTest.class);
-        addTestSuite(MemoryUsageHeuristicTest.class);
-        addTestSuite(NativeCrashHeuristicTest.class);
-        addTestSuite(PowerUsageHeuristicTest.class);
-        addTestSuite(ProcessLifecycleHeuristicTest.class);
-        addTestSuite(RuntimeRestartHeuristicTest.class);
 
         // item
         addTestSuite(DumpsysBatteryInfoItemTest.class);
