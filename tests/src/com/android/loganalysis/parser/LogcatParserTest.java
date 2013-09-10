@@ -57,6 +57,30 @@ public class LogcatParserTest extends TestCase {
     }
 
     /**
+     * Test that an ANR is parsed in the log.
+     */
+    public void testParse_anr_pid() throws ParseException {
+        List<String> lines = Arrays.asList(
+                "04-25 17:17:08.445   312   366 E ActivityManager: ANR (application not responding) in process: com.android.package",
+                "04-25 17:17:08.445   312   366 E ActivityManager: PID: 1234",
+                "04-25 17:17:08.445   312   366 E ActivityManager: Reason: keyDispatchingTimedOut",
+                "04-25 17:17:08.445   312   366 E ActivityManager: Load: 0.71 / 0.83 / 0.51",
+                "04-25 17:17:08.445   312   366 E ActivityManager: 33% TOTAL: 21% user + 11% kernel + 0.3% iowait");
+
+        LogcatItem logcat = new LogcatParser("2012").parse(lines);
+        assertNotNull(logcat);
+        assertEquals(parseTime("2012-04-25 17:17:08.445"), logcat.getStartTime());
+        assertEquals(parseTime("2012-04-25 17:17:08.445"), logcat.getStopTime());
+        assertEquals(1, logcat.getEvents().size());
+        assertEquals(1, logcat.getAnrs().size());
+        assertEquals(1234, logcat.getAnrs().get(0).getPid().intValue());
+        assertNull(logcat.getAnrs().get(0).getTid());
+        assertEquals("", logcat.getAnrs().get(0).getLastPreamble());
+        assertEquals("", logcat.getAnrs().get(0).getProcessPreamble());
+        assertEquals(parseTime("2012-04-25 17:17:08.445"), logcat.getAnrs().get(0).getEventTime());
+    }
+
+    /**
      * Test that Java crashes can be parsed.
      */
     public void testParse_java_crash() throws ParseException {
@@ -81,6 +105,76 @@ public class LogcatParserTest extends TestCase {
     }
 
     /**
+     * Test that Java crashes with process and pid can be parsed.
+     */
+    public void testParse_java_crash_process_pid() throws ParseException {
+        List<String> lines = Arrays.asList(
+                "04-25 09:55:47.799  3064  3082 E AndroidRuntime: FATAL EXCEPTION: main",
+                "04-25 09:55:47.799  3064  3082 E AndroidRuntime: Process: com.android.package, PID: 1234",
+                "04-25 09:55:47.799  3064  3082 E AndroidRuntime: java.lang.Exception",
+                "04-25 09:55:47.799  3064  3082 E AndroidRuntime: \tat class.method1(Class.java:1)",
+                "04-25 09:55:47.799  3064  3082 E AndroidRuntime: \tat class.method2(Class.java:2)",
+                "04-25 09:55:47.799  3064  3082 E AndroidRuntime: \tat class.method3(Class.java:3)");
+
+        LogcatItem logcat = new LogcatParser("2012").parse(lines);
+        assertNotNull(logcat);
+        assertEquals(parseTime("2012-04-25 09:55:47.799"), logcat.getStartTime());
+        assertEquals(parseTime("2012-04-25 09:55:47.799"), logcat.getStopTime());
+        assertEquals(1, logcat.getEvents().size());
+        assertEquals(1, logcat.getJavaCrashes().size());
+        assertEquals("com.android.package", logcat.getJavaCrashes().get(0).getApp());
+        assertEquals(1234, logcat.getJavaCrashes().get(0).getPid().intValue());
+        assertNull(logcat.getJavaCrashes().get(0).getTid());
+        assertEquals("", logcat.getJavaCrashes().get(0).getLastPreamble());
+        assertEquals("", logcat.getJavaCrashes().get(0).getProcessPreamble());
+        assertEquals(parseTime("2012-04-25 09:55:47.799"),
+                logcat.getJavaCrashes().get(0).getEventTime());
+    }
+
+    /**
+     * Test that Java crashes with pid can be parsed.
+     */
+    public void testParse_java_crash_pid() throws ParseException {
+        List<String> lines = Arrays.asList(
+                "04-25 09:55:47.799  3064  3082 E AndroidRuntime: FATAL EXCEPTION: main",
+                "04-25 09:55:47.799  3064  3082 E AndroidRuntime: PID: 1234",
+                "04-25 09:55:47.799  3064  3082 E AndroidRuntime: java.lang.Exception",
+                "04-25 09:55:47.799  3064  3082 E AndroidRuntime: \tat class.method1(Class.java:1)",
+                "04-25 09:55:47.799  3064  3082 E AndroidRuntime: \tat class.method2(Class.java:2)",
+                "04-25 09:55:47.799  3064  3082 E AndroidRuntime: \tat class.method3(Class.java:3)");
+
+        LogcatItem logcat = new LogcatParser("2012").parse(lines);
+        assertNotNull(logcat);
+        assertEquals(parseTime("2012-04-25 09:55:47.799"), logcat.getStartTime());
+        assertEquals(parseTime("2012-04-25 09:55:47.799"), logcat.getStopTime());
+        assertEquals(1, logcat.getEvents().size());
+        assertEquals(1, logcat.getJavaCrashes().size());
+        assertNull(logcat.getJavaCrashes().get(0).getApp());
+        assertEquals(1234, logcat.getJavaCrashes().get(0).getPid().intValue());
+        assertNull(logcat.getJavaCrashes().get(0).getTid());
+        assertEquals("", logcat.getJavaCrashes().get(0).getLastPreamble());
+        assertEquals("", logcat.getJavaCrashes().get(0).getProcessPreamble());
+        assertEquals(parseTime("2012-04-25 09:55:47.799"),
+                logcat.getJavaCrashes().get(0).getEventTime());
+    }
+
+    /**
+     * Test that Java crashes with process and pid without stack can be parsed.
+     */
+    public void testParse_java_crash_empty() throws ParseException {
+        List<String> lines = Arrays.asList(
+                "04-25 09:55:47.799  3064  3082 E AndroidRuntime: FATAL EXCEPTION: main",
+                "04-25 09:55:47.799  3064  3082 E AndroidRuntime: PID: 1234");
+
+        LogcatItem logcat = new LogcatParser("2012").parse(lines);
+        assertNotNull(logcat);
+        assertEquals(parseTime("2012-04-25 09:55:47.799"), logcat.getStartTime());
+        assertEquals(parseTime("2012-04-25 09:55:47.799"), logcat.getStopTime());
+        assertEquals(0, logcat.getEvents().size());
+        assertEquals(0, logcat.getJavaCrashes().size());
+    }
+
+    /**
      * Test that native crashes can be parsed.
      */
     public void testParse_native_crash() throws ParseException {
@@ -96,8 +190,8 @@ public class LogcatParserTest extends TestCase {
         assertEquals(parseTime("2012-04-25 18:33:27.273"), logcat.getStopTime());
         assertEquals(1, logcat.getEvents().size());
         assertEquals(1, logcat.getNativeCrashes().size());
-        assertEquals(115, logcat.getNativeCrashes().get(0).getPid().intValue());
-        assertEquals(115, logcat.getNativeCrashes().get(0).getTid().intValue());
+        assertEquals(3112, logcat.getNativeCrashes().get(0).getPid().intValue());
+        assertEquals(3112, logcat.getNativeCrashes().get(0).getTid().intValue());
         assertEquals("", logcat.getNativeCrashes().get(0).getLastPreamble());
         assertEquals("", logcat.getNativeCrashes().get(0).getProcessPreamble());
         assertEquals(parseTime("2012-04-25 18:33:27.273"),
@@ -165,7 +259,7 @@ public class LogcatParserTest extends TestCase {
                 "04-25 18:33:27.273   115   115 I DEBUG   : signal 11 (SIGSEGV), code 1 (SEGV_MAPERR), fault addr 00000000",
                 "04-25 18:33:27.273   117   117 I DEBUG   : *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** ***",
                 "04-25 18:33:27.273   117   117 I DEBUG   : Build fingerprint: 'product:build:target'",
-                "04-25 18:33:27.273   117   117 I DEBUG   : pid: 3112, tid: 3112  >>> com.google.android.browser <<<",
+                "04-25 18:33:27.273   117   117 I DEBUG   : pid: 3113, tid: 3113  >>> com.google.android.browser <<<",
                 "04-25 18:33:27.273   117   117 I DEBUG   : signal 11 (SIGSEGV), code 1 (SEGV_MAPERR), fault addr 00000000");
 
 
@@ -196,13 +290,13 @@ public class LogcatParserTest extends TestCase {
         assertEquals(parseTime("2012-04-25 09:55:47.799"),
                 logcat.getJavaCrashes().get(1).getEventTime());
 
-        assertEquals(115, logcat.getNativeCrashes().get(0).getPid().intValue());
-        assertEquals(115, logcat.getNativeCrashes().get(0).getTid().intValue());
+        assertEquals(3112, logcat.getNativeCrashes().get(0).getPid().intValue());
+        assertEquals(3112, logcat.getNativeCrashes().get(0).getTid().intValue());
         assertEquals(parseTime("2012-04-25 18:33:27.273"),
                 logcat.getNativeCrashes().get(0).getEventTime());
 
-        assertEquals(117, logcat.getNativeCrashes().get(1).getPid().intValue());
-        assertEquals(117, logcat.getNativeCrashes().get(1).getTid().intValue());
+        assertEquals(3113, logcat.getNativeCrashes().get(1).getPid().intValue());
+        assertEquals(3113, logcat.getNativeCrashes().get(1).getTid().intValue());
         assertEquals(parseTime("2012-04-25 18:33:27.273"),
                 logcat.getNativeCrashes().get(1).getEventTime());
     }
@@ -223,7 +317,7 @@ public class LogcatParserTest extends TestCase {
                 "04-25 09:55:47.799  3064  3082 E AndroidRuntime: \tat class.method2(Class.java:2)",
                 "04-25 09:55:47.799  3065  3090 E AndroidRuntime: \tat class.method2(Class.java:2)",
                 "04-25 09:55:47.799   115   115 I DEBUG   : pid: 3112, tid: 3112  >>> com.google.android.browser <<<",
-                "04-25 09:55:47.799   117   117 I DEBUG   : pid: 3112, tid: 3112  >>> com.google.android.browser <<<",
+                "04-25 09:55:47.799   117   117 I DEBUG   : pid: 3113, tid: 3113  >>> com.google.android.browser <<<",
                 "04-25 09:55:47.799  3064  3082 E AndroidRuntime: \tat class.method3(Class.java:3)",
                 "04-25 09:55:47.799  3065  3090 E AndroidRuntime: \tat class.method3(Class.java:3)",
                 "04-25 09:55:47.799   115   115 I DEBUG   : signal 11 (SIGSEGV), code 1 (SEGV_MAPERR), fault addr 00000000",
@@ -248,13 +342,13 @@ public class LogcatParserTest extends TestCase {
         assertEquals(parseTime("2012-04-25 09:55:47.799"),
                 logcat.getJavaCrashes().get(1).getEventTime());
 
-        assertEquals(115, logcat.getNativeCrashes().get(0).getPid().intValue());
-        assertEquals(115, logcat.getNativeCrashes().get(0).getTid().intValue());
+        assertEquals(3112, logcat.getNativeCrashes().get(0).getPid().intValue());
+        assertEquals(3112, logcat.getNativeCrashes().get(0).getTid().intValue());
         assertEquals(parseTime("2012-04-25 09:55:47.799"),
                 logcat.getNativeCrashes().get(0).getEventTime());
 
-        assertEquals(117, logcat.getNativeCrashes().get(1).getPid().intValue());
-        assertEquals(117, logcat.getNativeCrashes().get(1).getTid().intValue());
+        assertEquals(3113, logcat.getNativeCrashes().get(1).getPid().intValue());
+        assertEquals(3113, logcat.getNativeCrashes().get(1).getTid().intValue());
         assertEquals(parseTime("2012-04-25 09:55:47.799"),
                 logcat.getNativeCrashes().get(1).getEventTime());
     }

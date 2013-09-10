@@ -33,6 +33,10 @@ public class AnrParser implements IParser {
     public static final Pattern START = Pattern.compile(
             "^ANR (?:\\(application not responding\\) )?in (?:process: )?(\\S+).*$");
     /**
+     * Matches: PID: 1234
+     */
+    private static final Pattern PID = Pattern.compile("^PID: (\\d+)$");
+    /**
      * Matches: Reason: reason
      */
     private static final Pattern REASON = Pattern.compile("^Reason: (.*)$");
@@ -70,6 +74,10 @@ public class AnrParser implements IParser {
             }
 
             if (anr != null) {
+                m = PID.matcher(line);
+                if (m.matches()) {
+                    anr.setPid(Integer.valueOf(m.group(1)));
+                }
                 m = REASON.matcher(line);
                 if (m.matches()) {
                     anr.setReason(m.group(1));

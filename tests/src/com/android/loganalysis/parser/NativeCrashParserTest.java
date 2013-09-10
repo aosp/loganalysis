@@ -140,6 +140,8 @@ public class NativeCrashParserTest extends TestCase {
 
         NativeCrashItem nc = new NativeCrashParser().parse(lines);
         assertNotNull(nc);
+        assertEquals(2058, nc.getPid().intValue());
+        assertEquals(2523, nc.getTid().intValue());
         assertEquals("com.google.android.browser", nc.getApp());
         assertEquals("google/soju/crespo:4.0.4/IMM76D/299849:userdebug/test-keys",
                 nc.getFingerprint());
@@ -158,6 +160,8 @@ public class NativeCrashParserTest extends TestCase {
 
         NativeCrashItem nc = new NativeCrashParser().parse(lines);
         assertNotNull(nc);
+        assertEquals(2058, nc.getPid().intValue());
+        assertEquals(2523, nc.getTid().intValue());
         assertEquals("com.google.android.browser", nc.getApp());
 
         lines = Arrays.asList(
@@ -168,6 +172,9 @@ public class NativeCrashParserTest extends TestCase {
 
         nc = new NativeCrashParser().parse(lines);
         assertNotNull(nc);
+
+        assertEquals(2058, nc.getPid().intValue());
+        assertEquals(2523, nc.getTid().intValue());
         assertEquals("com.google.android.browser", nc.getApp());
     }
 }

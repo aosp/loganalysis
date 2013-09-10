@@ -69,6 +69,12 @@ public class LogcatParser implements IParser {
                 "(\\w)/(.+?)\\(\\s*(\\d+)\\): (.*)$");  /* level, tag, pid, msg [2-5] */
 
     /**
+     * Match "Process: com.android.package, PID: 123" or "PID: 123"
+     */
+    private static final Pattern JAVA_CRASH_PROCESS_PID = Pattern.compile(
+            "^(Process: (\\S+), )?PID: (\\d+)$");
+
+    /**
      * Class for storing logcat meta data for a particular grouped list of lines.
      */
     private class LogcatData {
@@ -262,11 +268,27 @@ public class LogcatParser implements IParser {
         for (LogcatData data : mDataList) {
             MiscLogcatItem item = null;
             if ("E".equals(data.mLevel) && "ActivityManager".equals(data.mTag)) {
-                // CLog.v("Parsing ANR: %s", data.mLines);
                 item = new AnrParser().parse(data.mLines);
             } else if ("E".equals(data.mLevel) && "AndroidRuntime".equals(data.mTag)) {
-                // CLog.v("Parsing Java crash: %s", data.mLines);
+                // Get the process name/PID from the Java crash, then pass the rest of the lines to
+                // the parser.
+                Integer pid = null;
+                String app = null;
+                for (int i = 0; i < data.mLines.size(); i++) {
+                    String line = data.mLines.get(i);
+                    Matcher m = JAVA_CRASH_PROCESS_PID.matcher(line);
+                    if (m.matches()) {
+                        app = m.group(2);
+                        pid = Integer.valueOf(m.group(3));
+                        data.mLines = data.mLines.subList(i + 1, data.mLines.size());
+                        break;
+                    }
+                }
                 item = new JavaCrashParser().parse(data.mLines);
+                if (item != null) {
+                    item.setApp(app);
+                    item.setPid(pid);
+                }
             } else if ("I".equals(data.mLevel) && "DEBUG".equals(data.mTag)) {
                 // CLog.v("Parsing native crash: %s", data.mLines);
                 item = new NativeCrashParser().parse(data.mLines);
@@ -282,8 +304,10 @@ public class LogcatParser implements IParser {
             }
             if (item != null) {
                 item.setEventTime(data.mTime);
-                item.setPid(data.mPid);
-                item.setTid(data.mTid);
+                if (item.getPid() == null) {
+                    item.setPid(data.mPid);
+                    item.setTid(data.mTid);
+                }
                 item.setLastPreamble(data.mLastPreamble);
                 item.setProcessPreamble(data.mProcPreamble);
                 mLogcat.addEvent(item);

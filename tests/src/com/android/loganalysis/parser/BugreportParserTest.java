@@ -389,7 +389,8 @@ public class BugreportParserTest extends TestCase {
                 "========================================================",
                 "------ PROCRANK (procrank) ------",
                 "  PID      Vss      Rss      Pss      Uss  cmdline",
-                " 3064   87136K   81684K   52829K   50012K  com.android.package",
+                " 3064   87136K   81684K   52829K   50012K  com.android.package1",
+                " 3066   87136K   81684K   52829K   50012K  com.android.package2",
                 "                          ------   ------  ------",
                 "                          203624K  163604K  TOTAL",
                 "RAM: 731448K total, 415804K free, 9016K buffers, 108548K cached",
@@ -402,19 +403,22 @@ public class BugreportParserTest extends TestCase {
                 "04-25 09:55:47.799  3065  3083 E AndroidRuntime: java.lang.Exception",
                 "04-25 09:55:47.799  3065  3083 E AndroidRuntime: \tat class.method1(Class.java:1)",
                 "04-25 09:55:47.799  3065  3083 E AndroidRuntime: \tat class.method2(Class.java:2)",
-                "04-25 09:55:47.799  3065  3083 E AndroidRuntime: \tat class.method3(Class.java:3)");
+                "04-25 09:55:47.799  3065  3083 E AndroidRuntime: \tat class.method3(Class.java:3)",
+                "04-25 09:55:47.799  3065  3084 E AndroidRuntime: FATAL EXCEPTION: main",
+                "04-25 09:55:47.799  3066  3084 E AndroidRuntime: Process: com.android.package3, PID: 1234",
+                "04-25 09:55:47.799  3066  3084 E AndroidRuntime: java.lang.Exception",
+                "04-25 09:55:47.799  3066  3084 E AndroidRuntime: \tat class.method1(Class.java:1)",
+                "04-25 09:55:47.799  3066  3084 E AndroidRuntime: \tat class.method2(Class.java:2)",
+                "04-25 09:55:47.799  3066  3084 E AndroidRuntime: \tat class.method3(Class.java:3)");
 
         BugreportItem bugreport = new BugreportParser().parse(lines);
         assertNotNull(bugreport.getSystemLog());
-        assertEquals(2, bugreport.getSystemLog().getJavaCrashes().size());
-        assertEquals("com.android.package",
+        assertEquals(3, bugreport.getSystemLog().getJavaCrashes().size());
+        assertEquals("com.android.package1",
                 bugreport.getSystemLog().getJavaCrashes().get(0).getApp());
         assertNull(bugreport.getSystemLog().getJavaCrashes().get(1).getApp());
-    }
-
-    private Date parseTime(String timeStr) throws ParseException {
-        DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-        return formatter.parse(timeStr);
+        assertEquals("com.android.package3",
+                bugreport.getSystemLog().getJavaCrashes().get(2).getApp());
     }
 
     /**
@@ -441,6 +445,11 @@ public class BugreportParserTest extends TestCase {
                 "12-17 15:15:12.877  1994  2019 D UiModeManager: updateConfigurationLocked: ");
         BugreportItem bugreport = new BugreportParser().parse(lines);
         assertNotNull(bugreport.getSystemLog());
+    }
+
+    private Date parseTime(String timeStr) throws ParseException {
+        DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+        return formatter.parse(timeStr);
     }
 }
 
