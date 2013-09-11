@@ -26,6 +26,8 @@ import com.android.loganalysis.util.config.ArgsOptionParser;
 import com.android.loganalysis.util.config.ConfigurationException;
 import com.android.loganalysis.util.config.Option;
 
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.File;
@@ -139,7 +141,11 @@ public class LogAnalyzer {
      * Print an {@link IItem} to stdout.
      */
     private void printJson(IItem item) {
-        System.out.println(item.toJson().toString());
+        if (item != null && item.toJson() != null) {
+            System.out.println(item.toJson().toString());
+        } else {
+            System.out.println(new JSONObject().toString());
+        }
     }
 
     /**
