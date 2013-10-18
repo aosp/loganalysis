@@ -105,6 +105,32 @@ public class LogcatParserTest extends TestCase {
     }
 
     /**
+     * Test that Java crashes from system server can be parsed.
+     */
+    public void testParse_java_crash_system_server() throws ParseException {
+        List<String> lines = Arrays.asList(
+                "04-25 09:55:47.799  3064  3082 E AndroidRuntime: *** FATAL EXCEPTION IN SYSTEM PROCESS: message",
+                "04-25 09:55:47.799  3064  3082 E AndroidRuntime: java.lang.Exception",
+                "04-25 09:55:47.799  3064  3082 E AndroidRuntime: \tat class.method1(Class.java:1)",
+                "04-25 09:55:47.799  3064  3082 E AndroidRuntime: \tat class.method2(Class.java:2)",
+                "04-25 09:55:47.799  3064  3082 E AndroidRuntime: \tat class.method3(Class.java:3)");
+
+        LogcatItem logcat = new LogcatParser("2012").parse(lines);
+        assertNotNull(logcat);
+        assertEquals(parseTime("2012-04-25 09:55:47.799"), logcat.getStartTime());
+        assertEquals(parseTime("2012-04-25 09:55:47.799"), logcat.getStopTime());
+        assertEquals(1, logcat.getEvents().size());
+        assertEquals(1, logcat.getJavaCrashes().size());
+        assertEquals("system_server", logcat.getJavaCrashes().get(0).getApp());
+        assertEquals(3064, logcat.getJavaCrashes().get(0).getPid().intValue());
+        assertEquals(3082, logcat.getJavaCrashes().get(0).getTid().intValue());
+        assertEquals("", logcat.getJavaCrashes().get(0).getLastPreamble());
+        assertEquals("", logcat.getJavaCrashes().get(0).getProcessPreamble());
+        assertEquals(parseTime("2012-04-25 09:55:47.799"),
+                logcat.getJavaCrashes().get(0).getEventTime());
+    }
+
+    /**
      * Test that Java crashes with process and pid can be parsed.
      */
     public void testParse_java_crash_process_pid() throws ParseException {

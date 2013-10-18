@@ -69,6 +69,11 @@ public class LogcatParser implements IParser {
                 "(\\w)/(.+?)\\(\\s*(\\d+)\\): (.*)$");  /* level, tag, pid, msg [2-5] */
 
     /**
+     * Match: "*** FATAL EXCEPTION IN SYSTEM PROCESS: message"
+     */
+    private static final Pattern SYSTEM_SERVER_CRASH = Pattern.compile(
+            "\\*\\*\\* FATAL EXCEPTION IN SYSTEM PROCESS:.*");
+    /**
      * Match "Process: com.android.package, PID: 123" or "PID: 123"
      */
     private static final Pattern JAVA_CRASH_PROCESS_PID = Pattern.compile(
@@ -280,6 +285,12 @@ public class LogcatParser implements IParser {
                     if (m.matches()) {
                         app = m.group(2);
                         pid = Integer.valueOf(m.group(3));
+                        data.mLines = data.mLines.subList(i + 1, data.mLines.size());
+                        break;
+                    }
+                    m = SYSTEM_SERVER_CRASH.matcher(line);
+                    if (m.matches()) {
+                        app = "system_server";
                         data.mLines = data.mLines.subList(i + 1, data.mLines.size());
                         break;
                     }
