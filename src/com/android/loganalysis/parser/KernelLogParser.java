@@ -31,6 +31,7 @@ import java.util.regex.Pattern;
 */
 public class KernelLogParser implements IParser {
     public static final String KERNEL_RESET = "KERNEL_RESET";
+    public static final String SELINUX_DENIAL = "SELINUX_DENIAL";
 
     /**
      * Matches: [     0.000000] Message<br />
@@ -160,6 +161,10 @@ public class KernelLogParser implements IParser {
                 "|Panic)"), KERNEL_RESET);
         mPatternUtil.addPattern(Pattern.compile("Last reset was system watchdog timer reset"),
                 KERNEL_RESET);
+
+        // SELINUX denials
+        mPatternUtil.addPattern(Pattern.compile(".*avc:\\s.*"), SELINUX_DENIAL);
+
     }
 
     /**
