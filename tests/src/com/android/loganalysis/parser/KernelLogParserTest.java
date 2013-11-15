@@ -155,4 +155,31 @@ public class KernelLogParserTest extends TestCase {
                     KernelLogParser.KERNEL_RESET, patternUtil.checkMessage(pattern));
         }
     }
+
+    /**
+     * Test that an SELinux Denial can be parsed out of a list of log lines.
+     */
+    public void testSelinuxDenialParse() {
+        final String SELINUX_DENIAL_STACK = "type=1400 audit(1384544483.730:10): avc:  denied  " +
+                "{ getattr } for  pid=797 comm=\"Binder_5\" path=\"/dev/pts/1\" + " +
+                "dev=devpts ino=4 scontext=u:r:system_server:s0 " +
+                "tcontext=u:object_r:devpts:s0 tclass=chr_file";
+        List<String> lines = Arrays.asList(
+                "<4>[    0.000000] Memory policy: ECC disabled, Data cache writealloc",
+                "<7>[    7.896355] SELinux: initialized (dev cgroup, type cgroup)" +
+                        ", uses genfs_contexts",
+                "<5>[   43.399164] " + SELINUX_DENIAL_STACK);
+        KernelLogItem kernelLog = new KernelLogParser().parse(lines);
+
+        assertNotNull(kernelLog);
+        assertEquals(0.0, kernelLog.getStartTime(), 0.0000005);
+        assertEquals(43.399164, kernelLog.getStopTime(), 0.0000005);
+        assertEquals(1, kernelLog.getEvents().size());
+        assertEquals(1, kernelLog.getMiscEvents(KernelLogParser.SELINUX_DENIAL).size());
+
+        MiscKernelLogItem item = kernelLog.getMiscEvents(KernelLogParser.SELINUX_DENIAL).get(0);
+        assertEquals(43.399164, item.getEventTime(), 0.0000005);
+        assertEquals(KernelLogParser.SELINUX_DENIAL, item.getCategory());
+        assertEquals(SELINUX_DENIAL_STACK, item.getStack());
+    }
 }
