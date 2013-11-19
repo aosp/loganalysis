@@ -218,6 +218,7 @@ public class LogcatParserTest extends TestCase {
         assertEquals(1, logcat.getNativeCrashes().size());
         assertEquals(3112, logcat.getNativeCrashes().get(0).getPid().intValue());
         assertEquals(3112, logcat.getNativeCrashes().get(0).getTid().intValue());
+        assertEquals("com.google.android.browser", logcat.getNativeCrashes().get(0).getApp());
         assertEquals("", logcat.getNativeCrashes().get(0).getLastPreamble());
         assertEquals("", logcat.getNativeCrashes().get(0).getProcessPreamble());
         assertEquals(parseTime("2012-04-25 18:33:27.273"),
