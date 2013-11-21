@@ -125,25 +125,29 @@ public class KernelLogParserTest extends TestCase {
     /**
      * Test that kernel patterns are matched.
      */
-    public void testKernelResetPatterns() {
+    public void testPatterns() {
         List<String> kernelResetPatterns = Arrays.asList(
                 "smem: DIAG",
                 "smsm: AMSS FATAL ERROR",
                 "kernel BUG at ",
-                "PC is at ",
-                "Internal error:",
                 "PVR_K:(Fatal): Debug assertion failed! []",
                 "Kernel panic",
                 "BP panicked",
                 "WROTE DSP RAMDUMP",
                 "tegra_wdt: last reset due to watchdog timeout",
+                "tegra_wdt tegra_wdt.0: last reset is due to watchdog timeout.",
                 "Last reset was MPU Watchdog Timer reset",
                 "[MODEM_IF] CRASH",
                 "Last boot reason: kernel_panic",
+                "Last boot reason: rpm_err",
+                "Last boot reason: hw_reset",
+                "Last boot reason: wdog_",
+                "Last boot reason: tz_err",
+                "Last boot reason: adsp_err",
+                "Last boot reason: modem_err",
+                "Last boot reason: mba_err",
                 "Last boot reason: watchdog",
                 "Last boot reason: watchdogr",
-                "Last boot reason: hw_reset",
-                "Last boot reason: PowerKey",
                 "Last boot reason: Watchdog",
                 "Last boot reason: Panic",
                 "Last reset was system watchdog timer reset");
@@ -154,6 +158,9 @@ public class KernelLogParserTest extends TestCase {
             assertEquals(String.format("Message \"%s\" was not matched.", pattern),
                     KernelLogParser.KERNEL_RESET, patternUtil.checkMessage(pattern));
         }
+
+        assertEquals(KernelLogParser.KERNEL_ERROR, patternUtil.checkMessage("Internal error:"));
+        assertEquals(KernelLogParser.SELINUX_DENIAL, patternUtil.checkMessage("avc: denied"));
     }
 
     /**

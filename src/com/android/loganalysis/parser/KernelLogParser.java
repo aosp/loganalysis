@@ -31,6 +31,7 @@ import java.util.regex.Pattern;
 */
 public class KernelLogParser implements IParser {
     public static final String KERNEL_RESET = "KERNEL_RESET";
+    public static final String KERNEL_ERROR = "KERNEL_ERROR";
     public static final String SELINUX_DENIAL = "SELINUX_DENIAL";
 
     /**
@@ -141,26 +142,28 @@ public class KernelLogParser implements IParser {
     private void initPatterns() {
         // Kernel resets
         // TODO: Separate out device specific patterns
-        mPatternUtil.addPattern(Pattern.compile("smem: DIAG.*"), KERNEL_RESET);
-        mPatternUtil.addPattern(Pattern.compile("smsm: AMSS FATAL ERROR.*"), KERNEL_RESET);
-        mPatternUtil.addPattern(Pattern.compile("kernel BUG at .*"), KERNEL_RESET);
-        mPatternUtil.addPattern(Pattern.compile("PC is at .*"), KERNEL_RESET);
-        mPatternUtil.addPattern(Pattern.compile("Internal error:.*"), KERNEL_RESET);
-        mPatternUtil.addPattern(Pattern.compile(
-                "PVR_K:\\(Fatal\\): Debug assertion failed! \\[.*\\]"), KERNEL_RESET);
-        mPatternUtil.addPattern(Pattern.compile("Kernel panic.*"), KERNEL_RESET);
-        mPatternUtil.addPattern(Pattern.compile("BP panicked"), KERNEL_RESET);
-        mPatternUtil.addPattern(Pattern.compile("WROTE DSP RAMDUMP"), KERNEL_RESET);
-        mPatternUtil.addPattern(Pattern.compile("tegra_wdt: last reset due to watchdog timeout.*"),
-                KERNEL_RESET);
-        mPatternUtil.addPattern(Pattern.compile("Last reset was MPU Watchdog Timer reset.*"),
-                KERNEL_RESET);
-        mPatternUtil.addPattern(Pattern.compile("\\[MODEM_IF\\].*CRASH.*"), KERNEL_RESET);
-        mPatternUtil.addPattern(Pattern.compile(
-                "Last boot reason: (?:kernel_panic|watchdogr?|hw_reset(?:$|\n)|PowerKey|Watchdog" +
-                "|Panic)"), KERNEL_RESET);
-        mPatternUtil.addPattern(Pattern.compile("Last reset was system watchdog timer reset"),
-                KERNEL_RESET);
+        final String[] kernelResets = {
+            "smem: DIAG.*",
+            "smsm: AMSS FATAL ERROR.*",
+            "kernel BUG at .*",
+            "PVR_K:\\(Fatal\\): Debug assertion failed! \\[.*\\]",
+            "Kernel panic.*",
+            "BP panicked",
+            "WROTE DSP RAMDUMP",
+            "tegra_wdt: last reset due to watchdog timeout.*",
+            "tegra_wdt tegra_wdt.0: last reset is due to watchdog timeout.*",
+            "Last reset was MPU Watchdog Timer reset.*",
+            "\\[MODEM_IF\\].*CRASH.*",
+            "Last boot reason: (?:kernel_panic|rpm_err|hw_reset(?:$|\n)|wdog_.*|" +
+            "tz_err|adsp_err|modem_err|mba_err|watchdogr?|Watchdog|Panic)",
+            "Last reset was system watchdog timer reset",
+        };
+        for (String pattern : kernelResets) {
+            mPatternUtil.addPattern(Pattern.compile(pattern), KERNEL_RESET);
+        }
+
+        mPatternUtil.addPattern(Pattern.compile("Internal error:.*"), KERNEL_ERROR);
+
 
         // SELINUX denials
         mPatternUtil.addPattern(Pattern.compile(".*avc:\\s.*"), SELINUX_DENIAL);
