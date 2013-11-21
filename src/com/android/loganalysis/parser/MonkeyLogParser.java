@@ -19,6 +19,7 @@ import com.android.loganalysis.item.AnrItem;
 import com.android.loganalysis.item.MiscLogcatItem;
 import com.android.loganalysis.item.MonkeyLogItem;
 import com.android.loganalysis.item.MonkeyLogItem.DroppedCategory;
+import com.android.loganalysis.item.NativeCrashItem;
 import com.android.loganalysis.item.TracesItem;
 
 import java.io.BufferedReader;
@@ -71,6 +72,8 @@ public class MonkeyLogParser implements IParser {
             "// NOT RESPONDING: (\\S+) \\(pid (\\d+)\\)");
     private static final Pattern CRASH = Pattern.compile(
             "// CRASH: (\\S+) \\(pid (\\d+)\\)");
+    private static final Pattern EMPTY_NATIVE_CRASH = Pattern.compile("" +
+            "\\*\\* New native crash detected.");
 
     private static final Pattern TRACES_START = Pattern.compile("anr traces:");
     private static final Pattern TRACES_STOP = Pattern.compile("// anr traces status was \\d+");
@@ -82,7 +85,7 @@ public class MonkeyLogParser implements IParser {
     private boolean mMatchingTraces = false;
     private List<String> mBlock = null;
     private String mApp = null;
-    private int mPid = 0;
+    private Integer mPid = null;
 
     private MonkeyLogItem mMonkeyLog = new MonkeyLogItem();
 
@@ -140,7 +143,7 @@ public class MonkeyLogParser implements IParser {
                     mMatchingJavaCrash = true;
                 }
             }
-            if (line.startsWith("// ")) {
+            if (line.startsWith("// ") && !line.startsWith("// ** ")) {
                 line = line.replace("// ", "");
                 mBlock.add(line);
                 return;
@@ -257,6 +260,11 @@ public class MonkeyLogParser implements IParser {
             mBlock = new LinkedList<String>();
             mMatchingCrash = true;
         }
+        m = EMPTY_NATIVE_CRASH.matcher(line);
+        if (m.matches()) {
+            MiscLogcatItem crash = new NativeCrashItem();
+            addCrashAndReset(crash);
+        }
         m = TRACES_START.matcher(line);
         if (m.matches()) {
             mBlock = new LinkedList<String>();
@@ -280,7 +288,7 @@ public class MonkeyLogParser implements IParser {
         mMatchingNativeCrash = false;
         mBlock = null;
         mApp = null;
-        mPid = 0;
+        mPid = null;
     }
 
     /**
