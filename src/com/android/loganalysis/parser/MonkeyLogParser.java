@@ -263,6 +263,7 @@ public class MonkeyLogParser implements IParser {
         m = EMPTY_NATIVE_CRASH.matcher(line);
         if (m.matches()) {
             MiscLogcatItem crash = new NativeCrashItem();
+            crash.setStack("");
             addCrashAndReset(crash);
         }
         m = TRACES_START.matcher(line);

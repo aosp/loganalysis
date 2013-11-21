@@ -528,7 +528,7 @@ public class MonkeyLogParserTest extends TestCase {
         assertNull(monkeyLog.getCrash().getPid());
         NativeCrashItem nc = (NativeCrashItem) monkeyLog.getCrash();
         assertNull(nc.getFingerprint());
-        assertNull(nc.getStack());
+        assertEquals("", nc.getStack());
     }
 
     /**
