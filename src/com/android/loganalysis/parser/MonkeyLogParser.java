@@ -83,6 +83,7 @@ public class MonkeyLogParser implements IParser {
     private boolean mMatchingJavaCrash = false;
     private boolean mMatchingNativeCrash = false;
     private boolean mMatchingTraces = false;
+    private boolean mMatchedTrace = false;
     private List<String> mBlock = null;
     private String mApp = null;
     private Integer mPid = null;
@@ -170,8 +171,8 @@ public class MonkeyLogParser implements IParser {
                     ((AnrItem) mMonkeyLog.getCrash()).setTrace(traces.getStack());
                 }
 
-                mMatchingTraces = false;
-                mBlock = null;
+                reset();
+                mMatchedTrace = true;
             } else {
                 mBlock.add(line);
             }
@@ -247,27 +248,27 @@ public class MonkeyLogParser implements IParser {
             mMonkeyLog.setDroppedCount(DroppedCategory.ROTATIONS, Integer.parseInt(m.group(1)));
         }
         m = ANR.matcher(line);
-        if (m.matches()) {
+        if (mMonkeyLog.getCrash() == null && m.matches()) {
             mApp = m.group(1);
             mPid = Integer.parseInt(m.group(2));
             mBlock = new LinkedList<String>();
             mMatchingAnr = true;
         }
         m = CRASH.matcher(line);
-        if (m.matches()) {
+        if (mMonkeyLog.getCrash() == null && m.matches()) {
             mApp = m.group(1);
             mPid = Integer.parseInt(m.group(2));
             mBlock = new LinkedList<String>();
             mMatchingCrash = true;
         }
         m = EMPTY_NATIVE_CRASH.matcher(line);
-        if (m.matches()) {
+        if (mMonkeyLog.getCrash() == null && m.matches()) {
             MiscLogcatItem crash = new NativeCrashItem();
             crash.setStack("");
             addCrashAndReset(crash);
         }
         m = TRACES_START.matcher(line);
-        if (m.matches()) {
+        if (!mMatchedTrace && m.matches()) {
             mBlock = new LinkedList<String>();
             mMatchingTraces = true;
         }
@@ -278,18 +279,30 @@ public class MonkeyLogParser implements IParser {
      */
     private void addCrashAndReset(MiscLogcatItem crash) {
         if (crash != null) {
-            crash.setPid(mPid);
-            crash.setApp(mApp);
+            if (crash.getPid() == null) {
+                crash.setPid(mPid);
+            }
+            if (crash.getApp() == null) {
+                crash.setApp(mApp);
+            }
             mMonkeyLog.setCrash(crash);
         }
 
+        reset();
+    }
+
+    /**
+     * Reset the parser state for crashes.
+     */
+    private void reset() {
+        mApp = null;
+        mPid = null;
         mMatchingAnr = false;
         mMatchingCrash = false;
         mMatchingJavaCrash = false;
         mMatchingNativeCrash = false;
+        mMatchingTraces = false;
         mBlock = null;
-        mApp = null;
-        mPid = null;
     }
 
     /**

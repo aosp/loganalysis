@@ -577,6 +577,114 @@ public class MonkeyLogParserTest extends TestCase {
     }
 
     /**
+     * Test that a monkey can be parsed if there is an ANR in the middle of the traces.
+     */
+    public void testParse_malformed_anr() {
+        List<String> lines = Arrays.asList(
+                "# Tuesday, 04/24/2012 05:23:30 PM - device uptime = 216.48: Monkey command used for this test:",
+                "adb shell monkey -p com.google.android.youtube  -c android.intent.category.SAMPLE_CODE -c android.intent.category.CAR_DOCK -c android.intent.category.LAUNCHER -c android.intent.category.MONKEY -c android.intent.category.INFO  --ignore-security-exceptions --throttle 100  -s 993 -v -v -v 10000 ",
+                "",
+                ":Monkey: seed=993 count=10000",
+                ":AllowPackage: com.google.android.youtube",
+                ":IncludeCategory: android.intent.category.LAUNCHER",
+                ":Switch: #Intent;action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;launchFlags=0x10200000;component=com.google.android.youtube/.app.honeycomb.Shell%24HomeActivity;end",
+                "    // Allowing start of Intent { act=android.intent.action.MAIN cat=[android.intent.category.LAUNCHER] cmp=com.google.android.youtube/.app.honeycomb.Shell$HomeActivity } in package com.google.android.youtube",
+                "Sleeping for 100 milliseconds",
+                ":Sending Key (ACTION_UP): 21    // KEYCODE_DPAD_LEFT",
+                "Sleeping for 100 milliseconds",
+                ":Sending Key (ACTION_DOWN): 22    // KEYCODE_DPAD_RIGHT",
+                ":Sending Key (ACTION_UP): 22    // KEYCODE_DPAD_RIGHT",
+                "    //[calendar_time:2012-04-25 00:27:27.155  system_uptime:454996]",
+                "    // Sending event #5300",
+                ":Sending Key (ACTION_UP): 19    // KEYCODE_DPAD_UP",
+                "Sleeping for 100 milliseconds",
+                ":Sending Trackball (ACTION_MOVE): 0:(4.0,3.0)",
+                ":Sending Key (ACTION_DOWN): 20    // KEYCODE_DPAD_DOWN",
+                ":Sending Key (ACTION_UP): 20    // KEYCODE_DPAD_DOWN",
+                "// NOT RESPONDING: com.google.android.youtube (pid 0)",
+                "ANR in com.google.android.youtube (com.google.android.youtube/.app.honeycomb.phone.WatchActivity)",
+                "PID: 3301",
+                "Reason: keyDispatchingTimedOut",
+                "Load: 1.0 / 1.05 / 0.6",
+                "CPU usage from 4794ms to -1502ms ago with 99% awake:",
+                "  18% 3301/com.google.android.youtube: 16% user + 2.3% kernel / faults: 268 minor 9 major",
+                "  13% 313/system_server: 9.2% user + 4.4% kernel / faults: 906 minor 3 major",
+                "  10% 117/surfaceflinger: 4.9% user + 5.5% kernel / faults: 1 minor",
+                "  10% 120/mediaserver: 6.8% user + 3.6% kernel / faults: 1189 minor",
+                "34% TOTAL: 19% user + 13% kernel + 0.2% iowait + 1% softirq",
+                "",
+                "procrank:",
+                "// procrank status was 0",
+                "anr traces:",
+                "",
+                "",
+                "----- pid 3301 at 2012-04-25 17:17:08 -----",
+                "Cmd line: com.google.android.youtube",
+                "",
+                "DALVIK THREADS:",
+                "(mutexes: tll=0 tsl=0 tscl=0 ghl=0)",
+                "",
+                "\"main\" prio=5 tid=1 SUSPENDED",
+                "  | group=\"main\" sCount=1 dsCount=0 obj=0x00000001 self=0x00000001",
+                "  | sysTid=2887 nice=0 sched=0/0 cgrp=foreground handle=0000000001",
+                "  | schedstat=( 0 0 0 ) utm=5954 stm=1017 core=0",
+                "  at class.method1(Class.java:1)",
+                "// NOT RESPONDING: com.google.android.youtube (pid 3302)",
+                "ANR in com.google.android.youtube (com.google.android.youtube/.app.honeycomb.phone.WatchActivity)",
+                "Reason: keyDispatchingTimedOut",
+                "Load: 1.0 / 1.05 / 0.6",
+                "CPU usage from 4794ms to -1502ms ago with 99% awake:",
+                "  18% 3301/com.google.android.youtube: 16% user + 2.3% kernel / faults: 268 minor 9 major",
+                "  13% 313/system_server: 9.2% user + 4.4% kernel / faults: 906 minor 3 major",
+                "  10% 117/surfaceflinger: 4.9% user + 5.5% kernel / faults: 1 minor",
+                "  10% 120/mediaserver: 6.8% user + 3.6% kernel / faults: 1189 minor",
+                "34% TOTAL: 19% user + 13% kernel + 0.2% iowait + 1% softirq",
+                "",
+                "  at class.method2(Class.java:2)",
+                "  at class.method2(Class.java:2)",
+                "",
+                "----- end 3301 -----",
+                "// anr traces status was 0",
+                "** Monkey aborted due to error.",
+                "Events injected: 5322",
+                ":Sending rotation degree=0, persist=false",
+                ":Dropped: keys=1 pointers=0 trackballs=0 flips=0 rotations=0",
+                "## Network stats: elapsed time=252942ms (0ms mobile, 252942ms wifi, 0ms not connected)",
+                "** System appears to have crashed at event 5322 of 10000 using seed 993",
+                "",
+                "# Tuesday, 04/24/2012 05:27:44 PM - device uptime = 471.37: Monkey command ran for: 04:14 (mm:ss)",
+                "",
+                "----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------",
+                "");
+
+        MonkeyLogItem monkeyLog = new MonkeyLogParser().parse(lines);
+        assertNotNull(monkeyLog);
+        // FIXME: Add test back once time situation has been worked out.
+        // assertEquals(parseTime("2012-04-24 17:23:30"), monkeyLog.getStartTime());
+        // assertEquals(parseTime("2012-04-24 17:27:44"), monkeyLog.getStopTime());
+        assertEquals(1, monkeyLog.getPackages().size());
+        assertTrue(monkeyLog.getPackages().contains("com.google.android.youtube"));
+        assertEquals(1, monkeyLog.getCategories().size());
+        assertTrue(monkeyLog.getCategories().contains("android.intent.category.LAUNCHER"));
+        assertEquals(100, monkeyLog.getThrottle());
+        assertEquals(993, monkeyLog.getSeed().intValue());
+        assertEquals(10000, monkeyLog.getTargetCount().intValue());
+        assertTrue(monkeyLog.getIgnoreSecurityExceptions());
+        assertEquals(4 * 60 * 1000 + 14 * 1000, monkeyLog.getTotalDuration().longValue());
+        assertEquals(216480, monkeyLog.getStartUptimeDuration().longValue());
+        assertEquals(471370, monkeyLog.getStopUptimeDuration().longValue());
+        assertFalse(monkeyLog.getIsFinished());
+        assertFalse(monkeyLog.getNoActivities());
+        assertEquals(5300, monkeyLog.getIntermediateCount());
+        assertEquals(5322, monkeyLog.getFinalCount().intValue());
+        assertNotNull(monkeyLog.getCrash());
+        assertTrue(monkeyLog.getCrash() instanceof AnrItem);
+        assertEquals("com.google.android.youtube", monkeyLog.getCrash().getApp());
+        assertEquals(3301, monkeyLog.getCrash().getPid().intValue());
+        assertEquals("keyDispatchingTimedOut", ((AnrItem) monkeyLog.getCrash()).getReason());
+    }
+
+    /**
      * Test that the other date format can be parsed.
      */
     public void testAlternateDateFormat() {
