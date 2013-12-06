@@ -108,6 +108,19 @@ public class KernelLogItem extends GenericItem {
     }
 
     /**
+     * Get the list of all {@link SELinuxItem} events.
+     */
+    public List<SELinuxItem> getSELinuxEvents() {
+        List<SELinuxItem> items = new LinkedList<SELinuxItem>();
+        for (MiscKernelLogItem item : getEvents()) {
+            if (item instanceof SELinuxItem) {
+                items.add((SELinuxItem)item);
+            }
+        }
+        return items;
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override

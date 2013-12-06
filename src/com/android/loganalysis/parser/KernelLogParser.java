@@ -17,6 +17,7 @@ package com.android.loganalysis.parser;
 
 import com.android.loganalysis.item.KernelLogItem;
 import com.android.loganalysis.item.MiscKernelLogItem;
+import com.android.loganalysis.item.SELinuxItem;
 import com.android.loganalysis.util.LogPatternUtil;
 import com.android.loganalysis.util.LogTailUtil;
 
@@ -40,6 +41,8 @@ public class KernelLogParser implements IParser {
      */
     private static final Pattern LOG_LINE = Pattern.compile(
             "^(<\\d+>)?\\[\\s*(\\d+.\\d{6})\\] (.*)$");
+    private static final Pattern SELINUX_DENIAL_PATTERN = Pattern.compile(
+            ".*avc:\\s.*scontext=\\w*:\\w*:([\\w\\s]*):\\w*\\s.*");
 
     private KernelLogItem mKernelLog = null;
     private Double mStartTime = null;
@@ -118,14 +121,26 @@ public class KernelLogParser implements IParser {
      */
     private void checkAndAddKernelEvent(String message) {
         String category = mPatternUtil.checkMessage(message);
-        if (category != null) {
-            MiscKernelLogItem kernelLogItem = new MiscKernelLogItem();
-            kernelLogItem.setEventTime(mStopTime);
-            kernelLogItem.setPreamble(mPreambleUtil.getLastTail());
-            kernelLogItem.setStack(message);
-            kernelLogItem.setCategory(category);
-            mKernelLog.addEvent(kernelLogItem);
+        if (category == null) {
+            return;
         }
+
+        MiscKernelLogItem kernelLogItem;
+        if (category.equals(SELINUX_DENIAL)) {
+            SELinuxItem selinuxItem = new SELinuxItem();
+            Matcher m = SELINUX_DENIAL_PATTERN.matcher(message);
+            if (m.matches()) {
+                selinuxItem.setSContext(m.group(1));
+            }
+            kernelLogItem = selinuxItem;
+        } else {
+            kernelLogItem = new MiscKernelLogItem();
+        }
+        kernelLogItem.setEventTime(mStopTime);
+        kernelLogItem.setPreamble(mPreambleUtil.getLastTail());
+        kernelLogItem.setStack(message);
+        kernelLogItem.setCategory(category);
+        mKernelLog.addEvent(kernelLogItem);
     }
 
     /**
@@ -164,10 +179,8 @@ public class KernelLogParser implements IParser {
 
         mPatternUtil.addPattern(Pattern.compile("Internal error:.*"), KERNEL_ERROR);
 
-
         // SELINUX denials
-        mPatternUtil.addPattern(Pattern.compile(".*avc:\\s.*"), SELINUX_DENIAL);
-
+        mPatternUtil.addPattern(SELINUX_DENIAL_PATTERN, SELINUX_DENIAL);
     }
 
     /**

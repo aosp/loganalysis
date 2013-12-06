@@ -45,6 +45,15 @@ public class MiscKernelLogItem extends GenericItem {
     }
 
     /**
+     * Constructor for {@link MiscKernelLogItem}.
+     *
+     * @param attributes A list of allowed attributes.
+     */
+    protected MiscKernelLogItem(Set<String> attributes) {
+        super(getAllAttributes(attributes));
+    }
+
+    /**
      * Get the time object when the event happened.
      */
     public Double getEventTime() {
@@ -98,5 +107,14 @@ public class MiscKernelLogItem extends GenericItem {
      */
     public void setStack(String stack) {
         setAttribute(STACK, stack);
+    }
+
+    /**
+     * Combine an array of attributes with the internal list of attributes.
+     */
+    private static Set<String> getAllAttributes(Set<String> attributes) {
+        Set<String> allAttributes = new HashSet<String>(ATTRIBUTES);
+        allAttributes.addAll(attributes);
+        return allAttributes;
     }
 }

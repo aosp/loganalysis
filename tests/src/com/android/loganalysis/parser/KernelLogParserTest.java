@@ -17,6 +17,7 @@ package com.android.loganalysis.parser;
 
 import com.android.loganalysis.item.KernelLogItem;
 import com.android.loganalysis.item.MiscKernelLogItem;
+import com.android.loganalysis.item.SELinuxItem;
 import com.android.loganalysis.util.LogPatternUtil;
 
 import junit.framework.TestCase;
@@ -160,7 +161,8 @@ public class KernelLogParserTest extends TestCase {
         }
 
         assertEquals(KernelLogParser.KERNEL_ERROR, patternUtil.checkMessage("Internal error:"));
-        assertEquals(KernelLogParser.SELINUX_DENIAL, patternUtil.checkMessage("avc: denied"));
+        assertEquals(KernelLogParser.SELINUX_DENIAL, patternUtil.checkMessage(
+                    "avc: denied scontext=0:0:domain:0 "));
     }
 
     /**
@@ -183,10 +185,17 @@ public class KernelLogParserTest extends TestCase {
         assertEquals(43.399164, kernelLog.getStopTime(), 0.0000005);
         assertEquals(1, kernelLog.getEvents().size());
         assertEquals(1, kernelLog.getMiscEvents(KernelLogParser.SELINUX_DENIAL).size());
+        assertEquals(1, kernelLog.getSELinuxEvents().size());
 
         MiscKernelLogItem item = kernelLog.getMiscEvents(KernelLogParser.SELINUX_DENIAL).get(0);
         assertEquals(43.399164, item.getEventTime(), 0.0000005);
         assertEquals(KernelLogParser.SELINUX_DENIAL, item.getCategory());
         assertEquals(SELINUX_DENIAL_STACK, item.getStack());
+
+        SELinuxItem selinuxItem = kernelLog.getSELinuxEvents().get(0);
+        assertEquals("system_server", selinuxItem.getSContext());
+        assertEquals(43.399164, selinuxItem.getEventTime(), 0.0000005);
+        assertEquals(KernelLogParser.SELINUX_DENIAL, selinuxItem.getCategory());
+        assertEquals(SELINUX_DENIAL_STACK, selinuxItem.getStack());
     }
 }
