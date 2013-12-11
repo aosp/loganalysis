@@ -16,6 +16,7 @@
 package com.android.loganalysis.parser;
 
 import com.android.loganalysis.item.DumpsysBatteryInfoItem;
+import com.android.loganalysis.item.DumpsysBatteryInfoItem.WakeLockCategory;
 
 import java.util.List;
 import java.util.regex.Matcher;
@@ -25,6 +26,8 @@ import java.util.regex.Pattern;
  * A {@link IParser} to handle the "dumpsys batteryinfo" command output.
  */
 public class DumpsysBatteryInfoParser implements IParser {
+    private static final Pattern LAST_CHARGED_START_PAT = Pattern.compile(
+            "^Statistics since last charge:$");
     private static final Pattern LAST_UNPLUGGED_START_PAT = Pattern.compile(
             "^Statistics since last unplugged:$");
     private static final Pattern WAKE_LOCK_START_PAT = Pattern.compile(
@@ -53,7 +56,8 @@ public class DumpsysBatteryInfoParser implements IParser {
      */
     @Override
     public DumpsysBatteryInfoItem parse(List<String> lines) {
-        boolean inLastUnplugged = false;
+        WakeLockCategory kernelWakeLockCategory = null;
+        WakeLockCategory wakeLockCategory = null;
         boolean inKernelWakeLock = false;
         boolean inWakeLock = false;
 
@@ -61,10 +65,17 @@ public class DumpsysBatteryInfoParser implements IParser {
         // immediately following, until a blank line. Partial wake locks are in their own block,
         // until a blank line. Return immediately after since there is nothing left to parse.
         for (String line : lines) {
-            if (!inLastUnplugged) {
-                Matcher m = LAST_UNPLUGGED_START_PAT.matcher(line);
+            if (kernelWakeLockCategory == null || wakeLockCategory == null) {
+                Matcher m = LAST_CHARGED_START_PAT.matcher(line);
                 if (m.matches()) {
-                    inLastUnplugged = true;
+                    kernelWakeLockCategory = WakeLockCategory.LAST_CHARGE_KERNEL_WAKELOCK;
+                    wakeLockCategory = WakeLockCategory.LAST_CHARGE_WAKELOCK;
+                    inKernelWakeLock = true;
+                }
+                m = LAST_UNPLUGGED_START_PAT.matcher(line);
+                if (m.matches()) {
+                    kernelWakeLockCategory = WakeLockCategory.LAST_UNPLUGGED_KERNEL_WAKELOCK;
+                    wakeLockCategory = WakeLockCategory.LAST_UNPLUGGED_WAKELOCK;
                     inKernelWakeLock = true;
                 }
             } else {
@@ -72,14 +83,15 @@ public class DumpsysBatteryInfoParser implements IParser {
                     if ("".equals(line.trim())) {
                         inKernelWakeLock = false;
                     } else {
-                        parseLastUnpluggedKernelWakeLock(line);
+                        parseKernelWakeLock(line, kernelWakeLockCategory);
                     }
                 } else if (inWakeLock) {
                     if ("".equals(line.trim())) {
                         inWakeLock = false;
-                        return mItem;
+                        kernelWakeLockCategory = null;
+                        wakeLockCategory = null;
                     } else {
-                        parseLastUnpluggedWakeLock(line);
+                        parseWakeLock(line, wakeLockCategory);
                     }
                 } else {
                     Matcher m = WAKE_LOCK_START_PAT.matcher(line);
@@ -98,7 +110,7 @@ public class DumpsysBatteryInfoParser implements IParser {
      * Exposed for unit testing.
      * </p>
      */
-    void parseLastUnpluggedKernelWakeLock(String line) {
+    void parseKernelWakeLock(String line, WakeLockCategory category) {
         Matcher m = KERNEL_WAKE_LOCK_PAT.matcher(line);
         if (!m.matches()) {
             return;
@@ -112,8 +124,7 @@ public class DumpsysBatteryInfoParser implements IParser {
         final long msecs = parseLongOrZero(m.group(11));
         final int timesCalled = Integer.parseInt(m.group(12));
 
-        mItem.addLastUnpluggedKernelWakeLock(name, getMs(days, hours, mins, secs, msecs),
-                timesCalled);
+        mItem.addWakeLock(name, getMs(days, hours, mins, secs, msecs), timesCalled, category);
     }
 
     /**
@@ -122,7 +133,7 @@ public class DumpsysBatteryInfoParser implements IParser {
      * Exposed for unit testing.
      * </p>
      */
-    void parseLastUnpluggedWakeLock(String line) {
+    void parseWakeLock(String line, WakeLockCategory category) {
         Matcher m = WAKE_LOCK_PAT.matcher(line);
         if (!m.matches()) {
             return;
@@ -137,8 +148,8 @@ public class DumpsysBatteryInfoParser implements IParser {
         final long msecs = parseLongOrZero(m.group(12));
         final int timesCalled = Integer.parseInt(m.group(13));
 
-        mItem.addLastUnpluggedWakeLock(name, number, getMs(days, hours, mins, secs, msecs),
-                timesCalled);
+        mItem.addWakeLock(name, number, getMs(days, hours, mins, secs, msecs), timesCalled,
+                category);
     }
 
     /**

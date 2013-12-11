@@ -17,6 +17,7 @@ package com.android.loganalysis.parser;
 
 import com.android.loganalysis.item.DumpsysBatteryInfoItem;
 import com.android.loganalysis.item.DumpsysBatteryInfoItem.WakeLock;
+import com.android.loganalysis.item.DumpsysBatteryInfoItem.WakeLockCategory;
 
 import junit.framework.TestCase;
 
@@ -96,13 +97,19 @@ public class DumpsysBatteryInfoParserTest extends TestCase {
         DumpsysBatteryInfoParser parser = new DumpsysBatteryInfoParser();
         DumpsysBatteryInfoItem item = parser.parse(inputBlock);
 
-        assertEquals(5, item.getLastUnpluggedWakeLocks().size());
-        assertEquals(3, item.getLastUnpluggedKernelWakeLocks().size());
+        assertEquals(2, item.getWakeLocks(WakeLockCategory.LAST_CHARGE_WAKELOCK).size());
+        assertEquals(2, item.getWakeLocks(WakeLockCategory.LAST_CHARGE_KERNEL_WAKELOCK).size());
+        assertEquals(5, item.getWakeLocks(WakeLockCategory.LAST_UNPLUGGED_WAKELOCK).size());
+        assertEquals(3, item.getWakeLocks(WakeLockCategory.LAST_UNPLUGGED_KERNEL_WAKELOCK).size());
 
         assertEquals("partialWakelock",
-                item.getLastUnpluggedWakeLocks().get(0).getName());
+                item.getWakeLocks(WakeLockCategory.LAST_CHARGE_WAKELOCK).get(0).getName());
         assertEquals("PowerManagerService.WakeLocks",
-                item.getLastUnpluggedKernelWakeLocks().get(0).getName());
+                item.getWakeLocks(WakeLockCategory.LAST_CHARGE_KERNEL_WAKELOCK).get(0).getName());
+        assertEquals("partialWakelock",
+                item.getWakeLocks(WakeLockCategory.LAST_UNPLUGGED_WAKELOCK).get(0).getName());
+        assertEquals("PowerManagerService.WakeLocks",
+                item.getWakeLocks(WakeLockCategory.LAST_UNPLUGGED_KERNEL_WAKELOCK).get(0).getName());
     }
 
     /**
@@ -112,11 +119,11 @@ public class DumpsysBatteryInfoParserTest extends TestCase {
         String inputLine = "  Kernel Wake lock \"Process\": 1d 2h 3m 4s 5ms (6 times) realtime";
 
         DumpsysBatteryInfoParser parser = new DumpsysBatteryInfoParser();
-        parser.parseLastUnpluggedKernelWakeLock(inputLine);
+        parser.parseKernelWakeLock(inputLine, WakeLockCategory.LAST_CHARGE_KERNEL_WAKELOCK);
         DumpsysBatteryInfoItem item = parser.getItem();
 
-        assertEquals(1, item.getLastUnpluggedKernelWakeLocks().size());
-        WakeLock wakeLock = item.getLastUnpluggedKernelWakeLocks().get(0);
+        assertEquals(1, item.getWakeLocks(WakeLockCategory.LAST_CHARGE_KERNEL_WAKELOCK).size());
+        WakeLock wakeLock = item.getWakeLocks(WakeLockCategory.LAST_CHARGE_KERNEL_WAKELOCK).get(0);
         assertEquals("Process", wakeLock.getName());
         assertNull(wakeLock.getNumber());
         assertEquals(DumpsysBatteryInfoParser.getMs(1, 2, 3, 4, 5), wakeLock.getHeldTime());
@@ -125,11 +132,11 @@ public class DumpsysBatteryInfoParserTest extends TestCase {
         inputLine = "  Kernel Wake lock \"Process\": 5m 7ms (2 times) realtime";
 
         parser = new DumpsysBatteryInfoParser();
-        parser.parseLastUnpluggedKernelWakeLock(inputLine);
+        parser.parseKernelWakeLock(inputLine, WakeLockCategory.LAST_CHARGE_KERNEL_WAKELOCK);
         item = parser.getItem();
 
-        assertEquals(1, item.getLastUnpluggedKernelWakeLocks().size());
-        wakeLock = item.getLastUnpluggedKernelWakeLocks().get(0);
+        assertEquals(1, item.getWakeLocks(WakeLockCategory.LAST_CHARGE_KERNEL_WAKELOCK).size());
+        wakeLock = item.getWakeLocks(WakeLockCategory.LAST_CHARGE_KERNEL_WAKELOCK).get(0);
         assertEquals("Process", wakeLock.getName());
         assertNull(wakeLock.getNumber());
         assertEquals(5 * 60 * 1000 + 7, wakeLock.getHeldTime());
@@ -143,11 +150,11 @@ public class DumpsysBatteryInfoParserTest extends TestCase {
         String inputLine = "  Wake lock #1234 Process: 1d 2h 3m 4s 5ms (6 times) realtime";
 
         DumpsysBatteryInfoParser parser = new DumpsysBatteryInfoParser();
-        parser.parseLastUnpluggedWakeLock(inputLine);
+        parser.parseWakeLock(inputLine, WakeLockCategory.LAST_CHARGE_WAKELOCK);
         DumpsysBatteryInfoItem item = parser.getItem();
 
-        assertEquals(1, item.getLastUnpluggedWakeLocks().size());
-        WakeLock wakeLock = item.getLastUnpluggedWakeLocks().get(0);
+        assertEquals(1, item.getWakeLocks(WakeLockCategory.LAST_CHARGE_WAKELOCK).size());
+        WakeLock wakeLock = item.getWakeLocks(WakeLockCategory.LAST_CHARGE_WAKELOCK).get(0);
         assertEquals("Process", wakeLock.getName());
         assertEquals((Integer) 1234, wakeLock.getNumber());
         assertEquals(DumpsysBatteryInfoParser.getMs(1, 2, 3, 4, 5), wakeLock.getHeldTime());
@@ -156,11 +163,11 @@ public class DumpsysBatteryInfoParserTest extends TestCase {
         inputLine = "  Wake lock #1234 Process:with:colons: 5m 7ms (2 times) realtime";
 
         parser = new DumpsysBatteryInfoParser();
-        parser.parseLastUnpluggedWakeLock(inputLine);
+        parser.parseWakeLock(inputLine, WakeLockCategory.LAST_CHARGE_WAKELOCK);
         item = parser.getItem();
 
-        assertEquals(1, item.getLastUnpluggedWakeLocks().size());
-        wakeLock = item.getLastUnpluggedWakeLocks().get(0);
+        assertEquals(1, item.getWakeLocks(WakeLockCategory.LAST_CHARGE_WAKELOCK).size());
+        wakeLock = item.getWakeLocks(WakeLockCategory.LAST_CHARGE_WAKELOCK).get(0);
         assertEquals("Process:with:colons", wakeLock.getName());
         assertEquals((Integer) 1234, wakeLock.getNumber());
         assertEquals(5 * 60 * 1000 + 7, wakeLock.getHeldTime());

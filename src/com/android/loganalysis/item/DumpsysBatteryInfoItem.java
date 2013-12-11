@@ -20,6 +20,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -32,8 +33,16 @@ public class DumpsysBatteryInfoItem implements IItem {
 
     /** Constant for JSON output */
     public static final String WAKELOCKS = "WAKELOCKS";
-    /** Constant for JSON output */
-    public static final String KERNEL_WAKELOCKS = "KERNEL_WAKELOCKS";
+
+    /**
+     * Enum for describing the type of wakelock
+     */
+    public enum WakeLockCategory {
+        LAST_CHARGE_WAKELOCK,
+        LAST_CHARGE_KERNEL_WAKELOCK,
+        LAST_UNPLUGGED_WAKELOCK,
+        LAST_UNPLUGGED_KERNEL_WAKELOCK;
+    }
 
     /**
      * A class designed to store information related to wake locks and kernel wake locks.
@@ -48,9 +57,11 @@ public class DumpsysBatteryInfoItem implements IItem {
         public static final String HELD_TIME = "HELD_TIME";
         /** Constant for JSON output */
         public static final String LOCKED_COUNT = "LOCKED_COUNT";
+        /** Constant for JSON output */
+        public static final String CATEGORY = "CATEGORY";
 
         private static final Set<String> ATTRIBUTES = new HashSet<String>(Arrays.asList(
-                NAME, NUMBER, HELD_TIME, LOCKED_COUNT));
+                NAME, NUMBER, HELD_TIME, LOCKED_COUNT, CATEGORY));
 
         /**
          * The constructor for {@link WakeLock}
@@ -58,9 +69,10 @@ public class DumpsysBatteryInfoItem implements IItem {
          * @param name The name of the wake lock
          * @param heldTime The amount of time held in milliseconds
          * @param lockedCount The number of times the wake lock was locked
+         * @param category The {@link WakeLockCategory} of the wake lock
          */
-        public WakeLock(String name, long heldTime, int lockedCount) {
-            this(name, null, heldTime, lockedCount);
+        public WakeLock(String name, long heldTime, int lockedCount, WakeLockCategory category) {
+            this(name, null, heldTime, lockedCount, category);
         }
 
         /**
@@ -70,14 +82,17 @@ public class DumpsysBatteryInfoItem implements IItem {
          * @param number The number of the wake lock
          * @param heldTime The amount of time held in milliseconds
          * @param lockedCount The number of times the wake lock was locked
+         * @param category The {@link WakeLockCategory} of the wake lock
          */
-        public WakeLock(String name, Integer number, long heldTime, int lockedCount) {
+        public WakeLock(String name, Integer number, long heldTime, int lockedCount,
+                WakeLockCategory category) {
             super(ATTRIBUTES);
 
             setAttribute(NAME, name);
             setAttribute(NUMBER, number);
             setAttribute(HELD_TIME, heldTime);
             setAttribute(LOCKED_COUNT, lockedCount);
+            setAttribute(CATEGORY, category);
         }
 
         /**
@@ -107,37 +122,59 @@ public class DumpsysBatteryInfoItem implements IItem {
         public int getLockedCount() {
             return (Integer) getAttribute(LOCKED_COUNT);
         }
+
+        /**
+         * Get the {@link WakeLockCategory} of the wake lock.
+         */
+        public WakeLockCategory getCategory() {
+            return (WakeLockCategory) getAttribute(CATEGORY);
+        }
     }
 
-    private List<WakeLock> mLastUnpluggedKernelWakeLocks = new LinkedList<WakeLock>();
-    private List<WakeLock> mLastUnpluggedWakeLocks = new LinkedList<WakeLock>();
+    private Collection<WakeLock> mWakeLocks = new LinkedList<WakeLock>();
 
     /**
-     * Add a kernel wake lock from the last unplugged section of the battery info.
+     * Add a wakelock from the battery info section.
+     *
+     * @param name The name of the wake lock.
+     * @param number The number of the wake lock.
+     * @param heldTime The held time of the wake lock.
+     * @param timesCalled The number of times the wake lock has been called.
+     * @param category The {@link WakeLockCategory} of the wake lock.
      */
-    public void addLastUnpluggedKernelWakeLock(String name, long heldTime, int timesCalled) {
-        mLastUnpluggedKernelWakeLocks.add(new WakeLock(name, heldTime, timesCalled));
+    public void addWakeLock(String name, Integer number, long heldTime, int timesCalled,
+            WakeLockCategory category) {
+        mWakeLocks.add(new WakeLock(name, number, heldTime, timesCalled, category));
     }
 
     /**
-     * Add a wake lock from the last unplugged section of the battery info.
+     * Add a wakelock from the battery info section.
+     *
+     * @param name The name of the wake lock.
+     * @param heldTime The held time of the wake lock.
+     * @param timesCalled The number of times the wake lock has been called.
+     * @param category The {@link WakeLockCategory} of the wake lock.
      */
-    public void addLastUnpluggedWakeLock(String name, int number, long heldTime, int timesCalled) {
-        mLastUnpluggedWakeLocks.add(new WakeLock(name, number, heldTime, timesCalled));
+    public void addWakeLock(String name, long heldTime, int timesCalled,
+            WakeLockCategory category) {
+        addWakeLock(name, null, heldTime, timesCalled, category);
     }
 
     /**
-     * Get the list of kernel wake locks from the last unplugged section of the battery info.
+     * Get a list of {@link WakeLock} objects matching a given {@link WakeLockCategory}.
      */
-    public List<WakeLock> getLastUnpluggedKernelWakeLocks() {
-        return mLastUnpluggedKernelWakeLocks;
-    }
+    public List<WakeLock> getWakeLocks(WakeLockCategory category) {
+        LinkedList<WakeLock> wakeLocks = new LinkedList<WakeLock>();
+        if (category == null) {
+            return wakeLocks;
+        }
 
-    /**
-     * Get the list of wake locks from the last unplugged section of the battery info.
-     */
-    public List<WakeLock> getLastUnpluggedWakeLocks() {
-        return mLastUnpluggedWakeLocks;
+        for (WakeLock wakeLock : mWakeLocks) {
+            if (category.equals(wakeLock.getCategory())) {
+                wakeLocks.add(wakeLock);
+            }
+        }
+        return wakeLocks;
     }
 
     /**
@@ -163,14 +200,8 @@ public class DumpsysBatteryInfoItem implements IItem {
     public JSONObject toJson() {
         JSONObject object = new JSONObject();
         try {
-            JSONArray kernelWakeLocks = new JSONArray();
-            for (WakeLock wakeLock : mLastUnpluggedKernelWakeLocks) {
-                kernelWakeLocks.put(wakeLock.toJson());
-            }
-            object.put(KERNEL_WAKELOCKS, kernelWakeLocks);
-
             JSONArray wakeLocks = new JSONArray();
-            for (WakeLock wakeLock : mLastUnpluggedWakeLocks) {
+            for (WakeLock wakeLock : mWakeLocks) {
                 wakeLocks.put(wakeLock.toJson());
             }
             object.put(WAKELOCKS, wakeLocks);
