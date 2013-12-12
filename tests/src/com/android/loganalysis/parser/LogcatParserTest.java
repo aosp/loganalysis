@@ -431,6 +431,50 @@ public class LogcatParserTest extends TestCase {
     }
 
     /**
+     * Test that events while the device is rebooting are ignored.
+     */
+    public void testParse_reboot() throws ParseException {
+        List<String> lines = Arrays.asList(
+                "04-25 09:15:47.799   123  3082 I ShutdownThread: Rebooting, reason: null",
+                "04-25 09:55:47.799  3064  3082 E AndroidRuntime: java.lang.Exception",
+                "04-25 09:55:47.799  3064  3082 E AndroidRuntime: \tat class.method1(Class.java:1)",
+                "04-25 09:55:47.799  3064  3082 E AndroidRuntime: \tat class.method2(Class.java:2)",
+                "04-25 09:55:47.799  3064  3082 E AndroidRuntime: \tat class.method3(Class.java:3)");
+
+        LogcatItem logcat = new LogcatParser("2012").parse(lines);
+        assertNotNull(logcat);
+        assertEquals(parseTime("2012-04-25 09:15:47.799"), logcat.getStartTime());
+        assertEquals(parseTime("2012-04-25 09:55:47.799"), logcat.getStopTime());
+        assertEquals(0, logcat.getEvents().size());
+    }
+
+    /**
+     * Test that events while the device is rebooting are ignored, but devices after the reboot are
+     * captured.
+     */
+    public void testParse_reboot_resume() throws ParseException {
+        List<String> lines = Arrays.asList(
+                "04-25 09:15:47.799   123  3082 I ShutdownThread: Rebooting, reason: null",
+                "04-25 09:55:47.799  3064  3082 E AndroidRuntime: java.lang.Exception",
+                "04-25 09:55:47.799  3064  3082 E AndroidRuntime: \tat class.method1(Class.java:1)",
+                "04-25 09:55:47.799  3064  3082 E AndroidRuntime: \tat class.method2(Class.java:2)",
+                "04-25 09:55:47.799  3064  3082 E AndroidRuntime: \tat class.method3(Class.java:3)",
+                "logcat interrupted. May see duplicated content in log.--------- beginning of /dev/log/main",
+                "04-25 09:59:47.799  3064  3082 E AndroidRuntime: java.lang.Exception2",
+                "04-25 09:59:47.799  3064  3082 E AndroidRuntime: \tat class.method1(Class.java:1)",
+                "04-25 09:59:47.799  3064  3082 E AndroidRuntime: \tat class.method2(Class.java:2)",
+                "04-25 09:59:47.799  3064  3082 E AndroidRuntime: \tat class.method3(Class.java:3)");
+
+
+        LogcatItem logcat = new LogcatParser("2012").parse(lines);
+        assertNotNull(logcat);
+        assertEquals(parseTime("2012-04-25 09:15:47.799"), logcat.getStartTime());
+        assertEquals(parseTime("2012-04-25 09:59:47.799"), logcat.getStopTime());
+        assertEquals(1, logcat.getEvents().size());
+        assertEquals("java.lang.Exception2", logcat.getJavaCrashes().get(0).getException());
+    }
+
+    /**
      * Test that the time logcat format can be parsed.
      */
     public void testParse_time() throws ParseException {
