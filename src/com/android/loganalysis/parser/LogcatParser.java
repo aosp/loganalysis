@@ -117,6 +117,8 @@ public class LogcatParser implements IParser {
     private Date mStartTime = null;
     private Date mStopTime = null;
 
+    private boolean mIsParsing = true;
+
     /**
      * Constructor for {@link LogcatParser}.
      */
@@ -209,15 +211,27 @@ public class LogcatParser implements IParser {
             tag = tm.group(3);
             pid = Integer.parseInt(tm.group(4));
             msg = tm.group(5);
-        } else {
-            // CLog.w("Failed to parse line '%s'", line);
-            return;
         }
 
-        if (mStartTime == null) {
-            mStartTime = time;
+        if (time != null) {
+            if (mStartTime == null) {
+                mStartTime = time;
+            }
+            mStopTime = time;
         }
-        mStopTime = time;
+
+        // Don't parse any lines after device begins reboot until a new log is detected.
+        if ("I".equals(level) && "ShutdownThread".equals(tag) &&
+                Pattern.matches("Rebooting, reason: .*", msg)) {
+            mIsParsing = false;
+        }
+        if (Pattern.matches(".*--------- beginning of /dev/log/main", line)) {
+            mIsParsing = true;
+        }
+
+        if (!mIsParsing || !(m.matches() || tm.matches())) {
+            return;
+        }
 
         // ANRs are split when START matches a line.  The newest entry is kept in the dataMap
         // for quick lookup while all entries are added to the list.
