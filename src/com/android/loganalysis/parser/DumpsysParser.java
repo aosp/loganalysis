@@ -35,6 +35,7 @@ public class DumpsysParser extends AbstractSectionParser {
      *
      * @return The {@link DumpsysItem}
      */
+    @Override
     public DumpsysItem parse(List<String> lines) {
         setup();
         for (String line : lines) {

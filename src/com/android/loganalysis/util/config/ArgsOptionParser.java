@@ -129,7 +129,6 @@ import java.util.ListIterator;
  */
 //TODO: Use libTF once this is copied over.
 public class ArgsOptionParser extends OptionSetter {
-    private static final String LOG_TAG = "ArgsOptionParser";
 
     static final String SHORT_NAME_PREFIX = "-";
     static final String OPTION_NAME_PREFIX = "--";
