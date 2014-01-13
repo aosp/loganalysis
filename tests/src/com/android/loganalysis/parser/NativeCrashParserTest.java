@@ -176,5 +176,18 @@ public class NativeCrashParserTest extends TestCase {
         assertEquals(2058, nc.getPid().intValue());
         assertEquals(2523, nc.getTid().intValue());
         assertEquals("com.google.android.browser", nc.getApp());
+
+        lines = Arrays.asList(
+                "*** *** *** *** *** *** *** *** *** *** *** *** *** *** *** ***",
+                "Build fingerprint: 'google/soju/crespo:4.0.4/IMM76D/299849:userdebug/test-keys'",
+                "pid: 2058, tid: 2523, name: Atlas Worker #1  >>> com.google.android.browser <<<",
+                "signal 11 (SIGSEGV), code 1 (SEGV_MAPERR), fault addr 00000000");
+
+        nc = new NativeCrashParser().parse(lines);
+        assertNotNull(nc);
+
+        assertEquals(2058, nc.getPid().intValue());
+        assertEquals(2523, nc.getTid().intValue());
+        assertEquals("com.google.android.browser", nc.getApp());
     }
 }

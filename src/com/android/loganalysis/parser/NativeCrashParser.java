@@ -32,7 +32,7 @@ public class NativeCrashParser implements IParser {
     private static final Pattern FINGERPRINT = Pattern.compile("^Build fingerprint: '(.*)'$");
     /** Matches: pid: 957, tid: 963  >>> com.android.camera <<< */
     private static final Pattern APP = Pattern.compile(
-            "^pid: (\\d+), tid: (\\d+)(, name: \\S+)?  >>> (\\S+) <<<$");
+            "^pid: (\\d+), tid: (\\d+)(, name: .+)?  >>> (\\S+) <<<$");
 
 
     /**
