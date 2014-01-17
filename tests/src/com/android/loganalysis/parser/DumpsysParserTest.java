@@ -15,6 +15,7 @@
  */
 package com.android.loganalysis.parser;
 
+import com.android.loganalysis.item.DumpsysBatteryInfoItem.WakeLockCategory;
 import com.android.loganalysis.item.DumpsysItem;
 
 import junit.framework.TestCase;
@@ -36,7 +37,7 @@ public class DumpsysParserTest extends TestCase {
                 "DUMP OF SERVICE process1:",
                 "-------------------------------------------------------------------------------",
                 "DUMP OF SERVICE batteryinfo:",
-                "Statistics since last unplugged:",
+                "Statistics since last charge:",
                 "  Kernel Wake lock \"PowerManagerService.WakeLocks\": 5m 10s 61ms (2 times) realtime",
                 "  Kernel Wake lock \"pm8921_eoc\": 9s 660ms (0 times) realtime",
                 "",
@@ -51,8 +52,10 @@ public class DumpsysParserTest extends TestCase {
         DumpsysItem item = new DumpsysParser().parse(inputBlock);
 
         assertNotNull(item.getBatteryInfo());
-        assertEquals(2, item.getBatteryInfo().getLastUnpluggedWakeLocks().size());
-        assertEquals(2, item.getBatteryInfo().getLastUnpluggedKernelWakeLocks().size());
+        assertEquals(2, item.getBatteryInfo().getWakeLocks(
+                WakeLockCategory.LAST_CHARGE_WAKELOCK).size());
+        assertEquals(2, item.getBatteryInfo().getWakeLocks(
+                WakeLockCategory.LAST_CHARGE_KERNEL_WAKELOCK).size());
     }
 
     /**

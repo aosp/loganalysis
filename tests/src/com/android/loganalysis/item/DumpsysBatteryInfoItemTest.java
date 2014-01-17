@@ -15,6 +15,8 @@
  */
 package com.android.loganalysis.item;
 
+import com.android.loganalysis.item.DumpsysBatteryInfoItem.WakeLockCategory;
+
 import junit.framework.TestCase;
 
 import org.json.JSONArray;
@@ -25,46 +27,42 @@ import org.json.JSONObject;
  * Unit test for {@link DumpsysBatteryInfoItem}.
  */
 public class DumpsysBatteryInfoItemTest extends TestCase {
+    private static final String WAKELOCKS = "WAKELOCKS";
+    private static final String LAST_CHARGE_KERNEL_WAKELOCKS = "LAST_CHARGE_KERNEL_WAKELOCKS";
+    private static final String LAST_UNPLUGGED_WAKELOCKS = "LAST_UNPLUGGED_WAKELOCKS";
+    private static final String LAST_UNPLUGGED_KERNEL_WAKELOCKS = "LAST_UNPLUGGED_KERNEL_WAKELOCKS";
     /**
      * Test that {@link DumpsysBatteryInfoItem#toJson()} returns correctly.
      */
     public void testToJson() throws JSONException {
         DumpsysBatteryInfoItem item = new DumpsysBatteryInfoItem();
-        item.addLastUnpluggedKernelWakeLock("a", 0, 1);
-        item.addLastUnpluggedKernelWakeLock("b", 2, 3);
-        item.addLastUnpluggedWakeLock("x", 4, 5, 6);
-        item.addLastUnpluggedWakeLock("y", 7, 8, 9);
-        item.addLastUnpluggedWakeLock("z", 10, 11, 12);
+        item.addWakeLock("a", 0, 1, WakeLockCategory.LAST_UNPLUGGED_KERNEL_WAKELOCK);
+        item.addWakeLock("b", 2, 3, WakeLockCategory.LAST_UNPLUGGED_KERNEL_WAKELOCK);
+        item.addWakeLock("c", 4, 5, 6, WakeLockCategory.LAST_UNPLUGGED_WAKELOCK);
+        item.addWakeLock("d", 7, 8, 9, WakeLockCategory.LAST_UNPLUGGED_WAKELOCK);
+        item.addWakeLock("e", 10, 11, 12, WakeLockCategory.LAST_UNPLUGGED_WAKELOCK);
+        item.addWakeLock("w", 0, 1, WakeLockCategory.LAST_CHARGE_KERNEL_WAKELOCK);
+        item.addWakeLock("v", 2, 3, WakeLockCategory.LAST_CHARGE_KERNEL_WAKELOCK);
+        item.addWakeLock("x", 4, 5, 6, WakeLockCategory.LAST_CHARGE_WAKELOCK);
+        item.addWakeLock("y", 7, 8, 9, WakeLockCategory.LAST_CHARGE_WAKELOCK);
+        item.addWakeLock("z", 10, 11, 12, WakeLockCategory.LAST_CHARGE_WAKELOCK);
 
         // Convert to JSON string and back again
         JSONObject output = new JSONObject(item.toJson().toString());
 
-        assertTrue(output.has(DumpsysBatteryInfoItem.KERNEL_WAKELOCKS));
-        assertTrue(output.get(DumpsysBatteryInfoItem.KERNEL_WAKELOCKS) instanceof JSONArray);
-        assertTrue(output.has(DumpsysBatteryInfoItem.WAKELOCKS));
-        assertTrue(output.get(DumpsysBatteryInfoItem.WAKELOCKS) instanceof JSONArray);
+        assertTrue(output.has(WAKELOCKS));
+        assertTrue(output.get(WAKELOCKS) instanceof JSONArray);
 
-        JSONArray kernelWakeLocks = output.getJSONArray(DumpsysBatteryInfoItem.KERNEL_WAKELOCKS);
-
-        assertEquals(2, kernelWakeLocks.length());
-        assertTrue(kernelWakeLocks.get(0) instanceof JSONObject);
-
-        JSONObject kernelWakeLock = kernelWakeLocks.getJSONObject(0);
-
-        assertEquals("a", kernelWakeLock.get(DumpsysBatteryInfoItem.WakeLock.NAME));
-        assertFalse(kernelWakeLock.has(DumpsysBatteryInfoItem.WakeLock.NUMBER));
-        assertEquals(0, kernelWakeLock.get(DumpsysBatteryInfoItem.WakeLock.HELD_TIME));
-        assertEquals(1, kernelWakeLock.get(DumpsysBatteryInfoItem.WakeLock.LOCKED_COUNT));
-
-        JSONArray wakeLocks = output.getJSONArray(DumpsysBatteryInfoItem.WAKELOCKS);
-        assertEquals(3, wakeLocks.length());
+        JSONArray wakeLocks = output.getJSONArray(WAKELOCKS);
+        assertEquals(10, wakeLocks.length());
         assertTrue(wakeLocks.get(0) instanceof JSONObject);
 
         JSONObject wakeLock = wakeLocks.getJSONObject(0);
-
-        assertEquals("x", wakeLock.get(DumpsysBatteryInfoItem.WakeLock.NAME));
-        assertEquals(4, wakeLock.get(DumpsysBatteryInfoItem.WakeLock.NUMBER));
-        assertEquals(5, wakeLock.get(DumpsysBatteryInfoItem.WakeLock.HELD_TIME));
-        assertEquals(6, wakeLock.get(DumpsysBatteryInfoItem.WakeLock.LOCKED_COUNT));
+        assertEquals("a", wakeLock.get(DumpsysBatteryInfoItem.WakeLock.NAME));
+        assertFalse(wakeLock.has(DumpsysBatteryInfoItem.WakeLock.NUMBER));
+        assertEquals(0, wakeLock.get(DumpsysBatteryInfoItem.WakeLock.HELD_TIME));
+        assertEquals(1, wakeLock.get(DumpsysBatteryInfoItem.WakeLock.LOCKED_COUNT));
+        assertEquals(WakeLockCategory.LAST_UNPLUGGED_KERNEL_WAKELOCK.toString(),
+                wakeLock.get(DumpsysBatteryInfoItem.WakeLock.CATEGORY));
     }
 }
