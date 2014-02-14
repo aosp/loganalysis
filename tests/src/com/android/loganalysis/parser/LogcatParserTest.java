@@ -27,6 +27,7 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * Unit tests for {@link LogcatParserTest}.
@@ -494,6 +495,77 @@ public class LogcatParserTest extends TestCase {
         assertNull(logcat.getJavaCrashes().get(0).getTid());
         assertEquals(parseTime("2012-04-25 09:55:47.799"),
                 logcat.getJavaCrashes().get(0).getEventTime());
+    }
+
+    /**
+     * Test that we can add and find custom patterns that match based on logcat Tags only.
+     */
+    public void testAddPattern_byTagOnly() {
+        List<String> lines = Arrays.asList(
+                "04-25 18:33:28.273  7813  7813 E HelloTag: Hello everyone!!!1",
+                "04-25 18:33:29.273   395   637 I Watchdog: find me!",
+                "04-25 18:33:39.273   395   637 W Watchdog: find me!");
+
+        LogcatParser parser = new LogcatParser("2012");
+        assertNotNull(parser);
+        parser.addPattern(null, null, "HelloTag", "HelloCategory");
+        parser.addPattern(null, null, "Watchdog", "WatchdogCategory");
+        LogcatItem logcat = parser.parse(lines);
+        assertNotNull(logcat);
+
+        /* verify that we find the HelloTag entry */
+        List<MiscLogcatItem> matchedEvents = logcat.getMiscEvents("HelloCategory");
+        assertEquals(1, matchedEvents.size());
+        assertEquals("HelloTag", matchedEvents.get(0).getTag());
+
+        /* verify that we find both Watchdog entries */
+        matchedEvents = logcat.getMiscEvents("WatchdogCategory");
+        assertEquals(2, matchedEvents.size());
+        assertEquals("Watchdog", matchedEvents.get(0).getTag());
+    }
+
+    /**
+     * Test that we can add and find custom patterns that match based on Level AND Tag.
+     */
+    public void testAddPattern_byLevelAndTagOnly() {
+        List<String> lines = Arrays.asList(
+                "04-25 18:33:28.273  7813  7813 E HelloTag: GetBufferLock timed out for thread 7813 buffer 0x61 usage 0x200 LockState 1",
+                "04-25 18:33:29.273   395   637 I Watchdog: Info",
+                "04-25 18:33:29.273   395   637 W Watchdog: Warning");
+
+        LogcatParser parser = new LogcatParser("2012");
+        assertNotNull(parser);
+        parser.addPattern(null, "I", "Watchdog", "WatchdogCategory");
+        LogcatItem logcat = parser.parse(lines);
+        assertNotNull(logcat);
+
+        List<MiscLogcatItem> matchedEvents = logcat.getMiscEvents("WatchdogCategory");
+        assertEquals(1, matchedEvents.size());
+        assertEquals("Watchdog", matchedEvents.get(0).getTag());
+        assertEquals("Info", matchedEvents.get(0).getStack());
+    }
+
+    /**
+     * Test that we can add and find custom patterns that match based on Level, Tag, AND Message.
+     */
+    public void testAddPattern_byLevelTagAndMessageOnly() {
+        List<String> lines = Arrays.asList(
+                "04-25 18:33:29.273   395   637 W Watchdog: I'm the one you need to find!",
+                "04-25 18:33:29.273   395   637 W Watchdog: my message doesn't match.",
+                "04-25 18:33:29.273   395   637 I Watchdog: my Level doesn't match, try and find me!",
+                "04-25 18:33:29.273   395   637 W NotMe: my Tag doesn't match, try and find me!");
+
+        LogcatParser parser = new LogcatParser("2012");
+        assertNotNull(parser);
+        parser.addPattern(Pattern.compile(".*find*."), "W", "Watchdog", "WatchdogCategory");
+        LogcatItem logcat = parser.parse(lines);
+        assertNotNull(logcat);
+
+        /* verify that we find the only entry that matches based on Level, Tag, AND Message */
+        List<MiscLogcatItem> matchedEvents = logcat.getMiscEvents("WatchdogCategory");
+        assertEquals(1, matchedEvents.size());
+        assertEquals("Watchdog", matchedEvents.get(0).getTag());
+        assertEquals("I'm the one you need to find!", matchedEvents.get(0).getStack());
     }
 
     /**

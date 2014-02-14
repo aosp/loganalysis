@@ -33,6 +33,8 @@ public class MiscLogcatItem extends GenericItem {
     /** Constant for JSON output */
     public static final String APP = "APP";
     /** Constant for JSON output */
+    public static final String TAG = "TAG";
+    /** Constant for JSON output */
     public static final String LAST_PREAMBLE = "LAST_PREAMBLE";
     /** Constant for JSON output */
     public static final String PROCESS_PREAMBLE = "PROCESS_PREAMBLE";
@@ -42,7 +44,7 @@ public class MiscLogcatItem extends GenericItem {
     public static final String STACK = "STACK";
 
     private static final Set<String> ATTRIBUTES = new HashSet<String>(Arrays.asList(
-            EVENT_TIME, PID, TID, APP, LAST_PREAMBLE, PROCESS_PREAMBLE, CATEGORY, STACK));
+            EVENT_TIME, PID, TID, APP, TAG, LAST_PREAMBLE, PROCESS_PREAMBLE, CATEGORY, STACK));
 
     /**
      * Constructor for {@link MiscLogcatItem}.
@@ -114,6 +116,20 @@ public class MiscLogcatItem extends GenericItem {
      */
     public void setApp(String app) {
         setAttribute(APP, app);
+    }
+
+    /**
+     * Get the tag of the event.
+     */
+    public String getTag() {
+        return (String) getAttribute(TAG);
+    }
+
+    /**
+     * Set the tag of the event.
+     */
+    public void setTag(String tag) {
+        setAttribute(TAG, tag);
     }
 
     /**

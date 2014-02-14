@@ -266,7 +266,7 @@ public class LogcatParser implements IParser {
         }
 
         // Check the message here but add it in commit()
-        if (mPatternUtil.checkMessage(msg) != null) {
+        if (mPatternUtil.checkMessage(msg, new ExtrasPattern(level, tag)) != null) {
             LogcatData data = new LogcatData(pid, tid, time, level, tag,
                     mPreambleUtil.getLastTail(), mPreambleUtil.getIdTail(pid));
             data.mLines.add(msg);
@@ -319,7 +319,8 @@ public class LogcatParser implements IParser {
                 item = new NativeCrashParser().parse(data.mLines);
             } else {
                 String msg = ArrayUtil.join("\n", data.mLines);
-                String category = mPatternUtil.checkMessage(msg);
+                String category = mPatternUtil.checkMessage(msg, new ExtrasPattern(
+                        data.mLevel, data.mTag));
                 if (category != null) {
                     MiscLogcatItem logcatItem = new MiscLogcatItem();
                     logcatItem.setCategory(category);
@@ -335,6 +336,7 @@ public class LogcatParser implements IParser {
                 }
                 item.setLastPreamble(data.mLastPreamble);
                 item.setProcessPreamble(data.mProcPreamble);
+                item.setTag(data.mTag);
                 mLogcat.addEvent(item);
             }
         }
@@ -389,5 +391,58 @@ public class LogcatParser implements IParser {
         // Runtime restarts
         mPatternUtil.addPattern(Pattern.compile("\\*\\*\\* WATCHDOG KILLING SYSTEM PROCESS.*"),
                 RUNTIME_RESTART);
+    }
+
+    /**
+     * Adds a custom, more complex pattern to LogcatParser for parsing out of logcat events.
+     * Any matched events are then assigned to the category name provided, and can be grabbed
+     * via LogcatParser's .getMiscEvents("yourCustomCategoryName") method.
+     * Considers null messages, levels, or tags to be wildcards.
+     *
+     * @param pattern The regex representing the pattern to match for, or null for wildcard.
+     * @param level The name of the level to match for, or null for wildcard.
+     * @param tag The name of the tag to match for, or null for wildcard.
+     * @param category Assign any matching logcat events to this category name, for later retrieval
+     */
+    public void addPattern(Pattern pattern, String level, String tag, String category) {
+        /* count null message as wildcard */
+        if (pattern == null) {
+            pattern = Pattern.compile(".*");
+        }
+        mPatternUtil.addPattern(pattern, new ExtrasPattern(level, tag), category);
+    }
+
+    /**
+     * Used internally for bundling up extra pattern criteria for more advanced pattern matching.
+     */
+    private class ExtrasPattern {
+        public String mLevel;
+        public String mTag;
+
+        public ExtrasPattern(String level, String tag) {
+            mLevel = level;
+            mTag = tag;
+        }
+
+        /**
+         * Override Object.equals to match based on the level & tag patterns,
+         * while also counting null level & tag patterns as wildcards.
+         *
+         * @param otherObj the object we're matching the level & tag patterns to.
+         * @return true if otherObj's extras match, false otherwise
+         */
+        @Override
+        public boolean equals(Object otherObj) {
+            if (otherObj instanceof ExtrasPattern) {
+                // Treat objects as equal only if the obj's level and tag match.
+                // Treat null as a wildcard.
+                ExtrasPattern other = (ExtrasPattern) otherObj;
+                if ((mLevel == null || other.mLevel == null || mLevel.equals(other.mLevel)) &&
+                        (mTag == null || other.mTag == null || mTag.equals(other.mTag))) {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 }
