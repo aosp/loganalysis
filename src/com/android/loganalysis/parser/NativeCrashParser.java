@@ -27,7 +27,7 @@ import java.util.regex.Pattern;
 public class NativeCrashParser implements IParser {
 
     /** Matches: *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** */
-    private static final Pattern START = Pattern.compile("^(?:\\*\\*\\* ){15}\\*\\*\\*$");
+    public static final Pattern START = Pattern.compile("^(?:\\*\\*\\* ){15}\\*\\*\\*$");
     /** Matches: Build fingerprint: 'fingerprint' */
     private static final Pattern FINGERPRINT = Pattern.compile("^Build fingerprint: '(.*)'$");
     /** Matches: pid: 957, tid: 963  >>> com.android.camera <<< */

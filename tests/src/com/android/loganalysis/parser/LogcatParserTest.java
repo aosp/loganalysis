@@ -226,6 +226,34 @@ public class LogcatParserTest extends TestCase {
                 logcat.getNativeCrashes().get(0).getEventTime());
     }
 
+    /**
+     * Test that native crashes can be parsed if they have the same pid/tid.
+     */
+    public void testParse_native_crash_same_pid() throws ParseException {
+        List<String> lines = Arrays.asList(
+                "04-25 18:33:27.273   115   115 I DEBUG   : *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** ***",
+                "04-25 18:33:27.273   115   115 I DEBUG   : Build fingerprint: 'product:build:target'",
+                "04-25 18:33:27.273   115   115 I DEBUG   : pid: 3112, tid: 3112  >>> com.google.android.browser <<<",
+                "04-25 18:33:27.273   115   115 I DEBUG   : signal 11 (SIGSEGV), code 1 (SEGV_MAPERR), fault addr 00000000",
+                "04-25 18:33:27.273   115   115 I DEBUG   : *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** ***",
+                "04-25 18:33:27.273   115   115 I DEBUG   : Build fingerprint: 'product:build:target'",
+                "04-25 18:33:27.273   115   115 I DEBUG   : pid: 3113, tid: 3113  >>> com.google.android.browser2 <<<",
+                "04-25 18:33:27.273   115   115 I DEBUG   : signal 11 (SIGSEGV), code 1 (SEGV_MAPERR), fault addr 00000000");
+
+        LogcatItem logcat = new LogcatParser("2012").parse(lines);
+        assertNotNull(logcat);
+        assertEquals(parseTime("2012-04-25 18:33:27.273"), logcat.getStartTime());
+        assertEquals(parseTime("2012-04-25 18:33:27.273"), logcat.getStopTime());
+        assertEquals(2, logcat.getEvents().size());
+        assertEquals(2, logcat.getNativeCrashes().size());
+        assertEquals(3112, logcat.getNativeCrashes().get(0).getPid().intValue());
+        assertEquals(3112, logcat.getNativeCrashes().get(0).getTid().intValue());
+        assertEquals("com.google.android.browser", logcat.getNativeCrashes().get(0).getApp());
+        assertEquals(3113, logcat.getNativeCrashes().get(1).getPid().intValue());
+        assertEquals(3113, logcat.getNativeCrashes().get(1).getTid().intValue());
+        assertEquals("com.google.android.browser2", logcat.getNativeCrashes().get(1).getApp());
+    }
+
     public void testParse_misc_events() throws ParseException {
         List<String> lines = Arrays.asList(
                 "04-25 18:33:27.273  1676  1821 W AudioTrack: obtainBuffer timed out (is the CPU pegged?) 0x361378 user=0000116a, server=00000000",

@@ -233,8 +233,9 @@ public class LogcatParser implements IParser {
             return;
         }
 
-        // ANRs are split when START matches a line.  The newest entry is kept in the dataMap
-        // for quick lookup while all entries are added to the list.
+        // ANRs are separated either by different PID/TIDs or when AnrParser.START matches a line.
+        // The newest entry is kept in the dataMap for quick lookup while all entries are added to
+        // the list.
         if ("E".equals(level) && "ActivityManager".equals(tag)) {
             String key = encodeLine(pid, tid, level, tag);
             LogcatData data;
@@ -249,9 +250,25 @@ public class LogcatParser implements IParser {
             data.mLines.add(msg);
         }
 
-        // PID and TID are enough to separate Java and native crashes.
-        if (("E".equals(level) && "AndroidRuntime".equals(tag)) ||
-                ("I".equals(level) && "DEBUG".equals(tag))) {
+        // Native crashes are separated either by different PID/TIDs or when NativeCrashParser.START
+        // matches a line.  The newest entry is kept in the dataMap for quick lookup while all
+        // entries are added to the list.
+        if ("I".equals(level) && "DEBUG".equals(tag)) {
+            String key = encodeLine(pid, tid, level, tag);
+            LogcatData data;
+            if (!mDataMap.containsKey(key) || NativeCrashParser.START.matcher(msg).matches()) {
+                data = new LogcatData(pid, tid, time, level, tag, mPreambleUtil.getLastTail(),
+                        mPreambleUtil.getIdTail(pid));
+                mDataMap.put(key, data);
+                mDataList.add(data);
+            } else {
+                data = mDataMap.get(key);
+            }
+            data.mLines.add(msg);
+        }
+
+        // PID and TID are enough to separate Java crashes.
+        if (("E".equals(level) && "AndroidRuntime".equals(tag))) {
             String key = encodeLine(pid, tid, level, tag);
             LogcatData data;
             if (!mDataMap.containsKey(key)) {
