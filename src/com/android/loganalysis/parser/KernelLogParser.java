@@ -40,7 +40,7 @@ public class KernelLogParser implements IParser {
      * Matches: &lt;3&gt;[     0.000000] Message
      */
     private static final Pattern LOG_LINE = Pattern.compile(
-            "^(<\\d+>)?\\[\\s*(\\d+.\\d{6})\\] (.*)$");
+            "^(<\\d+>)?\\[\\s*(\\d+\\.\\d{6})\\] (.*)$");
     private static final Pattern SELINUX_DENIAL_PATTERN = Pattern.compile(
             ".*avc:\\s.*scontext=\\w*:\\w*:([\\w\\s]*):\\w*\\s.*");
 
