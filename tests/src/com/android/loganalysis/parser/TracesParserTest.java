@@ -104,4 +104,64 @@ public class TracesParserTest extends TestCase {
         assertEquals("com.android.package", traces.getApp());
         assertEquals(ArrayUtil.join("\n", expectedStack), traces.getStack());
     }
+
+    /**
+     * Test that both forms of cmd line match for the trace.
+     */
+    public void testTracesParser_cmdline() {
+        List<String> expectedStack = Arrays.asList(
+                "\"main\" prio=5 tid=1 SUSPENDED",
+                "  | group=\"main\" sCount=1 dsCount=0 obj=0x00000001 self=0x00000001",
+                "  | sysTid=2887 nice=0 sched=0/0 cgrp=foreground handle=0000000001",
+                "  | schedstat=( 0 0 0 ) utm=5954 stm=1017 core=0",
+                "  at class.method1(Class.java:1)",
+                "  at class.method2(Class.java:2)",
+                "  at class.method2(Class.java:2)");
+
+        List<String> lines = Arrays.asList(
+                "",
+                "",
+                "----- pid 2887 at 2012-05-02 16:43:41 -----",
+                "Cmd line: com.android.package",
+                "",
+                "DALVIK THREADS:",
+                "(mutexes: tll=0 tsl=0 tscl=0 ghl=0)",
+                "",
+                "\"main\" prio=5 tid=1 SUSPENDED",
+                "  | group=\"main\" sCount=1 dsCount=0 obj=0x00000001 self=0x00000001",
+                "  | sysTid=2887 nice=0 sched=0/0 cgrp=foreground handle=0000000001",
+                "  | schedstat=( 0 0 0 ) utm=5954 stm=1017 core=0",
+                "  at class.method1(Class.java:1)",
+                "  at class.method2(Class.java:2)",
+                "  at class.method2(Class.java:2)",
+                "");
+
+        TracesItem traces = new TracesParser().parse(lines);
+        assertEquals(2887, traces.getPid().intValue());
+        assertEquals("com.android.package", traces.getApp());
+        assertEquals(ArrayUtil.join("\n", expectedStack), traces.getStack());
+
+        lines = Arrays.asList(
+                "",
+                "",
+                "----- pid 2887 at 2012-05-02 16:43:41 -----",
+                "Cmdline: com.android.package                                            Original command line: <unset>",
+                "",
+                "DALVIK THREADS:",
+                "(mutexes: tll=0 tsl=0 tscl=0 ghl=0)",
+                "",
+                "\"main\" prio=5 tid=1 SUSPENDED",
+                "  | group=\"main\" sCount=1 dsCount=0 obj=0x00000001 self=0x00000001",
+                "  | sysTid=2887 nice=0 sched=0/0 cgrp=foreground handle=0000000001",
+                "  | schedstat=( 0 0 0 ) utm=5954 stm=1017 core=0",
+                "  at class.method1(Class.java:1)",
+                "  at class.method2(Class.java:2)",
+                "  at class.method2(Class.java:2)",
+                "");
+
+        traces = new TracesParser().parse(lines);
+        assertEquals(2887, traces.getPid().intValue());
+        assertEquals("com.android.package", traces.getApp());
+        assertEquals(ArrayUtil.join("\n", expectedStack), traces.getStack());
+    }
 }

@@ -39,7 +39,7 @@ public class TracesParser implements IParser {
     /**
      * Matches: Cmd line: APP
      */
-    private static final Pattern APP = Pattern.compile("^Cmd line: (\\S+)$");
+    private static final Pattern APP = Pattern.compile("^Cmd ?line: (\\S+).*$");
 
     /**
      * Matches: "main" prio=5 tid=1 STATE
