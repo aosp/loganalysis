@@ -49,7 +49,7 @@ public class KernelLogParser implements IParser {
     private Double mStopTime = null;
 
     private LogPatternUtil mPatternUtil = new LogPatternUtil();
-    private LogTailUtil mPreambleUtil = new LogTailUtil();
+    private LogTailUtil mPreambleUtil = new LogTailUtil(500, 50, 50);
 
     public KernelLogParser() {
         initPatterns();
