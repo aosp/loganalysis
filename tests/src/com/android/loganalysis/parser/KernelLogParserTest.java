@@ -198,4 +198,18 @@ public class KernelLogParserTest extends TestCase {
         assertEquals(KernelLogParser.SELINUX_DENIAL, selinuxItem.getCategory());
         assertEquals(SELINUX_DENIAL_STACK, selinuxItem.getStack());
     }
+
+    public void testMantaReset() {
+        final List<String> lines = Arrays.asList("[ 3281.347296] ---fimc_is_ischain_close(0)",
+                "[ 3281.432055] fimc_is_scalerc_video_close",
+                "[ 3281.432270] fimc_is_scalerp_video_close",
+                "[ 3287.688303] wm8994-codec wm8994-codec: FIFO error",
+                "",
+                "No errors detected",
+                "Last reset was system watchdog timer reset (RST_STAT=0x100000)");
+
+        KernelLogItem kernelLog = new KernelLogParser().parse(lines);
+        assertEquals(1, kernelLog.getEvents().size());
+        assertEquals(1, kernelLog.getMiscEvents(KernelLogParser.KERNEL_RESET).size());
+    }
 }

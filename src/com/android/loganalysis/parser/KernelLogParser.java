@@ -171,7 +171,7 @@ public class KernelLogParser implements IParser {
             "\\[MODEM_IF\\].*CRASH.*",
             "Last boot reason: (?:kernel_panic|rpm_err|hw_reset(?:$|\n)|wdog_.*|" +
             "tz_err|adsp_err|modem_err|mba_err|watchdogr?|Watchdog|Panic)",
-            "Last reset was system watchdog timer reset",
+            "Last reset was system watchdog timer reset.*",
         };
         for (String pattern : kernelResets) {
             mPatternUtil.addPattern(Pattern.compile(pattern), KERNEL_RESET);
