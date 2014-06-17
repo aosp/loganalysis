@@ -79,6 +79,12 @@ public class LogcatParser implements IParser {
     private static final Pattern JAVA_CRASH_PROCESS_PID = Pattern.compile(
             "^(Process: (\\S+), )?PID: (\\d+)$");
 
+
+    /**
+     * Match a line thats printed when a non app java process starts.
+     */
+    private static final Pattern JAVA_PROC_START = Pattern.compile("Calling main entry (.+)");
+
     /**
      * Class for storing logcat meta data for a particular grouped list of lines.
      */
@@ -118,6 +124,8 @@ public class LogcatParser implements IParser {
     private Date mStopTime = null;
 
     private boolean mIsParsing = true;
+
+    private Map<Integer, String> mPids = new HashMap<Integer, String>();
 
     /**
      * Constructor for {@link LogcatParser}.
@@ -233,6 +241,14 @@ public class LogcatParser implements IParser {
             return;
         }
 
+
+        // When a non app java process starts add its pid to the map
+        Matcher pidMatcher = JAVA_PROC_START.matcher(msg);
+        if (pidMatcher.matches()) {
+            String name = pidMatcher.group(1);
+            mPids.put(pid, name);
+        }
+
         // ANRs are separated either by different PID/TIDs or when AnrParser.START matches a line.
         // The newest entry is kept in the dataMap for quick lookup while all entries are added to
         // the list.
@@ -321,7 +337,10 @@ public class LogcatParser implements IParser {
                     }
                     m = SYSTEM_SERVER_CRASH.matcher(line);
                     if (m.matches()) {
-                        app = "system_server";
+                        app = mPids.get(data.mPid);
+                        if (app == null) {
+                            app = "system_server";
+                        }
                         data.mLines = data.mLines.subList(i + 1, data.mLines.size());
                         break;
                     }

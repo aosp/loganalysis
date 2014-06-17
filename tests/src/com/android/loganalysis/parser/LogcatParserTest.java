@@ -15,6 +15,7 @@
  */
 package com.android.loganalysis.parser;
 
+import com.android.loganalysis.item.JavaCrashItem;
 import com.android.loganalysis.item.LogcatItem;
 import com.android.loganalysis.item.MiscLogcatItem;
 import com.android.loganalysis.util.ArrayUtil;
@@ -594,6 +595,26 @@ public class LogcatParserTest extends TestCase {
         assertEquals(1, matchedEvents.size());
         assertEquals("Watchdog", matchedEvents.get(0).getTag());
         assertEquals("I'm the one you need to find!", matchedEvents.get(0).getStack());
+    }
+
+    public void testFatalException() {
+        List<String> lines = Arrays.asList(
+                "06-05 06:14:51.529  1712  1712 D AndroidRuntime: Calling main entry com.android.commands.input.Input",
+                "06-05 06:14:51.709  1712  1712 E AndroidRuntime: *** FATAL EXCEPTION IN SYSTEM PROCESS: main",
+                "06-05 06:14:51.709  1712  1712 E AndroidRuntime: java.lang.NullPointerException",
+                "06-05 06:14:51.709  1712  1712 E AndroidRuntime: \tat android.hardware.input.InputManager.injectInputEvent(InputManager.java:641)",
+                "06-05 06:14:51.709  1712  1712 E AndroidRuntime: \tat com.android.commands.input.Input.injectKeyEvent(Input.java:233)",
+                "06-05 06:14:51.709  1712  1712 E AndroidRuntime: \tat com.android.commands.input.Input.sendKeyEvent(Input.java:184)",
+                "06-05 06:14:51.709  1712  1712 E AndroidRuntime: \tat com.android.commands.input.Input.run(Input.java:96)",
+                "06-05 06:14:51.709  1712  1712 E AndroidRuntime: \tat com.android.commands.input.Input.main(Input.java:59)",
+                "06-05 06:14:51.709  1712  1712 E AndroidRuntime: \tat com.android.internal.os.RuntimeInit.nativeFinishInit(Native Method)",
+                "06-05 06:14:51.709  1712  1712 E AndroidRuntime: \tat com.android.internal.os.RuntimeInit.main(RuntimeInit.java:243)",
+                "06-05 06:14:51.709  1712  1712 E AndroidRuntime: \tat dalvik.system.NativeStart.main(Native Method)");
+        LogcatParser parser = new LogcatParser("2014");
+        LogcatItem logcat = parser.parse(lines);
+        assertEquals(1, logcat.getJavaCrashes().size());
+        JavaCrashItem crash = logcat.getJavaCrashes().get(0);
+        assertEquals("com.android.commands.input.Input", crash.getApp());
     }
 
     /**
