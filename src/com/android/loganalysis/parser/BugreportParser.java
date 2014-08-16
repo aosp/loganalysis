@@ -17,11 +17,13 @@ package com.android.loganalysis.parser;
 
 import com.android.loganalysis.item.AnrItem;
 import com.android.loganalysis.item.BugreportItem;
+import com.android.loganalysis.item.BugreportItem.CommandLineItem;
 import com.android.loganalysis.item.DumpsysItem;
 import com.android.loganalysis.item.IItem;
 import com.android.loganalysis.item.KernelLogItem;
 import com.android.loganalysis.item.LogcatItem;
 import com.android.loganalysis.item.MemInfoItem;
+import com.android.loganalysis.item.MiscKernelLogItem;
 import com.android.loganalysis.item.MiscLogcatItem;
 import com.android.loganalysis.item.ProcrankItem;
 import com.android.loganalysis.item.SystemPropsItem;
@@ -55,11 +57,19 @@ public class BugreportParser extends AbstractSectionParser {
     private static final String DUMPSYS_SECTION_REGEX = "------ DUMPSYS .*";
     private static final String NOOP_SECTION_REGEX = "------ .*";
 
+    private static final String BOOTREASON = "androidboot.bootreason";
+
     /**
      * Matches: == dumpstate: 2012-04-26 12:13:14
      */
     private static final Pattern DATE = Pattern.compile(
             "^== dumpstate: (\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2})$");
+
+    /**
+     * Matches: Command line: key=value key=value
+     */
+    private static final Pattern COMMAND_LINE = Pattern.compile(
+            "Command line:((\\s+[^\\s=]+=[^\\s]*)*)\\s*");
 
     private IParser mBugreportParser = new IParser() {
         @Override
@@ -72,6 +82,18 @@ public class BugreportParser extends AbstractSectionParser {
                 Matcher m = DATE.matcher(line);
                 if (m.matches()) {
                     bugreport.setTime(parseTime(m.group(1)));
+                }
+                m = COMMAND_LINE.matcher(line);
+                if (m.matches()) {
+                    String argString = m.group(1).trim();
+                    if (!argString.isEmpty()) {
+                        String[] pairs = argString.split("\\s+");
+                        for (String pair : pairs) {
+                            System.out.println(pair);
+                            String[] keyValue = pair.split("=", 2);
+                            mCommandLine.put(keyValue[0], keyValue[1]);
+                        }
+                    }
                 }
             }
             return bugreport;
@@ -88,6 +110,7 @@ public class BugreportParser extends AbstractSectionParser {
     private DumpsysParser mDumpsysParser = new DumpsysParser();
 
     private BugreportItem mBugreport = null;
+    private CommandLineItem mCommandLine = new CommandLineItem();
 
     private boolean mParsedInput = false;
 
@@ -164,6 +187,7 @@ public class BugreportParser extends AbstractSectionParser {
         }
 
         if (mBugreport != null) {
+            mBugreport.setCommandLine(mCommandLine);
             mBugreport.setMemInfo((MemInfoItem) getSection(mMemInfoParser));
             mBugreport.setProcrank((ProcrankItem) getSection(mProcrankParser));
             mBugreport.setTop((TopItem) getSection(mTopParser));
@@ -189,7 +213,20 @@ public class BugreportParser extends AbstractSectionParser {
                     mBugreport.getSystemLog() != null) {
                 addAnrTrace(mBugreport.getSystemLog().getAnrs(), traces.getApp(),
                         traces.getStack());
+            }
 
+            if (mCommandLine.containsKey(BOOTREASON)) {
+                String bootreason = mCommandLine.get(BOOTREASON);
+                Matcher m = KernelLogParser.BAD_BOOTREASONS.matcher(bootreason);
+                if (m.matches()) {
+                    if (mBugreport.getLastKmsg() == null) {
+                        mBugreport.setLastKmsg(new KernelLogItem());
+                    }
+                    MiscKernelLogItem item = new MiscKernelLogItem();
+                    item.setStack("Last boot reason: " + bootreason.trim());
+                    item.setCategory(KernelLogParser.KERNEL_RESET);
+                    mBugreport.getLastKmsg().addEvent(item);
+                }
             }
         }
     }

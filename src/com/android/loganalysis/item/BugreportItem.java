@@ -28,6 +28,8 @@ public class BugreportItem extends GenericItem {
     /** Constant for JSON output */
     public static final String TIME = "TIME";
     /** Constant for JSON output */
+    public static final String COMMAND_LINE = "COMMAND_LINE";
+    /** Constant for JSON output */
     public static final String MEM_INFO = "MEM_INFO";
     /** Constant for JSON output */
     public static final String PROCRANK = "PROCRANK";
@@ -45,8 +47,10 @@ public class BugreportItem extends GenericItem {
     public static final String DUMPSYS = "DUMPSYS";
 
     private static final Set<String> ATTRIBUTES = new HashSet<String>(Arrays.asList(
-            TIME, MEM_INFO, PROCRANK, TOP, KERNEL_LOG, LAST_KMSG, SYSTEM_LOG, SYSTEM_PROPS,
-            DUMPSYS));
+            TIME, COMMAND_LINE, MEM_INFO, PROCRANK, TOP, KERNEL_LOG, LAST_KMSG, SYSTEM_LOG,
+            SYSTEM_PROPS, DUMPSYS));
+
+    public static class CommandLineItem extends GenericMapItem<String> {}
 
     /**
      * The constructor for {@link BugreportItem}.
@@ -67,6 +71,20 @@ public class BugreportItem extends GenericItem {
      */
     public void setTime(Date time) {
         setAttribute(TIME, time);
+    }
+
+    /**
+     * Get the {@link CommandLineItem} of the bugreport.
+     */
+    public CommandLineItem getCommandLine() {
+        return (CommandLineItem) getAttribute(COMMAND_LINE);
+    }
+
+    /**
+     * Set the {@link CommandLineItem} of the bugreport.
+     */
+    public void setCommandLine(CommandLineItem commandLine) {
+        setAttribute(COMMAND_LINE, commandLine);
     }
 
     /**

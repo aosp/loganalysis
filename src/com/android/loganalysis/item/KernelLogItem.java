@@ -15,6 +15,8 @@
  */
 package com.android.loganalysis.item;
 
+import com.android.loganalysis.parser.KernelLogParser;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -91,6 +93,11 @@ public class KernelLogItem extends GenericItem {
      * Add an {@link MiscKernelLogItem} event to the end of the list of events.
      */
     public void addEvent(MiscKernelLogItem event) {
+        // Only take the first kernel reset
+        if (KernelLogParser.KERNEL_RESET.equals(event.getCategory()) &&
+                !getMiscEvents(KernelLogParser.KERNEL_RESET).isEmpty()) {
+            return;
+        }
         ((ItemList) getAttribute(EVENTS)).add(event);
     }
 

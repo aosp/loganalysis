@@ -212,4 +212,30 @@ public class KernelLogParserTest extends TestCase {
         assertEquals(1, kernelLog.getEvents().size());
         assertEquals(1, kernelLog.getMiscEvents(KernelLogParser.KERNEL_RESET).size());
     }
+
+    /**
+     * Test that only the first kernel reset is taken but other signatures can have multiple
+     */
+    public void testMultipleKernelResets() {
+        final String SELINUX_DENIAL_STACK = "type=1400 audit(1384544483.730:10): avc:  denied  " +
+                "{ getattr } for  pid=797 comm=\"Binder_5\" path=\"/dev/pts/1\" + " +
+                "dev=devpts ino=4 scontext=u:r:system_server:s0 " +
+                "tcontext=u:object_r:devpts:s0 tclass=chr_file";
+        final List<String> lines = Arrays.asList(
+                "[ 0.000000] Kernel panic",
+                "[ 0.000000] Internal error:",
+                "[ 0.000000] " + SELINUX_DENIAL_STACK,
+                "[ 1.000000] Kernel panic",
+                "[ 1.000000] Internal error:",
+                "[ 1.000000] " + SELINUX_DENIAL_STACK,
+                "[ 2.000000] Kernel panic",
+                "[ 2.000000] Internal error:",
+                "[ 2.000000] " + SELINUX_DENIAL_STACK);
+
+        KernelLogItem kernelLog = new KernelLogParser().parse(lines);
+        assertEquals(7, kernelLog.getEvents().size());
+        assertEquals(1, kernelLog.getMiscEvents(KernelLogParser.KERNEL_RESET).size());
+        assertEquals(0.0,
+                kernelLog.getMiscEvents(KernelLogParser.KERNEL_RESET).get(0).getEventTime());
+    }
 }

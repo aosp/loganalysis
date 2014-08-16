@@ -44,6 +44,13 @@ public class KernelLogParser implements IParser {
     private static final Pattern SELINUX_DENIAL_PATTERN = Pattern.compile(
             ".*avc:\\s.*scontext=\\w*:\\w*:([\\w\\s]*):\\w*\\s.*");
 
+    /**
+     * Regular expression representing all known bootreasons which are bad.
+     */
+    public static final Pattern BAD_BOOTREASONS = Pattern.compile(
+            "(?:kernel_panic|rpm_err|hw_reset(?:$|\\n)|wdog_.*|tz_err|adsp_err|modem_err|mba_err|"
+            + "watchdogr?|Watchdog|Panic|srto:.*)");
+
     private KernelLogItem mKernelLog = null;
     private Double mStartTime = null;
     private Double mStopTime = null;
@@ -161,16 +168,17 @@ public class KernelLogParser implements IParser {
             "smem: DIAG.*",
             "smsm: AMSS FATAL ERROR.*",
             "kernel BUG at .*",
+            "BUG: failure at .*",
             "PVR_K:\\(Fatal\\): Debug assertion failed! \\[.*\\]",
             "Kernel panic.*",
+            "Unable to handle kernel paging request.*",
             "BP panicked",
             "WROTE DSP RAMDUMP",
             "tegra_wdt: last reset due to watchdog timeout.*",
             "tegra_wdt tegra_wdt.0: last reset is due to watchdog timeout.*",
             "Last reset was MPU Watchdog Timer reset.*",
             "\\[MODEM_IF\\].*CRASH.*",
-            "Last boot reason: (?:kernel_panic|rpm_err|hw_reset(?:$|\n)|wdog_.*|" +
-            "tz_err|adsp_err|modem_err|mba_err|watchdogr?|Watchdog|Panic)",
+            "Last boot reason: " + BAD_BOOTREASONS,
             "Last reset was system watchdog timer reset.*",
         };
         for (String pattern : kernelResets) {

@@ -92,7 +92,7 @@ public class BugreportParserTest extends TestCase {
                 "",
                 "------ LAST KMSG (/proc/last_kmsg) ------",
                 "[    0.000000] Initializing cgroup subsys cpu",
-                "[   16.203491] benight message",
+                "[   16.203491] benign message",
                 "",
                 "------ SECTION ------",
                 "",
@@ -180,6 +180,83 @@ public class BugreportParserTest extends TestCase {
         assertNotNull(bugreport.getSystemLog());
         assertEquals(parseTime("1999-01-01 01:02:03.000"), bugreport.getSystemLog().getStartTime());
         assertEquals(parseTime("1999-01-01 01:02:04.000"), bugreport.getSystemLog().getStopTime());
+    }
+
+    /**
+     * Test that the command line is parsed
+     */
+    public void testParse_command_line() {
+        List<String> lines = Arrays.asList("Command line:");
+        BugreportItem bugreport = new BugreportParser().parse(lines);
+        assertTrue(bugreport.getCommandLine().isEmpty());
+
+        lines = Arrays.asList("Command line: key=value");
+        bugreport = new BugreportParser().parse(lines);
+        assertEquals(1, bugreport.getCommandLine().size());
+        assertEquals("value", bugreport.getCommandLine().get("key"));
+
+        lines = Arrays.asList("Command line: key1=value1 key2=value2");
+        bugreport = new BugreportParser().parse(lines);
+        assertEquals(2, bugreport.getCommandLine().size());
+        assertEquals("value1", bugreport.getCommandLine().get("key1"));
+        assertEquals("value2", bugreport.getCommandLine().get("key2"));
+
+        // Test a bad strings
+        lines = Arrays.asList("Command line:   key1=value=withequals  key2=  ");
+        bugreport = new BugreportParser().parse(lines);
+        assertEquals(2, bugreport.getCommandLine().size());
+        assertEquals("value=withequals", bugreport.getCommandLine().get("key1"));
+        assertEquals("", bugreport.getCommandLine().get("key2"));
+
+        lines = Arrays.asList("Command line:   key1=value=withequals  key2=  key3");
+        bugreport = new BugreportParser().parse(lines);
+        assertTrue(bugreport.getCommandLine().isEmpty());
+    }
+
+    /**
+     * Test
+     */
+    public void testParse_bootreason_good() {
+        List<String> lines = Arrays.asList(
+                "========================================================",
+                "== dumpstate: 1999-01-01 02:03:04",
+                "========================================================",
+                "Command line: androidboot.bootreason=reboot",
+                "");
+        BugreportItem bugreport = new BugreportParser().parse(lines);
+        assertNull(bugreport.getLastKmsg());
+    }
+
+    public void testParse_bootreason_bad() {
+        List<String> lines = Arrays.asList(
+                "========================================================",
+                "== dumpstate: 1999-01-01 02:03:04",
+                "========================================================",
+                "Command line: androidboot.bootreason=hw_reset",
+                "");
+        BugreportItem bugreport = new BugreportParser().parse(lines);
+        assertNotNull(bugreport.getLastKmsg());
+        assertEquals(1, bugreport.getLastKmsg().getEvents().size());
+        assertEquals("Last boot reason: hw_reset",
+                bugreport.getLastKmsg().getEvents().get(0).getStack());
+        assertEquals("KERNEL_RESET", bugreport.getLastKmsg().getEvents().get(0).getCategory());
+    }
+
+    public void testParse_bootreason_duplicate() {
+        List<String> lines = Arrays.asList(
+                "========================================================",
+                "== dumpstate: 1999-01-01 02:03:04",
+                "========================================================",
+                "Command line: androidboot.bootreason=hw_reset",
+                "------ LAST KMSG (/proc/last_kmsg) ------",
+                "[    0.000000] Initializing cgroup subsys cpu",
+                "[   16.203491] Kernel panic",
+                "");
+        BugreportItem bugreport = new BugreportParser().parse(lines);
+        assertNotNull(bugreport.getLastKmsg());
+        assertEquals(1, bugreport.getLastKmsg().getEvents().size());
+        assertEquals("Kernel panic", bugreport.getLastKmsg().getEvents().get(0).getStack());
+        assertEquals("KERNEL_RESET", bugreport.getLastKmsg().getEvents().get(0).getCategory());
     }
 
     /**
