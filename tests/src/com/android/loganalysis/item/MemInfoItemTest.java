@@ -30,8 +30,8 @@ public class MemInfoItemTest extends TestCase {
      */
     public void testToJson() throws JSONException {
         MemInfoItem item = new MemInfoItem();
-        item.put("foo", 123);
-        item.put("bar", 456);
+        item.put("foo", 123l);
+        item.put("bar", 456l);
         item.setText("foo: 123 kB\nbar: 456 kB");
 
         // Convert to JSON string and back again

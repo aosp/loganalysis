@@ -22,7 +22,7 @@ import org.json.JSONObject;
  * An {@link IItem} used to store the memory info output.
  */
 @SuppressWarnings("serial")
-public class MemInfoItem extends GenericMapItem<Integer> {
+public class MemInfoItem extends GenericMapItem<Long> {
 
     /** Constant for JSON output */
     public static final String LINES = "LINES";

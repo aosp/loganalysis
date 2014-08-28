@@ -37,16 +37,20 @@ public class MemInfoParserTest extends TestCase {
                 "MemFree:           65420 kB",
                 "Buffers:           20800 kB",
                 "Cached:            86204 kB",
-                "SwapCached:            0 kB");
+                "SwapCached:            0 kB",
+                "Long:           34359640152 kB",
+                "ExtraLongIgnore: 12345678901234567890 kB");
 
         MemInfoItem item = new MemInfoParser().parse(inputBlock);
 
-        assertEquals(5, item.size());
-        assertEquals((Integer)353332, item.get("MemTotal"));
-        assertEquals((Integer)65420, item.get("MemFree"));
-        assertEquals((Integer)20800, item.get("Buffers"));
-        assertEquals((Integer)86204, item.get("Cached"));
-        assertEquals((Integer)0, item.get("SwapCached"));
+        assertEquals(6, item.size());
+        assertEquals((Long)353332l, item.get("MemTotal"));
+        assertEquals((Long)65420l, item.get("MemFree"));
+        assertEquals((Long)20800l, item.get("Buffers"));
+        assertEquals((Long)86204l, item.get("Cached"));
+        assertEquals((Long)0l, item.get("SwapCached"));
+        assertEquals((Long)34359640152l, item.get("Long"));
+        assertNull(item.get("ExtraLongIgnore"));
         assertEquals(ArrayUtil.join("\n", inputBlock), item.getText());
     }
 

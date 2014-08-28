@@ -49,8 +49,12 @@ public class MemInfoParser implements IParser {
             Matcher m = INFO_LINE.matcher(line);
             if (m.matches()) {
                 String key = m.group(1);
-                Integer value = Integer.parseInt(m.group(2));
-                item.put(key, value);
+                try {
+                    Long value = Long.parseLong(m.group(2));
+                    item.put(key, value);
+                } catch (NumberFormatException e) {
+                    // Ignore
+                }
             }
         }
 
